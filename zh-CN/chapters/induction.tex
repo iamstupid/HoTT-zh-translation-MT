@@ -1,35 +1,1394 @@
 % 第5章 归纳 / Chapter 5: Induction
-% 翻译状态：未开始
-% 译者：
+% 翻译状态：进行中
+% 译者：MT (机器翻译)
 % 审校：
+\label{cha:induction}
 
-% TODO: 翻译 induction.tex
-% 原文件位置: ../induction.tex
+在\cref{cha:typetheory}中，我们介绍了许多从旧类型构造新类型的方式。
+除了（依赖）函数类型和宇宙之外，所有这些规则都是\emph{归纳定义}\index{定义!归纳}\index{归纳!定义}的一般概念的特例。
+在本章中，我们将更一般地研究归纳定义。
 
-% ============================================
-% 占位符节标签 (翻译时替换为完整内容)
-% ============================================
 
-\section{正类型简介}
-\label{sec:strictly-positive}
+\section{归纳类型简介}
+\label{sec:bool-nat}
 
-\section{W-类型的唯一性}
+\index{类型!归纳|(}%
+\index{生成!类型的, 归纳|(}
+\emph{归纳类型} $X$ 可以直观地理解为由某个有限的\emph{构造子}集合``自由生成''的类型，每个构造子都是一个（具有若干参数的）以 $X$ 为陪域的函数。
+这包括零参数的函数，即 $X$ 的元素。
+
+在描述一个特定的归纳类型时，我们用项目符号列出其构造子。
+例如，\cref{sec:type-booleans}中的类型 \bool 是由以下构造子归纳生成的：
+\begin{itemize}
+\item $\bfalse:\bool$
+\item $\btrue:\bool$
+\end{itemize}
+类似地，$\unit$ 由以下构造子归纳生成：
+\begin{itemize}
+\item $\ttt:\unit$
+\end{itemize}
+而 $\emptyt$ 则不由任何构造子生成。
+一个构造子函数取参数的例子是余积 $A+B$，它由两个构造子生成：
+\begin{itemize}
+\item $\inl:A\to A+B$
+\item $\inr:B\to A+B$
+\end{itemize}
+一个取多个参数的构造子的例子是笛卡尔积 $A\times B$，它由一个构造子生成：
+\begin{itemize}
+\item $\pairr{\blank, \blank} : A\to B \to A\times B$
+\end{itemize}
+至关重要的是，我们还允许归纳类型的构造子从正在定义的归纳类型中取参数。
+例如，自然数类型 $\nat$ 有以下构造子：
+\begin{itemize}
+\item $0:\nat$
+\item $\suc:\nat\to\nat$
+\end{itemize}
+\symlabel{lst}
+\index{类型!列表}%
+\indexsee{列表}{列表类型}%
+另一个有用的例子是某类型 $A$ 的元素的有限列表类型 $\lst A$，它有以下构造子：
+\begin{itemize}\label{list_constructors}
+\item $\nil:\lst A$
+\item $\cons:A\to \lst A \to \lst A$
+\end{itemize}
+
+\index{自由!归纳类型的生成}%
+直观地，我们应该将归纳类型理解为由其构造子\emph{自由生成的}。
+也就是说，归纳类型的元素恰好是从无到有并反复应用构造子所能得到的。
+（我们将在\cref{sec:identity-systems,cha:hits}中看到，对于更一般的归纳定义，这种理解需要稍作修改，但目前这已足够。）
+例如，在 \bool 的情况下，我们应该期望仅有的元素是 $\bfalse$ 和 $\btrue$。
+类似地，在 \nat 的情况下，我们应该期望每个元素要么是 $0$，要么是通过对某个``先前构造的''自然数应用 $\suc$ 得到的。
+
+\index{归纳原理}%
+然而，我们不是直接断言这样的性质，而是通过\emph{归纳原理}来表达它们，归纳原理也称为\emph{（依赖）消去规则}。
+我们已经在\cref{cha:typetheory}中见过这些原理。
+例如，\bool 的归纳原理是：
+%
+\begin{itemize}
+\item 当证明一个关于 \bool 的\emph{所有}居留者的陈述 $E : \bool \to \type$ 时，只需对 $\bfalse$ 和 $\btrue$ 分别证明即可，即给出证明 $e_0 : E(\bfalse)$ 和 $e_1 : E(\btrue)$。
+\end{itemize}
+
+此外，由此得到的证明 $\ind\bool(E,e_0,e_1): \prd{b : \bool}E(b)$ 在应用于构造子 $\bfalse$ 和 $\btrue$ 时表现如预期；这一原理由\emph{计算规则}\index{计算规则!布尔类型的}表达：
+\begin{itemize}
+\item 我们有 $\ind\bool(E,e_0,e_1,\bfalse) \jdeq e_0$。
+\item 我们有 $\ind\bool(E,e_0,e_1,\btrue) \jdeq e_1$。
+\end{itemize}
+
+\index{情况分析}%
+因此，布尔类型 $\bool$ 的归纳原理允许我们通过\emph{情况分析}进行推理。
+由于两个构造子都不取任何参数，这对于布尔类型来说已经足够了。
+
+\index{自然数}%
+然而，对于自然数，情况分析通常是不够的：在对应于归纳步骤 $\suc(n)$ 的情况中，我们还想假设待证陈述已经对 $n$ 成立。
+这给出了以下归纳原理：
+\begin{itemize}
+\item 当证明一个关于\emph{所有}自然数的陈述 $E : \nat \to \type$ 时，只需对 $0$ 和 $\suc(n)$（假设它对 $n$ 成立）分别证明即可，即我们构造 $e_z : E(0)$ 和 $e_s : \prd{n : \nat} E(n) \to E(\suc(n))$。
+\end{itemize}
+与布尔类型的情况一样，我们也有函数 $\ind\nat(E,e_z,e_s) : \prd{x:\nat} E(x)$ 相应的计算规则：
+\index{计算规则!自然数的}%
+\begin{itemize}
+\item $\ind\nat(E,e_z,e_s,0) \jdeq e_z$。
+\item $\ind\nat(E,e_z,e_s,\suc(n)) \jdeq e_s(n,\ind\nat(E,e_z,e_s,n))$，对任意 $n : \nat$。
+\end{itemize}
+依赖函数 $\ind\nat(E,e_z,e_s)$ 因此可以理解为通过参数 $x : \nat$ 递归定义的，其中我们称函数 $e_z$ 和 $e_s$ 为\define{递推式}\indexdef{递推式}。
+当 $x$ 为零\index{零}时，函数简单地返回 $e_z$。
+当 $x$ 是另一个自然数 $n$ 的后继\index{后继}时，结果由取递推式 $e_s$ 并代入具体的前驱\index{前驱} $n$ 和递归调用值 $\ind\nat(E,e_z,e_s,n)$ 得到。
+
+以上所有例子的归纳原理都有这种家族相似性。
+在\cref{sec:strictly-positive}中，我们将讨论``归纳定义''的一般概念以及如何为其推导出适当的\emph{归纳原理}，但首先我们研究归纳定义之间的各种共同点。
+
+\index{递归原理}%
+例如，我们在\cref{cha:typetheory}的每种情况中都曾提到，从归纳原理可以推导出\emph{递归原理}，其中陪域是一个简单类型（而非一个族）。
+归纳原理和递归原理可能看起来很奇怪，因为它们只给出了函数的\emph{存在性}而似乎没有唯一地刻画它。
+然而，事实上归纳原理的强度足以证明其自身的\emph{唯一性原理}\index{唯一性!原理, 命题!对 $\nat$ 上函数的}，如下面的定理所示。
+
+\begin{thm}\label{thm:nat-uniq}
+设 $f,g : \prd{x:\nat} E(x)$ 是两个满足递推式
+%
+\begin{equation*}
+  e_z : E(0)
+  \qquad\text{和}\qquad
+  e_s : \prd{n : \nat} E(n) \to E(\suc(n))
+\end{equation*}
+%
+达到命题相等的函数，即满足
+\begin{equation*}
+  \id{f(0)}{e_z}
+  \qquad\text{和}\qquad
+  \id{g(0)}{e_z}
+\end{equation*}
+以及
+\begin{gather*}
+  \prd{n : \nat} \id{f(\suc(n))}{e_s(n, f(n))},\\
+  \prd{n : \nat} \id{g(\suc(n))}{e_s(n, g(n))}。
+\end{gather*}
+则 $f$ 和 $g$ 相等。
+\end{thm}
+
+\begin{proof}
+我们对类型族 $D(x) \defeq \id{f(x)}{g(x)}$ 使用归纳。对于基础情况，我们有
+\[ f(0) = e_z = g(0)。 \]
+对于归纳情况，假设 $n : \nat$ 使得 $f(n) = g(n)$。则
+\[ f(\suc(n)) = e_s(n, f(n)) = e_s(n, g(n)) = g(\suc(n))。 \]
+第一个和最后一个等式由 $f$ 和 $g$ 的假设条件得出。中间的等式由归纳假设和函数应用保持等式的事实得出。这给出了 $f$ 和 $g$ 之间的逐点相等；调用函数外延性完成证明。
+\end{proof}
+
+注意唯一性原理甚至适用于仅\emph{达到命题相等}（即路径）满足递推式的函数。
+当然，由归纳原理得到的特定函数判断地\index{判断相等}满足这些递推式；我们将在\cref{sec:htpy-inductive}中回到这一点。
+另一方面，定理本身只断言了函数之间的命题相等（另见\cref{ex:same-recurrence-not-defeq}）。
+从同伦论的观点来看，自然要问这条路径是否\emph{相干}，即等式 $f=g$ 是否在高阶路径下唯一；在\cref{sec:initial-alg}中我们将看到这确实是事实。
+
+当然，类似的函数唯一性定理通常也可以为其他归纳类型陈述和证明。
+在下一节中，我们展示这种唯一性性质与泛等性结合如何意味着像自然数这样的归纳类型完全由其引入规则、消去规则和计算规则所刻画。
+
+\index{类型!归纳|)}%
+\index{生成!类型的, 归纳|)}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{归纳类型的唯一性}
+\label{sec:appetizer-univalence}
+
+\index{唯一性!相等类型的}%
+我们将``自然数''定义为具有特定归纳生成元 $0$ 和 $\suc$ 的特定类型 \nat。
+然而，根据前一节描述的类型论中归纳定义的一般原理，没有什么能阻止我们以完全相同的方式定义\emph{另一个}类型。
+\index{自然数!同构定义}
+也就是说，假设我们令 $\natp$ 为由以下构造子生成的归纳类型：
+\begin{itemize}
+\item $\zerop:\natp$
+\item $\sucp:\natp\to\natp$
+\end{itemize}
+则 $\natp$ 将具有与 $\nat$ 看起来相同的归纳原理和递归原理。
+当为这些``新''自然数的所有元素证明陈述 $E : \natp \to \type$ 时，只需给出证明 $e_z : E(\zerop)$ 和 \narrowequation{e_s : \prd{n : \natp} E(n) \to E(\sucp(n))} 即可。
+函数 $\rec\natp(E,e_z,e_s) : \prd{n:\natp} E(n)$ 有以下计算规则：
+\begin{itemize}
+\item $\rec\natp(E,e_z,e_s,\zerop) \jdeq e_z$，
+\item $\rec\natp(E,e_z,e_s,\sucp(n)) \jdeq e_s(n,\rec\natp(E,e_z,e_s,n))$，对任意 $n : \natp$。
+\end{itemize}
+但 $\nat$ 和 $\natp$ 之间是什么关系？
+
+这不仅仅是一个学术问题，因为``看起来像''自然数的结构可以在许多其他地方找到。
+\index{类型!列表}%
+例如，我们可以将自然数与单元素类型上的列表等同（这可能是最古老的表示，可以在洞穴壁画\index{洞穴, 壁画}上找到），与非负整数等同，与有理数和实数的子集等同，等等。
+从编程\index{编程}的角度来看，我们自然数的``一元''表示非常低效，所以有时我们可能更喜欢使用二进制表示。
+我们希望能够将这些``自然数''的所有版本相互等同，以便将构造和结果从一个版本转移到另一个版本。
+
+当然，如果两个版本的自然数满足相同的归纳原理，那么它们具有相同的诱导结构。
+例如，回顾\cref{sec:inductive-types}中定义的函数 $\dbl$。通过复制和添加撇号，可以很容易地为我们的新自然数定义一个类似的函数：
+\[ \dblp \defeq \rec\natp(\natp, \; \zerop, \;  \lamu{n:\natp}{m:\natp} \sucp(\sucp(m)))。 \]
+看起来很简单，但它有一个明显的缺点，即导致大量重复。不仅函数需要复制，而且所有引理及其证明也需要复制。例如，一个简单的结果如 $\prd{n : \nat} \dbl(\suc(n))=\suc(\suc(\dbl(n)))$ 及其归纳证明也必须``加撇''。
+
+在传统数学中，人们只是宣称 $\nat$ 和 $\natp$ 显然是``相同的''，可以在需要时相互替换。
+这通常是没有问题的，但它掩盖了相当多的细节，拉大了非形式数学和其精确描述之间的差距。
+在同伦类型论中，我们可以做得更好。
+
+首先观察到我们有以下可定义的映射：
+\begin{itemize}
+\item $f \defeq \rec\nat(\natp, \; \zerop, \;  \lamu{n:\nat} \sucp)
+       : \nat \to\natp$，
+\item $g \defeq \rec\natp(\nat, \; 0, \;  \lamu{n:\natp} \suc)
+       : \natp \to\nat$。
+\end{itemize}
+由于 $g$ 和 $f$ 的复合满足与 $\nat$ 上的恒等函数相同的递推式，\cref{thm:nat-uniq}给出 $\prd{n : \nat} \id{g(f(n))}{n}$，同一定理的``加撇''版本给出 $\prd{n : \natp} \id{f(g(n))}{n}$。
+因此，$f$ 和 $g$ 是拟逆，从而 $\eqv{\nat}{\natp}$。
+我们现在可以沿着这个等价直接将 $\nat$ 上的函数转移到 $\natp$ 上（反之亦然），例如
+\[ \dblp \defeq \lamu{n:\natp} f(\dbl(g(n)))。 \]
+容易验证这个版本的 $\dblp$ 等于之前的版本。
+
+当然，这没有什么令人惊讶的；这样的同构正是数学家想象的``等同'' $\nat$ 和 $\natp$ 的方式。
+然而，跨同构``转移''的机制取决于被转移的东西；它并不总是像对单个函数用 $f$ 和 $g$ 进行前置和后置复合那么简单。
+例如，考虑一个简单的引理如
+\[\prd{n : \natp} \dblp(\sucp(n))=\sucp(\sucp(\dblp(n)))。\]
+插入正确的 $f$ 和 $g$ 仅比直接对 $n:\natp$ 用归纳重新证明稍微容易一点。
+\index{同构!跨越传递}%
+
+\index{泛等公理}%
+这就是泛等公理发挥作用的地方：由于 $\eqv{\nat}{\natp}$，我们也有 $\id[\type]{\nat}{\natp}$，即 $\nat$ 和 $\natp$ 作为类型是\emph{相等的}。
+现在相等类型的归纳原理保证了任何与 $\nat$ 相关的构造或证明都可以以同样的方式自动转移到 $\natp$。
+我们只需将函数或定理的类型视为一个类型索引的类型族 $P:\type\to\type$，给定的对象是 $P(\nat)$ 的一个元素，然后沿路径 $\id \nat\natp$ 传输。
+这涉及相当少的开销。
+
+为简单起见，我们在两个具有\emph{完全相同}定义的类型 \nat 和 \natp 的情况下描述了这种方法。
+然而，实践中更常见的情况是定义不是字面上相同的，但一个归纳原理蕴含另一个。
+\index{类型!单位}%
+\index{自然数!编码为 $\lst\unit$}%
+例如，考虑单元素类型上的列表类型 $\lst\unit$，它由以下生成：
+\begin{itemize}
+\item 一个元素 $\nil:\lst\unit$，和
+\item 一个函数 $\cons:\unit \times \lst\unit \to\lst\unit$。
+\end{itemize}
+这与 \nat 的定义不同，也不会产生相同的归纳原理。
+$\lst\unit$ 的归纳原理说，对于任意 $E:\lst\unit\to\type$ 以及递推数据 $e_\nil:E(\nil)$ 和 $e_\cons : \prd{u:\unit}{\ell:\lst\unit} E(\ell) \to E(\cons(u,\ell))$，存在 $f:\prd{\ell:\lst\unit} E(\ell)$ 使得 $f(\nil)\jdeq e_\nil$ 且 $f(\cons(u,\ell))\jdeq e_\cons(u,\ell,f(\ell))$。
+（我们将在\cref{sec:strictly-positive}中看到如何推导归纳定义的归纳原理。）
+
+现在假设我们定义 $0'' \defeq \nil: \lst\unit$，以及 $\suc'':\lst\unit\to\lst\unit$ 为 $\suc''(\ell) \defeq \cons(\ttt,\ell)$。
+则对于任意 $E:\lst\unit\to\type$ 以及 $e_0:E(0'')$ 和 $e_s:\prd{\ell:\lst\unit} E(\ell) \to E(\suc''(\ell))$，我们可以定义
+\begin{align*}
+  e_\nil &\defeq e_0\\
+  e_\cons(\ttt,\ell,x) &\defeq e_s(\ell,x)。
+\end{align*}
+（在 $e_\cons$ 的定义中，我们使用 \unit 的归纳原理假设 $u$ 是 $\ttt$。）
+现在我们可以应用 $\lst\unit$ 的归纳原理，得到 $f:\prd{\ell:\lst\unit} E(\ell)$ 使得
+\begin{gather*}
+  f(0'') \jdeq f(\nil) \jdeq e_\nil \jdeq e_0\\
+  f(\suc''(\ell)) \jdeq f(\cons(\ttt,\ell)) \jdeq e_\cons(\ttt,\ell,f(\ell)) \jdeq e_s(\ell,f(\ell))。
+\end{gather*}
+因此，$\lst\unit$ 满足与 $\nat$ 相同的归纳原理，从而（通过上述相同的论证）与它相等。
+
+最后，这些结论不仅限于自然数：它们适用于任何归纳类型。
+如果我们有一个归纳定义的类型 $W$，以及另一个满足与 $W$ 相同归纳原理的类型 $W'$，则 $\eqv{W}{W'}$，从而 $W=W'$。
+我们分别使用 $W$ 和 $W'$ 的推导递归原理来构造映射 $W\to W'$ 和 $W'\to W$，然后使用各自的归纳原理来证明两个复合都等于恒等映射。
+例如，在\cref{cha:typetheory}中我们看到余积 $A+B$ 也可以定义为 $\sm{x:\bool} \rec{\bool}(\UU,A,B,x)$。
+后一个类型满足与前者相同的归纳原理；因此它们典范等价。
+
+这当然与范畴论中熟悉的事实非常相似：如果两个对象具有相同的\emph{泛性质}，则它们是等价的。
+在\cref{sec:initial-alg}中，我们将看到归纳类型实际上确实具有泛性质，因此这是那个一般原理的一个体现。
+\index{泛性质}
+
+
+\section{$\w$-类型}
 \label{sec:w-types}
 
-\section{自然数}
-\label{sec:inductive-naturals}
+归纳类型非常一般，这对它们的有用性和适用性来说非常好，但使它们难以作为一个整体来研究。
+幸运的是，它们都可以被形式地归约为几个特殊情况。
+讨论这种归约超出了本书的范围——这对于在实践中使用类型论的数学家来说也是无关紧要的——但我们将花一点时间讨论我们尚未遇到的一个基本特例。
+这就是 Martin-L{\"o}f 的\emph{$\w$-类型}，也称为\emph{良基树}的类型。
+\index{树, 良基}%
+$\w$-类型是自然数、列表和二叉树等类型的推广，它足够一般以封装\emph{任何}归纳类型的``递归''方面。
 
-\section{归纳原则的等价}
-\label{sec:equiv-induction}
+一个特定的 $\w$-类型由给定两个参数 $A : \type$ 和 $B : A \to \type$ 来指定，此时得到的 $\w$-类型写作 $\wtype{a:A} B(a)$。
+类型 $A$ 表示 $\wtype{a :A} B(a)$ 的\emph{标签}类型，它们的功能类似于构造子（然而，我们保留这个词用于归纳定义中实际出现的函数）。例如，当把自然数定义为 $\w$-类型时，%
+\index{自然数!编码为 $\w$-类型}
+类型 $A$ 将是类型 $\bool$，由两个元素 $\bfalse$ 和 $\btrue$ 居留，因为恰好有两种方式获得自然数——要么是零，要么是另一个自然数的后继。
 
-\section{函子化与自然性}
-\label{sec:functorality}
+类型族 $B : A \to \type$ 用于记录标签的元数\index{元数}：标签 $a : A$ 将取一族归纳参数，由 $B(a)$ 索引。因此我们可以把 $a$ 的参数想象成``$B(a)$-多个''。这些参数由函数 $f : B(a) \to \wtype{a :A} B(a)$ 表示，理解为对于任意 $b : B(a)$，$f(b)$ 是标签 $a$ 的``第 $b$ 个''参数。$\w$-类型 $\wtype{a :A} B(a)$ 因此可以被认为是良基树的类型，其中节点由 $A$ 的元素标记，每个标记为 $a : A$ 的节点有 $B(a)$-多个分支。
 
-\section{高阶归纳类型的一般化}
+在自然数的情况下，标签 $\bfalse$ 的元数为 0，因为它构造常数零\index{零}；标签 $\btrue$ 的元数为 1，因为它构造其参数的后继\index{后继}。我们可以通过使用 $\bool$ 上的简单消去来定义一个函数 $\rec\bool(\bbU,\emptyt,\unit)$ 进入类型宇宙来捕获这一点；这个函数对 $\bfalse$ 返回空类型 $\emptyt$，对 $\btrue$ 返回单位\index{类型!单位}类型 $\unit$。我们因此可以定义
+\symlabel{natw}
+\index{类型!单位}%
+\index{类型!空}%
+\[ \natw \defeq \wtype{b:\bool} \rec\bool(\bbU,\emptyt,\unit,b) \]
+其中上标 $\mathbf{w}$ 用于区分这个版本的自然数与之前使用的版本。
+类似地，我们可以将 $A$ 上的列表类型\index{类型!列表}定义为具有 $\unit + A$ 多个标签的 $\w$-类型：一个用于空列表的零元标签，加上每个 $a : A$ 对应的一个一元标签，对应于将 $a$ 追加到列表头部：
+\[ \lst A \defeq \wtype{x: \unit + A} \rec{\unit + A}(\bbU, \; \emptyt, \; \lamu{a:A} \unit,\; x)。 \]
+%
+\index{W-类型@$\w$-类型}%
+\indexsee{类型!W-@$\w$-}{$\w$-类型}%
+一般地，由 $A : \type$ 和 $B : A \to \type$ 指定的 $\w$-类型 $\wtype{x:A} B(x)$ 是由以下构造子生成的归纳类型：
+\begin{itemize}
+\item \label{defn:supp}
+  $\supp : \prd{a:A} \Big(B(a) \to \wtype{x:A} B(x)\Big) \to \wtype{x:A} B(x)$。
+\end{itemize}
+%
+构造子 $\supp$（supremum\index{上确界!$\w$-类型的构造子}的缩写）取一个标签 $a : A$ 和一个表示 $a$ 的参数的函数 $f : B(a) \to \wtype{x:A} B(x)$，并构造 $\wtype{x:A} B(x)$ 的一个新元素。使用我们之前将自然数编码为 $\w$-类型的方式，我们可以例如定义
+\begin{equation*}
+\zerow \defeq \supp(\bfalse, \; \lamu{x:\emptyt} \rec\emptyt(\natw,x))。
+\end{equation*}
+换句话说，我们使用标签 $\bfalse$ 来构造 $\zerow$。然后，$\rec\bool(\bbU,\emptyt,\unit, \bfalse)$ 求值为 $\emptyt$，这是应该的，因为 $\bfalse$ 是一个零元标签。因此，我们需要构造一个函数 $f : \emptyt \to \natw$，它表示提供给 $\bfalse$ 的（零个）参数。这当然是平凡的，使用 $\emptyt$ 上的简单消去如上所示。类似地，我们可以定义 $1^{\mathbf{w}}$ 和后继函数 $\sucw$
+\begin{align*}
+1^{\mathbf{w}} &\defeq \supp(\btrue, \; \lamu{x:\unit} 0^{\mathbf{w}}) \\
+\sucw&\defeq \lamu{n:\natw} \supp(\btrue, \; \lamu{x:\unit} n)。
+\end{align*}
+
+
+\index{归纳原理!$\w$-类型的}%
+我们有以下 $\w$-类型的归纳原理：
+\begin{itemize}
+\item 当证明一个关于 $\w$-类型 $\wtype{x:A} B(x)$ 的\emph{所有}元素的陈述 $E : \big(\wtype{x:A} B(x)\big) \to \type$ 时，只需对 $\supp(a,f)$ 证明它，假设它对所有 $b : B(a)$ 的 $f(b)$ 成立。
+换句话说，只需给出一个证明
+\begin{equation*}
+e : \prd{a:A}{f : B(a) \to \wtype{x:A} B(x)}{g : \prd{b : B(a)} E(f(b))} E(\supp(a,f))
+\end{equation*}
+\end{itemize}
+
+\index{变量}%
+变量 $g$ 表示我们的归纳假设，即 $a$ 的所有参数都满足 $E$。为陈述这一点，我们对 $B(a)$ 类型的所有元素量化，因为每个 $b : B(a)$ 对应 $a$ 的一个参数 $f(b)$。
+
+我们如何为编码为 $\w$-类型的自然数定义函数 $\dbl$？我们想使用 $\natw$ 的递归原理，陪域为 $\natw$ 本身。因此我们需要构造一个合适的函数
+\[e : \prd{a : \bool}{f : B(a) \to \natw}{g : B(a) \to \natw} \natw\]
+它将表示 $\dbl$ 函数的递推式；为简洁起见，我们将类型族 $\rec\bool(\bbU,\emptyt,\unit)$ 记为 $B$。
+
+显然，$e$ 将是一个以 $a : \bool$ 为其第一个参数的函数。下一步是对 $a$ 进行情况分析，根据它是 $\bfalse$ 还是 $\btrue$ 来继续。这建议以下形式
+\[ e \defeq \lamu{a:\bool} \ind\bool(C,e_0,e_1,a) \]
+其中
+\[C \defeq \lamu{a:\bool} \prd{f : B(a) \to \natw}{g : B(a) \to \natw} \natw。\]
+如果 $a$ 是 $\bfalse$，类型 $B(a)$ 变成 $\emptyt$。因此，给定 $f : \emptyt \to \natw$ 和 $g : \emptyt \to \natw$，我们想构造 $\natw$ 的一个元素。由于标签 $\bfalse$ 表示 $\emptyt$，它不需要归纳参数，变量 $f$ 和 $g$ 是无关的。我们返回 $\zerow$\index{零}作为结果：
+\[ e_0 \defeq \lamu{f:\emptyt \to \natw}{g:\emptyt \to \natw} \zerow。 \]
+类似地，如果 $a$ 是 $\btrue$，类型 $B(a)$ 变成 $\unit$。
+由于标签 $\btrue$ 表示后继\index{后继}运算符，它需要一个归纳参数——前驱\index{前驱}——由变量 $f : \unit \to \natw$ 表示。
+在前驱上递归调用的值由变量 $g : \unit \to \natw$ 表示。
+因此，取这个值（即 $g(\ttt)$）并应用后继函数两次得到所需的结果：
+\begin{equation*}
+e_1 \defeq \; \lamu{f:\unit \to \natw}{g:\unit \to \natw} \sucw(\sucw(g(\ttt)))。
+\end{equation*}
+综合起来，我们因此有
+\[ \dbl \defeq \rec\natw(\natw, e) \]
+其中 $e$ 如上定义。
+
+\symlabel{defn:recursor-wtype}
+函数 $\rec{\wtype{x:A} B(x)}(E,e) : \prd{w : \wtype{x:A} B(x)} E(w)$ 相应的计算规则如下。
+\index{计算规则!$\w$-类型的}%
+\begin{itemize}
+\item
+  对任意 $a : A$ 和 $f : B(a) \to \wtype{x:A} B(x)$，我们有
+  \begin{equation*}
+    \rec{\wtype{x:A} B(x)}(E,e,\supp(a,f)) \jdeq
+    e(a,f,\big(\lamu{b:B(a)} \rec{\wtype{x:A} B(x)}(E,e,f(b))\big))。
+  \end{equation*}
+\end{itemize}
+换句话说，函数 $\rec{\wtype{x:A} B(x)}(E,e)$ 满足递推式 $e$。
+
+根据上述计算规则，函数 $\dbl$ 表现如预期：
+\begin{align*}
+\dbl(\zerow) & \jdeq \rec\natw(\natw, e, \supp(\bfalse, \; \lamu{x:\emptyt} \rec\emptyt(\natw,x))) \\
+& \jdeq e(\bfalse, \big(\lamu{x:\emptyt} \rec\emptyt(\natw,x)\big),
+   \big(\lamu{x:\emptyt} \dbl(\rec\emptyt(\natw,x))\big)) \\
+ & \jdeq e_0(\big(\lamu{x:\emptyt} \rec\emptyt(\natw,x)\big), \big(\lamu{x:\emptyt} \dbl(\rec\emptyt(\natw,x))\big))\\
+ & \jdeq \zerow \\
+ \intertext{以及}
+\dbl(1^{\mathbf{w}}) & \jdeq \rec\natw(\natw, e, \supp(\btrue, \; \lamu{x:\unit} \zerow)) \\
+& \jdeq e(\btrue, \big(\lamu{x:\unit} \zerow\big), \big(\lamu{x:\unit} \dbl(\zerow)\big)) \\
+ & \jdeq e_1(\big(\lamu{x:\unit} \zerow\big), \big(\lamu{x:\unit} \dbl(\zerow)\big)) \\
+ & \jdeq \sucw(\sucw\big((\lamu{x:\unit} \dbl(\zerow))(\ttt)\big))\\
+ & \jdeq \sucw(\sucw(\zerow))
+\end{align*}
+等等。
+
+正如对自然数一样，我们可以为 $\w$-类型证明一个唯一性定理：
+\begin{thm}\label{thm:w-uniq}
+  \index{唯一性!原理, 命题!对 $\w$-类型上函数的}%
+设 $g,h : \prd{w:\wtype{x:A}B(x)} E(w)$ 是两个命题地满足递推式
+%
+\begin{equation*}
+  e : \prd{a,f} \Parens{\prd{b : B(a)} E(f(b))} \to  E(\supp(a,f))
+\end{equation*}
+%
+的函数，即满足
+%
+\begin{gather*}
+ \prd{a,f} \id{g(\supp(a,f))} {e(a,f,\lamu{b:B(a)} g(f(b)))}， \\
+ \prd{a,f} \id{h(\supp(a,f))}{e(a,f,\lamu{b:B(a)} h(f(b)))}。
+\end{gather*}
+则 $g$ 和 $h$ 相等。
+\end{thm}
+
+
+\section{归纳类型是始代数}
+\label{sec:initial-alg}
+
+\indexsee{始!代数刻画归纳类型}{同伦-始}%
+
+如前所述，归纳类型也具有范畴论的泛性质。
+它们是\emph{同伦-始代数}：在由指定构造子确定的``代数''范畴中的始对象（达到相干同伦）。
+作为一个简单的例子，考虑自然数。
+这里适当的``代数''是一个配备了与 $\nat$ 的构造子给予它的相同结构的类型。
+
+\index{自然数!作为同伦-始代数}
+\begin{defn}\label{defn:nalg}
+  一个 \define{$\nat$-代数}
+  \indexdef{N-代数@$\nat$-代数}%
+  \indexdef{代数!N-@$\nat$-}%
+  是一个类型 $C$，带有两个元素 $c_0 : C$，$c_s : C \to C$。这种代数的类型是
+\begin{equation*}
+\nalg \defeq \sm {C : \type} C \times (C \to C)。
+\end{equation*}
+\end{defn}
+
+\begin{defn}\label{defn:nhom}
+  $\nat$-代数 $(C,c_0,c_s)$ 和 $(D,d_0,d_s)$ 之间的 \define{$\nat$-同态}
+  \indexdef{N-同态@$\nat$-同态}%
+  \indexdef{同态!N-@$\nat$-}%
+  是一个函数 $h : C \to D$ 使得 $h(c_0) = d_0$ 且对所有 $c : C$ 有 $h(c_s(c)) = d_s(h(c))$。这种同态的类型是
+\begin{narrowmultline*}
+\nhom((C,c_0,c_s),(D,d_0,d_s)) \defeq \narrowbreak
+ \dsm {h : C \to D} (\id{h(c_0)}{d_0}) \times \tprd{c:C} (\id{h(c_s(c))}{d_s(h(c))})。
+\end{narrowmultline*}
+\end{defn}
+
+因此我们有一个 $\nat$-代数和 $\nat$-同态的范畴，断言是 $\nat$ 是这个范畴的始对象。
+范畴论家会立即认出这是一个范畴中\emph{自然数对象}的定义。
+
+当然，由于我们的类型表现得像 $\infty$-广群\index{$\infty$-广群}，我们实际上有一个 $\nat$-代数的 $(\infty,1)$-范畴\index{$(\infty,1)$-范畴}，我们应该要求 $\nat$ 在适当的 $(\infty,1)$-范畴意义上是始对象。
+幸运的是，我们可以在不需要定义 $(\infty,1)$-范畴的情况下表述这一点。
+
+\begin{defn}
+  \index{泛!性质!自然数的}%
+  一个 $\nat$-代数 $I$ 称为\define{同伦-始}，
+  \indexdef{同伦-始!$\nat$-代数}%
+  \indexdef{N-代数@$\nat$-代数!同伦-始 (h-始)}%
+  或简称为 \define{h-始}
+  \indexsee{h-始}{同伦-始}%
+  如果对于任何其他 $\nat$-代数 $C$，从 $I$ 到 $C$ 的 $\nat$-同态的类型是可缩的。因此，
+\begin{equation*}
+\ishinitn(I) \defeq \prd{C : \nalg} \iscontr(\nhom(I,C))。
+\end{equation*}
+\end{defn}
+
+当 h-始代数存在时，它们是唯一的——不仅在范畴论中通常的意义下达到同构，而且由于泛等公理，达到相等。
+
+\begin{thm}
+  任何两个 h-始 $\nat$-代数相等。
+  因此，h-始 $\nat$-代数的类型是纯命题。
+\end{thm}
+\begin{proof}
+  假设 $I$ 和 $J$ 是 h-始 $\nat$-代数。
+  则 $\nhom(I,J)$ 是可缩的，从而由某个 $\nat$-同态 $f:I\to J$ 居留，同样我们有一个 $\nat$-同态 $g:J\to I$。
+  现在复合 $g\circ f$ 是从 $I$ 到 $I$ 的 $\nat$-同态，$\idfunc[I]$ 也是；但 $\nhom(I,I)$ 是可缩的，所以 $g\circ f = \idfunc[I]$。
+  类似地，$f\circ g = \idfunc[J]$。
+  因此 $\eqv IJ$，从而 $I=J$。由于可缩是纯命题且依赖积保持纯命题，h-始本身也是纯命题。因此 $I$（或 $J$）是 h-始的任何两个证明必然相等，这完成了证明。
+\end{proof}
+
+我们现在有以下定理。
+
+\begin{thm}\label{thm:nat-hinitial}
+$\nat$-代数 $(\nat, \emptyt, \suc)$ 是同伦-始的。
+\end{thm}
+\begin{proof}[证明概要]
+  固定一个任意的 $\nat$-代数 $(C,c_0,c_s)$。
+  $\nat$ 的递归原理给出一个函数 $f:\nat\to C$，定义为
+  \begin{align*}
+    f(0) &\defeq c_0\\
+    f(\suc(n)) &\defeq c_s(f(n))。
+  \end{align*}
+  这两个等式使 $f$ 成为一个 $\nat$-同态，我们可以将其作为 $\nhom(\nat,C)$ 的收缩中心。
+  唯一性定理（\cref{thm:nat-uniq}）然后意味着任何其他 $\nat$-同态都等于 $f$。
+\end{proof}
+
+为了将此置于更一般的背景下，考虑\emph{自函子的代数}\index{代数!自函子的}的概念是有用的。
+注意使类型 $C$ 成为 $\nat$-代数等价于给出一个函数 $c:C+\unit\to C$，而函数 $f:C\to D$ 是 $\nat$-同态当且仅当 $f \circ c \htpy d \circ (f+\unit)$。
+用范畴论语言，这意味着 \nat-代数是类型范畴的自函子 $F(X)\defeq X+1$ 的代数。
+
+\indexsee{函子!多项式}{自函子, 多项式}%
+\indexsee{多项式函子}{自函子, 多项式}%
+\indexdef{自函子!多项式}%
+\index{W-类型@$\w$-类型!作为同伦-始代数}
+对于更一般的情况，考虑与 $A : \type$ 和 $B : A \to \type$ 相关联的 $\w$-类型。
+在这种情况下，我们有一个相关联的\define{多项式函子}：
+\begin{equation}
+\label{eq:polyfunc}
+P(X) = \sm{x : A} (B(x) \rightarrow X)。
+\end{equation}
+实际上，这种赋值只在同伦意义下是函子性的，但这对以下内容没有影响。
+根据定义，一个 \define{$P$-代数}
+\indexdef{代数!多项式函子的}%
+\indexdef{代数!W-@$\w$-}%
+是一个类型 $C$，配备一个函数 $s_C :  PC \rightarrow C$。
+根据 $\Sigma$-类型的泛性质，这等价于给出一个函数 $\prd{a:A} (B(a) \to C) \to C$。
+我们也称这样的对象为 $A$ 和 $B$ 的 \define{$\w$-代数}
+\indexdef{W-代数@$\w$-代数}%
+，并写作
+\symlabel{walg}
+\begin{equation*}
+\walg(A,B) \defeq \sm {C : \type} \prd{a:A} (B(a) \to C) \to C。
+\end{equation*}
+
+类似地，对于 $P$-代数 $(C,s_C)$ 和 $(D,s_D)$，它们之间的\define{同态}
+\indexdef{同态!函子的代数的}%
+$(f, s_f) : (C, s_C) \rightarrow (D, s_D)$ 由一个函数 $f : C \rightarrow D$ 和映射 $PC \rightarrow D$ 之间的一个同伦组成
+\[
+s_f :  f \circ s_C \, = s_{D} \circ Pf,
+\]
+其中 $Pf : PC\rightarrow PD$ 是 $P$ 在 $f: C \rightarrow D$ 上的容易定义的作用的结果。这样的代数同态可以用暗示性的形式表示为：
+\[
+\xymatrix{
+ PC \ar[d]_{s_C} \ar[r]^{Pf}  \ar@{}[dr]|{s_f} &  PD \ar[d]^{s_D}\\
+C \ar[r]_{f}   & D }
+\]
+用元素来说，$f$ 是 $P$-同态（或 \define{$\w$-同态}）如果
+\indexdef{W-同态@$\w$-同态}%
+\indexdef{同态!W-@$\w$-}%
+\[f(s_C(a,h)) = s_D(a,f \circ h)。\]
+我们有 $\w$-同态的类型：
+\symlabel{whom}
+\begin{equation*}
+  \whom_{A,B}((C, s_C),(D,s_D)) \defeq \sm{f : C \to D} \prd{a:A}{h:B(a)\to C} \id{f(s_C(a,h))}{s_D(a, f\circ h)}
+\end{equation*}
+
+\index{泛!性质!$\w$-类型的}%
+最后，一个 $P$-代数 $(C, s_C)$ 称为\define{同伦-始}
+\indexdef{同伦-始!函子的代数}%
+\indexdef{同伦-始!$\w$-代数}%
+如果对于每个 $P$-代数 $(D, s_D)$，从 $(C, s_C)$ 到 $(D, s_D)$ 的所有代数同态的类型是可缩的。
+即，
+\begin{equation*}
+\ishinitw(A,B,I) \defeq \prd{C : \walg(A,B)} \iscontr(\whom_{A,B}(I,C))。
+\end{equation*}
+%
+现在类似于\cref{thm:nat-hinitial}的定理是：
+
+\begin{thm}\label{thm:w-hinit}
+对任意类型 $A : \type$ 和类型族 $B : A \to \type$，$\w$-代数 $(\wtype{x:A}B(x), \supp)$ 是 h-始的。
+\end{thm}
+
+\begin{proof}[证明概要]
+假设我们有 $A : \type$ 和 $B : A \to \type$，
+并考虑相关联的多项式函子 $P(X)\defeq\sm{x:A}(B(x)\to X)$。
+令 $W \defeq \wtype{x:A}B(x)$。则使用
+\cref{sec:w-types}中的 $\w$-引入规则，我们有一个结构映射 $s_W\defeq\supp: PW \rightarrow W$。
+我们想证明代数 $(W, s_W)$ 是
+h-始的。因此，让我们考虑另一个代数 $(C,s_C)$ 并证明类型 $T\defeq \whom_{A,B}((W, s_W),(C,s_C)) $
+即从 $(W, s_W)$ 到 $(C, s_C)$ 的 $\w$-同态是可缩的。为此，
+观察 $\w$-消去规则和 $\w$-计算
+规则允许我们定义一个 $\w$-同态 $(f, s_f) : (W, s_W) \rightarrow (C, s_C)$，
+从而证明 $T$ 是有居留的。此外还需要证明对于每个 $\w$-同态 $(g, s_g) : (W, s_W) \rightarrow (C, s_C)$，存在一个恒等证明
+\begin{equation}
+\label{equ:prequired}
+p :  (f,s_f) = (g,s_g)。
+\end{equation}
+这用到了一个事实，即一般地，形如 $(f,s_f) = (g,s_g) $ 的类型
+等价于我们所谓的\define{代数 $2$-胞腔}
+\indexdef{代数!2-胞腔}%
+从 $f$ 到 $g$ 的类型，其典范
+元素是形如 $(e, s_e)$ 的对，其中 $e : f=g$ 而 $s_e$ 是由以下粘贴图表表示的恒等证明之间的高阶恒等证明：
+\[
+\xymatrix{
+PW \ar@/^1pc/[r]^{Pg}   \ar[d]_{s_W}   \ar@/_1pc/[r]_{Pf} \ar@{}[r]|{Pe}
+& PC \ar[d]^{s_C}  \\
+W  \ar@/_1pc/[r]_f  \ar@{}[r]^{s_f} & C } \qquad
+\xymatrix{
+PW \ar@/^1pc/[r]^{Pg}   \ar[d]_{s_W} \ar@{}[r]_(.52){s_g}  & PC \ar[d]^{s_C}  \\
+W \ar@/^1pc/[r]^g  \ar@/_1pc/[r]_f  \ar@{}[r]|{e} & C }
+\]
+鉴于这个事实，要证明存在如~\eqref{equ:prequired}中的元素，
+只需证明存在一个从 $f$ 到 $g$ 的代数 2-胞腔 $(e,s_e)$ 即可。
+恒等证明 $e : f=g$ 现在由函数外延性和
+$\w$-消去构造，以保证所需恒等
+证明 $s_e$ 的存在性。
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{同伦-归纳类型}
+\label{sec:htpy-inductive}
+
+在\cref{sec:w-types}中，我们展示了如何将自然数编码为 $\w$-类型，其中
+\begin{align*}
+\natw & \defeq \wtype{b:\bool} \rec\bool(\bbU,\emptyt,\unit,b), \\
+\zerow & \defeq \supp(\bfalse, (\lamu{x:\emptyt} \rec\emptyt(\natw,x))), \\
+\sucw & \defeq \lamu{n:\natw} \supp(\btrue, (\lamu{x:\unit} n))。
+\end{align*}
+我们还展示了如何使用递归原理在 $\natw$ 上定义 $\dbl$ 函数。
+然而，当涉及归纳原理时，这种编码不再令人满意：给定 $E : \natw \to \type$ 和递推式 $e_z : E(\zerow)$ 以及 $e_s : \prd{n : \natw}  E(n) \to E(\sucw(n))$，我们只能构造一个满足给定递推式\emph{命题地}（即达到一条路径）的依赖函数 $r(E,e_z,e_s) : \prd{n : \natw} E(n)$。
+这意味着自然数的计算规则，它们给出判断等式，不能以任何明显的方式从 $\w$-类型的规则推导出来。
+
+\index{类型!同伦-归纳}%
+\index{同伦-归纳类型}%
+如果我们考虑\emph{同伦-归纳类型}而不是传统的归纳类型，这个问题就消失了，在同伦-归纳类型中，所有计算规则都是达到一条路径陈述的，即符号 $\jdeq$ 被 $=$ 替换。例如，同伦版本的 $\w$-类型 $\mathsf{W^h}$ 的计算规则变为：
+\index{计算规则!命题}%
+\begin{itemize}
+\item 对任意 $a : A$ 和 $f : B(a) \to \wtypeh{x:A} B(x)$，我们有
+\begin{equation*}
+  \rec{\wtypeh{x:A} B(x)}(E,e,\supp(a,f)) = e\Big(a,f,\big(\lamu{b:B(a)} \rec{\wtypeh{x:A} B(x)}(E,f(b))\big)\Big)
+\end{equation*}
+\end{itemize}
+
+同伦-归纳类型在计算性质方面有一个明显的缺点——使用归纳原理构造的任何函数的行为现在只能命题地刻画。
+但许多其他考虑促使我们也考虑同伦-归纳类型。
+例如，虽然我们在\cref{sec:initial-alg}中证明了归纳类型是同伦-始代数，但并非每个同伦-始代数都是归纳类型（即满足相应的归纳原理）——但每个同伦-始代数\emph{是}一个同伦-归纳类型。
+类似地，当涉及的一个（或两个）类型只是同伦-归纳类型时，我们可能想应用\cref{sec:appetizer-univalence}中的唯一性论证——例如，证明 $\nat$ 的 $\w$-类型编码等价于通常的 $\nat$。
+
+此外，同伦-归纳类型的概念现在是类型论内部的。
+例如，这意味着我们可以形成所有自然数对象的类型并对其做出断言。
+在 $\w$-类型的情况下，我们可以将同伦 $\w$-类型 $\wtype{x:A} B(x)$ 刻画为任何配备上确界函数和满足适当（命题）计算规则的归纳原理的类型：
+\begin{multline*}
+\w_d(A,B) \defeq \sm{W : \type}
+                 \sm{\supp : \prd {a} (B(a) \to W) \to W}
+                 \prd{E : W \to \type} \\
+                 \prd{e : \prd{a,f} (\prd{b : B(a)} E(f(b))) \to E(\supp(a,f))}
+                 \sm{\ind{} : \prd{w : W} E(w)}
+                 \prd{a,f} \\
+                 \ind{}(\supp(a,f)) = e(a,\lamu{b:B(a)} \ind{}(f(b)))。
+\end{multline*}
+在\cref{cha:hits}中，我们将看到命题计算规则值得考虑的其他一些原因。
+
+在本节中，我们将陈述一些关于同伦-归纳类型的基本事实。
+我们省略了大部分证明，它们有些技术性。
+
+\begin{thm}
+  对任意 $A : \type$ 和 $B : A \to \type$，类型 $\w_d(A,B)$ 是纯命题。
+\end{thm}
+
+事实证明，还有一个等价的 $\w$-类型刻画，使用递归原理加上某些\emph{唯一性}和\emph{相干性}定律。首先我们给出递归原理：
+%
+\begin{itemize}
+\item 当从 $\w$-类型 $\wtypeh{x:A} B(x)$ 构造函数到类型 $C$ 时，只需给出它在 $\supp(a,f)$ 上的值，假设给定所有 $b : B(a)$ 的 $f(b)$ 的值。
+换句话说，只需构造一个函数
+\begin{equation*}
+  c : \prd{a:A} (B(a) \to C) \to C。
+\end{equation*}
+\end{itemize}
+\index{计算规则!命题}%
+$\rec{\wtypeh{x:A} B(x)}(C,c) : (\wtype{x:A} B(x)) \to C$ 相应的计算规则如下：
+\begin{itemize}
+\item 对任意 $a : A$ 和 $f : B(a) \to \wtypeh{x:A} B(x)$，我们有
+一个等式的见证 $\beta(C,c,a,f)$
+\begin{equation*}
+  \rec{\wtypeh{x:A} B(x)}(C,c,\supp(a,f)) =
+  c(a,\lamu{b:B(a)} \rec{\wtypeh{x:A} B(x)}(C,c,f(b)))。
+\end{equation*}
+\end{itemize}
+
+此外，我们断言以下唯一性原理，说明由相同递推式定义的任何两个函数相等：
+\index{唯一性!原理, 命题!同伦 $\w$-类型的}%
+\begin{itemize}
+\item 给定 $C : \type$ 和 $c : \prd{a:A} (B(a) \to C) \to C$。设 $g,h : (\wtypeh{x:A} B(x)) \to C$ 是两个命题地满足递推式 $c$ 的函数，即使得我们有
+\begin{align*}
+  \beta_g &: \prd{a,f} \id{g(\supp(a,f))}{c(a,\lamu{b: B(a)} g(f(b)))}， \\
+  \beta_h &: \prd{a,f} \id{h(\supp(a,f))}{c(a,\lamu{b: B(a)} h(f(b)))}。
+\end{align*}
+则 $g$ 和 $h$ 相等，即存在类型为 $g = h$ 的 $\alpha(C,c,f,g,\beta_g,\beta_h)$。
+\end{itemize}
+
+\index{相干性}%
+回顾当我们有归纳原理而不仅仅是递归原理时，这个命题唯一性原理是可推导的（\cref{thm:w-uniq}）。
+但仅有递归时，唯一性原理不再可推导——事实上，陈述甚至不成立（练习）。因此，我们将其公设为公理。
+我们还公设以下相干性\index{相干性}定律，它告诉我们唯一性证明在典范元素上如何表现：
+\begin{itemize}
+\item
+对任意 $a : A$ 和 $f : B(a) \to C$，以下图表命题地交换：
+\[\xymatrix{
+  g(\supp(a,f)) \ar_{\alpha(\supp(a,f))}[d] \ar^-{\beta_g}[r] & c(a,\lamu{b:B(a)} g(f(b)))
+  \ar^{c(a,\blank)(\funext (\lam{b} \alpha(f(b))))}[d] \\
+  h(\supp(a,f)) \ar_-{\beta_h}[r] & c(a,\lamu{b: B(a)} h(f(b))) \\
+}\]
+其中 $\alpha$ 缩写为路径 $\alpha(C,c,f,g,\beta_g,\beta_h) : g = h$。
+\end{itemize}
+
+将所有这些数据放在一起，得到 $\wtype{x:A} B(x)$ 的另一个刻画，作为配备上确界函数、满足简单消去、计算、唯一性和相干性规则的类型：
+\begin{multline*}
+\w_s(A,B) \defeq \sm{W : \type}
+                       \sm{\supp : \prd {a} (B(a) \to W) \to W}
+                       \prd{C : \type}
+                       \prd{c : \prd{a} (B(a) \to C) \to C}\\
+                       \sm{\rec{} : W \to C}
+                       \sm{\beta : \prd{a,f} \rec{}(\supp(a,f)) = c(a,\lamu{b: B(a)} \rec{}(f(b)))} \narrowbreak
+                       \prd{g : W \to C}
+                       \prd{h : W \to C}
+                       \prd{\beta_g : \prd{a,f} g(\supp(a,f)) = c(a,\lamu{b: B(a)} g(f(b)))} \\
+                       \prd{\beta_h : \prd{a,f} h(\supp(a,f)) = c(a,\lamu{b: B(a)} h(f(b)))}
+                       \sm{\alpha : \prd {w : W} g(w) = h(w)}
+                       \prd{a,f} \\
+                       \alpha(\supp(a,f)) \ct \beta_h = \beta_g \ct c(a,-)(\funext \; \lam{b} \alpha(f(b)))
+\end{multline*}
+
+\begin{thm}
+对任意 $A : \type$ 和 $B : A \to \type$，类型 $\w_s (A,B)$ 是纯命题。
+\end{thm}
+
+最后，我们有第三个非常简洁的 $\wtype{x:A} B(x)$ 刻画，作为 h-始 $\w$-代数：
+\begin{equation*}
+\w_h(A,B) \defeq \sm{I : \walg(A,B)} \ishinitw(A,B,I)。
+\end{equation*}
+
+\begin{thm}
+对任意 $A : \type$ 和 $B : A \to \type$，类型 $\w_h (A,B)$ 是纯命题。
+\end{thm}
+
+事实证明，$\w$-类型的所有三种刻画实际上是等价的：
+\begin{lem}\label{lem:homotopy-induction-times-3}
+对任意 $A : \type$ 和 $B : A \to \type$，我们有
+\[ \w_d(A,B) \eqvsym \w_s(A,B) \eqvsym \w_h(A,B) \]
+\end{lem}
+
+事实上，我们有以下定理，它是对\cref{thm:w-hinit}的改进：
+
+\begin{thm}
+满足 $\w$-类型的形成、引入、消去和命题计算规则的类型正是同伦-始 $\w$-代数。
+\end{thm}
+
+%%%%%
+\begin{proof}[证明概要]
+%%%%%
+检查\cref{thm:w-hinit}的证明，我们看到只需要\emph{命题}计算规则就足以建立 $\wtype{x:A}B(x)$ 的 h-始性。
+对于逆蕴含，让我们假设与
+$A : \type$ 和 $B : A \to \UU$ 相关联的多项式函子有一个 h-始代数 $(W,s_W)$；我们证明 $W$ 满足 $\w$-类型的命题规则。
+$\w$-引入规则很简单；即对于 $a : A$ 和 $t : B(a) \rightarrow W$，我们定义 $\supp(a,t) : W$ 为
+将结构映射 $s_W : PW \rightarrow W$ 应用于 $(a,t) : PW$ 的结果。
+对于 $\w$-消去规则，让我们假设其前提，特别是 $C' : W \to \type$。
+使用其他前提，可以证明类型 $C \defeq \sm{ w : W} C'(w)$
+可以配备结构映射 $s_C : PC \rightarrow C$。由 $W$ 的 h-始性，
+我们得到一个代数同态 $(f, s_f) : (W, s_W) \rightarrow (C, s_C)$。此外，
+第一投影 $\proj1 : C \rightarrow W$ 可以配备
+同态的结构，因此我们得到以下形式的图表
+\[
+\xymatrix{
+PW \ar[r]^{Pf} \ar[d]_{s_W}  & PC \ar[d]^{s_C}  \ar[r]^{P \proj1}  & PW  \ar[d]^{s_W}  \\
+W \ar[r]_f  & C \ar[r]_{\proj1}  & W。}
+\]
+但恒等函数 $1_W : W \rightarrow W$ 有一个典范的代数同态结构，因此，由从 $(W,s_W)$ 到其自身的同态类型的可缩性，$(f,s_f)$ 与 $(\proj1, s_{\proj1})$ 的复合与 $(1_W, s_{1_W})$ 之间必须有一个恒等证明。这特别意味着
+存在一个恒等证明 $p :  \proj1 \circ f = 1_W$。
+
+由于 $(\proj2 \circ f) w : C( (\proj1 \circ f) w)$，我们可以定义
+\[
+\rec{}(w,c) \defeq
+p_{\, * \,}( ( \proj2 \circ  f)   w )   : C(w)
+\]
+其中传输 $p_{\, * \,}$ 是关于族
+\[
+\lamu{u}C\circ u : (W\to W)\to W\to \UU。
+\]
+命题 $\w$-计算规则的验证是一个计算，
+涉及形如 $p_{\, * \,}$ 的操作的自然性性质。
+\end{proof}
+%%%%%
+
+\index{自然数!编码为 $\w$-类型}%
+最后，如所愿，我们可以将同伦-自然数编码为同伦-$\w$-类型：
+
+\begin{thm}
+具有命题计算规则的自然数规则可以从具有命题计算规则的 $\w$-类型规则推导出来。
+\end{thm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{归纳定义的一般语法}
+\label{sec:strictly-positive}
+
+\index{类型!归纳|(}%
+\indexsee{归纳!类型}{类型, 归纳}%
+
+到目前为止，我们只讨论了特定的归纳类型：$\emptyt$、$\unit$、$\bool$、$\nat$、余积、积、$\Sigma$-类型、$\w$-类型等。
+然而，类型论的一个重要方面是能够定义\emph{新的}归纳类型，而不是仅限于某个特定的固定列表。
+然而，为了能够做到这一点，我们需要知道什么样的``归纳定义''是有效或合理的。
+
+为了看到并非所有``看起来像归纳定义''的东西都有意义，考虑以下类型 $C$ 的``构造子''：
+\begin{itemize}
+\item $g:(C\to \nat) \to C$。
+\end{itemize}
+这样一个类型 $C$ 的递归原理应该说，给定一个类型 $P$，为了构造函数 $f:C\to P$，只需考虑输入 $c:C$ 具有形式 $g(\alpha)$（其中 $\alpha:C\to\nat$）的情况即可。
+此外，我们期望能够以某种方式使用 $f$ 应用于 $\alpha$ 的``递归数据''。
+然而，完全不清楚如何``将 $f$ 应用于 $\alpha$''，因为两者都是以 $C$ 为定义域的函数。
+
+我们可以通过只是假设（毫无道理地）存在某种方法将 $f$ 应用于 $\alpha$ 并得到一个函数 $P\to\nat$ 来为 $C$ 写下一个``递归原理''。
+那么递归规则的输入将要求一个类型 $P$ 以及一个函数
+\begin{equation}
+  h:(C\to\nat) \to (P\to\nat) \to P\label{eq:fake-recursor}
+\end{equation}
+其中 $h$ 的两个参数是 $\alpha$ 和``将 $f$ 应用于 $\alpha$ 的结果''。
+然而，得到的函数 $f:C\to P$ 的计算规则会是什么？
+看看其他计算规则，我们会期望类似``$f(g(\alpha)) \jdeq h(\alpha,f(\alpha))$''（对 $\alpha:C\to\nat$），但正如我们所见，``$f(\alpha)$''没有意义。
+$C$ 的归纳原理更成问题；甚至不清楚如何写下假设。
+
+另一方面，我们可以通过忽略 $C$ 在 $\alpha$ 的定义域中的``递归''出现来为 $C$ 写下一个不同的``递归原理''，将其仅视为自然数族的索引类型。
+在这种情况下，输入将要求一个类型 $P$ 以及一个函数
+\begin{equation*}
+  h:(C\to \nat) \to P,
+\end{equation*}
+所以递归原理的类型将是 $\rec{C}:\prd{P:\UU} ((C\to \nat) \to P) \to C\to P$，归纳原理类似。
+现在可以写下计算规则，即 $\rec{C}(P,h,g(\alpha))\jdeq h(\alpha)$。
+然而，一个具有这种递归子和计算规则的类型 $C$ 的存在性证明是不一致的。
+参见\cref{ex:loop,ex:loop2,ex:inductive-lawvere,ex:ilunit}关于这个和其他变体的证明。
+
+这个例子建议了对归纳定义的一个限制：所有构造子的定义域必须是被定义类型的\emph{协变函子}\index{函子!协变}\index{协变函子}，这样我们才能``将 $f$ 应用于它们''以获得``递归调用''的结果。
+换句话说，如果我们用一个变量 $X:\type$
+\index{变量!类型}%
+替换被定义类型的所有出现，则构造子的每个定义域
+\index{定义域!构造子的}%
+必须是可以成为 $X$ 的协变函子的表达式。
+这对于我们迄今考虑的所有例子都是这种情况。
+例如，对于构造子 $\inl:A\to A+B$，相关的函子是常数 $A$（即 $X\mapsto A$），而对于构造子 $\suc:\nat\to\nat$，函子是恒等函子（$X\mapsto X$）。
+
+然而，这个必要条件也不是充分的。
+协变性阻止了归纳类型出现在其构造子定义域中单个函数类型的左边，就像上面考虑的``构造子'' $g$ 的参数 $C\to\nat$ 那样，因为这产生的是逆变\index{函子!逆变}\index{逆变函子}函子而不是协变函子。
+然而，由于两个逆变函子的复合是协变的，\emph{双重}函数类型如 $((X\to \nat)\to \nat)$ 再次是协变的。
+这使我们能够重现康托尔式悖论\index{悖论}。
+
+例如，考虑一个具有以下构造子的``归纳类型'' $D$：
+\begin{itemize}
+\item $k:((D\to\prop)\to\prop)\to D$。
+\end{itemize}
+假设这样的类型存在，我们定义函数
+\begin{align*}
+  r&:D\to (D\to\prop)\to\prop,\\
+  f&:(D\to\prop) \to D,\\
+  p&:(D\to \prop) \to (D\to\prop)\to \prop,\\
+  \intertext{为}
+  r(k(\theta)) &\defeq \theta,\\
+  f(\delta) &\defeq k(\lam{x} (x=\delta)),\\
+  p(\delta) &\defeq \lam{x} \delta(f(x))。
+\end{align*}
+这里 $r$ 由 $D$ 的递归原理定义，而 $f$ 和 $p$ 是显式定义的。
+则对任意 $\delta:D\to\prop$，我们有 $r(f(\delta)) = \lam{x}(x=\delta)$。
+
+特别地，因此，如果 $f(\delta)=f(\delta')$，则我们有一条路径 $s:(\lam{x}(x=\delta)) = (\lam{x}(x=\delta'))$。
+因此，$\happly(s,\delta) : (\delta=\delta) = (\delta=\delta')$，从而特别地 $\delta=\delta'$ 成立。
+因此，$f$ 是``单射''的（虽然\emph{先验地} $D$ 可能不是集合）。
+这已经听起来可疑——我们有 $D$ 的``幂集''\index{幂集}到 $D$ 的``单射''——再多做一点工作我们可以将其加工成一个矛盾。
+
+假设给定 $\theta:(D\to\prop)\to\prop$，定义 $\delta:D\to\prop$ 为
+\begin{equation}
+  \delta(d) \defeq \exis{\gamma:D\to\prop} (f(\gamma) = d) \times \theta(\gamma)。\label{eq:Pinj}
+\end{equation}
+我们断言 $p(\delta)=\theta$。
+由函数外延性，只需证明对任意 $\gamma:D\to\prop$ 有 $p(\delta)(\gamma) =_\prop \theta(\gamma)$ 即可。
+由泛等性，为此只需证明各自蕴含另一个。
+现在根据 $p$ 的定义，我们有
+\begin{align*}
+  p(\delta)(\gamma) &\jdeq \delta(f(\gamma))\\
+  &\jdeq \exis{\gamma':D\to\prop} (f(\gamma') = f(\gamma)) \times \theta(\gamma')。
+\end{align*}
+如果 $\theta(\gamma)$ 成立，显然成立，因为我们可以取 $\gamma'\defeq \gamma$。
+另一方面，如果我们有 $\gamma'$ 满足 $f(\gamma') = f(\gamma)$ 且 $\theta(\gamma')$，则 $\gamma'=\gamma$（因为 $f$ 是单射的），从而也有 $\theta(\gamma)$。
+
+这完成了 $p(\delta)=\theta$ 的证明。
+因此，每个元素 $\theta:(D\to\prop)\to\prop$ 都是某个元素 $\delta:D\to\prop$ 在 $p$ 下的像。
+然而，如果我们通过经典对角化定义 $\theta$：
+\[ \theta(\gamma) \defeq \neg p(\gamma)(\gamma) \quad\text{对所有 $\gamma:D\to\prop$} \]
+则从 $\theta = p(\delta)$ 我们推出 $p(\delta)(\delta) = \neg p(\delta)(\delta)$。
+这是一个矛盾：没有命题可以等价于其否定。
+（假设 $P\Leftrightarrow \neg P$，如果 $P$，则 $\neg P$，从而 $\emptyt$；因此 $\neg P$，但那样 $P$，从而 $\emptyt$。）
+
+\begin{rmk}
+  有一个宇宙大小的问题需要解决。
+  一般地，归纳类型必须生活在一个已经包含其定义中所有类型的宇宙中。
+  因此如果在 $D$ 的定义中，模糊符号 \prop 意味着 $\prop_{\UU}$，则我们没有 $D:\UU$ 而只有 $D:\UU'$，其中 $\UU'$ 是某个更大的宇宙，满足 $\UU:\UU'$。
+  \index{数学!谓词性}%
+  \indexsee{非谓词性}{数学, 谓词性}%
+  \indexsee{谓词性数学}{数学, 谓词性}%
+  因此在谓词性理论中，~\eqref{eq:Pinj}的右边生活在 $\prop_{\UU'}$ 中，而不是 $\prop_\UU$。
+  所以这个矛盾确实需要\cref{subsec:prop-subsets}中提到的命题调整公理
+  \index{命题!调整}%
+  。
+\end{rmk}
+
+\index{一致性}%
+这个反例建议我们应该禁止归纳类型出现在其构造子定义域中箭头的左边，即使那个出现嵌套在其他箭头中以至于最终变成协变的。
+（类似地，我们也禁止它出现在依赖函数类型的定义域中。）
+这个限制称为\define{严格正性}
+\indexdef{严格!正性}%
+\indexsee{正性, 严格}{严格正性}%
+（普通``正性''本质上是协变性），事实证明它是充分的。
+
+\index{构造子}%
+因此，总之，一个类型 $W$ 的有效归纳定义由一列\emph{构造子}组成。
+每个构造子被赋予一个函数类型，取若干个（可能互相依赖的）输入并返回 $W$ 的一个元素。
+最后，我们允许 $W$ 本身出现在其构造子的输入类型中，但只能严格正地出现。
+这本质上意味着构造子的每个参数要么是不涉及 $W$ 的类型，要么是以 $W$ 为陪域的某个迭代函数类型。
+例如，以下是一个有效的构造子类型：
+\begin{equation}
+  c:(A\to W) \to (B\to C \to W) \to D \to W \to W。\label{eq:example-constructor}
+\end{equation}
+所有这些函数类型也可以是依赖函数（$\Pi$-类型）。%
+\footnote{用\cref{sec:initial-alg}的语言，严格正性条件确保相关的自函子是多项式的。\indexfoot{自函子!多项式}\indexfoot{代数!始}\indexsee{代数!始}{同伦-始} 在范畴论中众所周知，不是\emph{所有}自函子都能有始代数；限制为多项式函子确保一致性。
+可以考虑这个条件的各种放松，但在本书中我们将限制在这里定义的严格正性。}
+
+注意我们要求归纳定义由\emph{有限}列构造子给出。
+这只是因为我们必须把它写在纸上。
+如果我们想要一个表现得像有无限多个构造子的归纳类型，我们可以简单地让一个构造子由某个无限类型参数化。
+例如，形如 $\nat \to W \to W$ 的构造子可以被认为等价于可数多个形如 $W\to W$ 的构造子。
+（当然，无限性现在是类型论\emph{内部}的，但对于任何基础系统来说这都是应该的。）
+类似地，如果我们想要一个取``无限多个参数''的构造子，我们可以允许它取一族由某个无限类型参数化的参数，如 $(\nat\to W) \to W$，它取 $W$ 的元素的无限序列\index{序列}。
+
+\index{递归原理!归纳类型的}%
+现在，一旦我们有了这样的归纳定义，我们能用它做什么？
+首先，有一个\define{递归原理}说明为了定义函数 $f:W\to P$，只需考虑输入 $w:W$ 来自某个构造子的情况，允许我们对该构造子的输入递归调用 $f$。
+对于例子构造子~\eqref{eq:example-constructor}，我们需要 $P$ 配备一个类型为
+\begin{narrowmultline}\label{eq:example-rechyp}
+  d : (A\to W) \to (A\to P) \to (B\to C\to W) \to
+  \narrowbreak
+  (B\to C \to P) \to D \to W \to P \to P
+\end{narrowmultline}
+的函数。
+在这些假设下，递归原理给出 $f:W\to P$，它还以明显的方式``保持构造子数据''——这是计算规则，我们使用输入的协变性。
+\index{计算规则!归纳类型的}%
+例如，在例子~\eqref{eq:example-constructor}中，计算规则说对任意 $\alpha:A\to W$、$\beta:B\to C\to W$、$\delta:D$ 和 $\omega:W$，我们有
+\begin{equation}
+  f(c(\alpha,\beta,\delta,\omega)) \jdeq d(\alpha,f\circ \alpha,\beta, f\circ \beta, \delta, \omega,f(\omega))。\label{eq:example-comp}
+\end{equation}
+
+\index{归纳原理!归纳类型的}%
+一般归纳类型 $W$ 的\define{归纳原理}只稍微复杂一点。
+当然，我们从类型族 $P:W\to\type$ 开始，我们要求它配备``在'' $W$ 的构造子数据``之上''的构造子数据。
+这意味着像上面的 $A\to P$ 这样的``递归调用''参数必须被替换为具有类型如 $\prd{a:A} P(\alpha(a))$ 的依赖函数。
+在~\eqref{eq:example-constructor}的完整例子中，归纳原理的相应假设将要求
+\begin{multline}\label{eq:example-indhyp}
+d : \prd{\alpha:A\to W}\Parens{\prd{a:A} P(\alpha(a))} \to \narrowbreak
+\prd{\beta:B\to C\to W} \Parens{\prd{b:B}{c:C} P(\beta(b,c))} \to\\
+\prd{\delta:D}
+\prd{\omega:W} P(\omega) \to
+P(c(\alpha,\beta,\delta,\omega))。
+\end{multline}
+相应的计算规则看起来与~\eqref{eq:example-comp}相同。
+当然，递归原理是归纳原理的特例，其中 $P$ 是常数族。
+如我们之前提到的，归纳原理也称为\define{消去子}，递归原理称为\define{非依赖消去子}。
+
+如\cref{sec:pattern-matching}中讨论的，我们也允许自己隐式地调用归纳原理和递归原理，为归纳原理假设中的每个表达式写一个定义方程 $\defeq$。
+这称为给出一个（依赖）\define{模式匹配}定义。
+\index{模式匹配}%
+\index{定义!通过模式匹配}%
+在我们正在运行的例子中，这意味着我们可以通过
+\[ f(c(\alpha,\beta,\delta,\omega)) \defeq \cdots \]
+来定义 $f:\prd{w:W} P(w)$，
+其中 $\alpha:A\to W$ 和 $\beta:B\to C\to W$ 和 $\delta:D$ 和 $\omega:W$ 是在右边绑定的变量
+\index{变量}%
+。
+此外，右边可以包含对 $f$ 的递归调用，形如 $f(\alpha(a))$、$f(\beta(b,c))$ 和 $f(\omega)$。
+当这个定义用归纳原理的术语重新包装时，我们分别用 $\bar\alpha(a)$、$\bar\beta(b,c)$ 和 $\bar\omega$ 替换这样的递归调用，它们是新变量
+\begin{align*}
+  \bar\alpha &: \prd{a:A} P(\alpha(a))\\
+  \bar\beta &: \prd{b:B}{c:C} P(\beta(b,c))\\
+  \bar\omega &: P(\omega)。
+\end{align*}
+\symlabel{defn:induction-wtype}%
+然后我们可以写
+\[ f \defeq \ind{W}(P,\, \lam{\alpha}{\bar\alpha}{\beta}{\bar\beta}{\delta}{\omega}{\bar\omega} \cdots ) \]
+其中 $\ind{W}$ 的第二个参数具有~\eqref{eq:example-indhyp}的类型。
+
+我们不会试图给出有效归纳定义及其产生的归纳原理、递归原理和模式匹配规则的语法的形式表述。
+这是可以做到的（事实上，如果实现计算机证明助手，这是必要的），但不会提供额外的洞见。
+通过练习，人们学会自动为任何归纳定义推导归纳原理和递归原理，并毫不犹豫地使用它们。
+
+
+\section{归纳类型的推广}
 \label{sec:generalizations}
 
-\section{广义归纳定义}
-\label{sec:general-induction}
+\index{类型!归纳!推广}%
+归纳类型的概念在类型论中已经研究了很多年，并承认许多许多推广：归纳类型族、互归纳类型、归纳-归纳类型、归纳-递归类型等。
+在本节中，我们给出其中一些的概述，其中一些将在本书后面使用。
+（在\cref{cha:hits}中，我们将更深入地研究归纳类型的一个非常不同的推广，它是\emph{同伦}类型论特有的。）
 
-\section{余归纳}
-\label{sec:coinduction}
+这些推广中的大多数涉及允许我们同时通过归纳定义多个类型。
+我们已经见过的一个非常简单的例子是余积 $A+B$。
+如果每次我们想考虑两个类型的余积时都必须分别写下 $\nat+\nat$、$\nat+\bool$、$\bool+\bool$ 等的归纳定义，那确实会很繁琐。
+相反，我们做一个定义，其中 $A$ 和 $B$ 是代表类型的变量；
+\index{变量!类型}%
+在类型论中它们被称为\define{参数}。%
+\indexdef{参数!归纳定义的}
+因此，严格来说，从定义得到的不是单个类型，而是一个类型族 $+ : \type\to\type\to\type$，取两个类型作为输入并产生它们的余积。
+类似地，列表类型\index{类型!列表} $\lst A$ 是一个族 $\lst{\blank}:\type\to\type$，其中类型 $A$ 是参数。
+
+在数学中，这种事情太明显以至于不值一提，但我们提出它是为了与下一个例子形成对比。
+注意每个类型 $A+B$ 是\emph{独立地}归纳定义的，每个类型 $\lst A$ 也是。
+\index{类型!类型族!归纳}%
+\index{归纳!类型族}%
+相比之下，我们可能也考虑\emph{一起}通过归纳定义整个类型族 $B:A\to\type$。
+区别在于现在构造子可以改变索引 $a:A$，因此我们不能说单个类型 $B(a)$ 是归纳定义的，只能说整个族是归纳定义的。
+
+\index{类型!向量}%
+\index{向量}%
+标准例子是指定长度的列表类型，传统上称为\define{向量}。
+我们固定一个参数类型 $A$，并定义类型族 $\vect n A$（对 $n:\nat$），由以下构造子生成：
+\begin{itemize}
+\item 长度为零的向量 $\nil:\vect 0 A$，
+\item 一个函数 $\cons:\prd{n:\nat} A\to \vect n A \to \vect{\suc (n)} A$。
+\end{itemize}
+与列表相比，向量（具有来自固定类型 $A$ 的元素）形成按其长度索引的类型族。
+虽然 $A$ 是参数，我们说 $n:\nat$ 是归纳族的\define{索引}
+\indexdef{索引!归纳定义的}%
+。
+单个类型如 $\vect3A$ 不是归纳定义的：构建 $\vect3A$ 元素的构造子从族中的另一个类型取输入，如 $\cons:A \to \vect2A \to \vect3A$。
+
+\index{归纳原理!向量类型的}
+\index{向量!归纳原理}
+特别地，归纳原理也必须引用整个类型族；因此假设和结论必须适当地对索引量化。
+在向量的情况下，归纳原理陈述为：给定类型族 $C:\prd{n:\nat} \vect n A \to \type$，连同
+\begin{itemize}
+\item 元素 $c_\nil : C(0,\nil)$，和
+\item 函数 \narrowequation{c_\cons : \prd{n:\nat}{a:A}{\ell:\vect n A} C(n,\ell) \to C(\suc(n),\cons(a,\ell))}
+\end{itemize}
+存在函数 $f:\prd{n:\nat}{\ell:\vect n A} C(n,\ell)$ 使得
+\begin{align*}
+  f(0,\nil) &\jdeq c_\nil\\
+  f(\suc(n),\cons(a,\ell)) &\jdeq c_\cons(n,a,\ell,f(\ell))。
+\end{align*}
+
+\index{谓词!归纳}%
+\index{归纳!谓词}%
+归纳族的一个用途是归纳定义\emph{谓词}。
+例如，我们可以定义谓词 $\mathsf{iseven}:\nat\to\type$ 作为由 $\nat$ 索引的归纳族，具有以下构造子：
+\begin{itemize}
+\item 元素 $\mathsf{even}_0 : \mathsf{iseven}(0)$，
+\item 函数 $\mathsf{even}_{ss} : \prd{n:\nat} \mathsf{iseven}(n) \to \mathsf{iseven}(\suc(\suc(n)))$。
+\end{itemize}
+换句话说，我们规定 $0$ 是偶数，如果 $n$ 是偶数则 $\suc(\suc(n))$ 也是。
+这些构造子``显然''不提供构造（比如说）$\mathsf{iseven}(1)$ 的元素的方法，由于 $\mathsf{iseven}$ 应该是由这些构造子自由生成的，所以必须没有这样的元素。
+（然而，实际证明 $\neg \mathsf{iseven}(1)$ 并非完全平凡。）
+$\mathsf{iseven}$ 的归纳原理说，为了证明关于所有偶自然数的某事，只需对 $0$ 证明它并验证它在加二时保持。
+
+\index{数学!形式化}%
+归纳定义的谓词在数学的计算机形式化和软件验证中被大量使用。
+但我们不会大量使用它们，除了\cref{sec:ordinals,sec:compactness-interval}中的几个例外。
+
+\index{类型!互归纳}%
+\index{互归纳类型}%
+另一个重要的特例是当归纳族的索引类型是有限的。
+在这种情况下，我们可以等价地将归纳定义表示为通过\emph{互归纳}定义的有限类型集合。
+例如，我们可以通过互归纳定义偶自然数类型 $\mathsf{even}$ 和奇自然数类型 $\mathsf{odd}$，其中 $\mathsf{even}$ 由构造子生成
+\begin{itemize}
+\item $0:\mathsf{even}$ 和
+\item $\mathsf{esucc} : \mathsf{odd}\to\mathsf{even}$，
+\end{itemize}
+而 $\mathsf{odd}$ 由一个构造子生成
+\begin{itemize}
+\item $\mathsf{osucc} : \mathsf{even}\to \mathsf{odd}$。
+\end{itemize}
+注意 $\mathsf{even}$ 和 $\mathsf{odd}$ 是简单类型（不是类型族），但它们的构造子可以相互引用。
+如果我们将这个定义表示为归纳类型族 $\mathsf{paritynat} : \bool \to \type$，其中 $\mathsf{paritynat}(\bfalse)$ 和 $\mathsf{paritynat}(\btrue)$ 分别表示 $\mathsf{even}$ 和 $\mathsf{odd}$，它将有构造子：
+\begin{itemize}
+\item $0 : \mathsf{paritynat}(\bfalse)$，
+\item $\mathsf{esucc} : \mathsf{paritynat}(\btrue) \to \mathsf{paritynat}(\bfalse)$，
+\item $\mathsf{osucc} : \mathsf{paritynat}(\bfalse) \to \mathsf{paritynat}(\btrue)$。
+\end{itemize}
+当显式表示为互归纳定义时，$\mathsf{even}$ 和 $\mathsf{odd}$ 的归纳原理说给定 $C:\mathsf{even}\to\type$ 和 $D:\mathsf{odd}\to\type$，连同
+\begin{itemize}
+\item $c_0 : C(0)$，
+\item $c_s : \prd{n:\mathsf{odd}} D(n) \to C(\mathsf{esucc}(n))$，
+\item $d_s : \prd{n:\mathsf{even}} C(n) \to D(\mathsf{osucc}(n))$，
+\end{itemize}
+存在 $f:\prd{n:\mathsf{even}} C(n)$ 和 $g:\prd{n:\mathsf{odd}}D(n)$ 使得
+\begin{align*}
+  f(0) &\jdeq c_0\\
+  f(\mathsf{esucc}(n)) &\jdeq c_s(g(n))\\
+  g(\mathsf{osucc}(n)) &\jdeq d_s(f(n))。
+\end{align*}
+特别地，正如我们只能``一起''对归纳族归纳一样，我们必须同时对 $\mathsf{even}$ 和 $\mathsf{odd}$ 归纳。
+在本书中我们也不会大量使用互归纳定义。
+
+\index{类型!归纳-归纳}%
+\index{归纳-归纳类型}%
+一个更进一步、更激进的推广是允许定义类型族 $B:A\to \type$，其中不仅类型 $B(a)$，而且类型 $A$ 本身，作为一个大归纳的一部分被定义。
+换句话说，我们不仅为 $B(a)$ 指定可以从其他 $B(a')$ 取输入的构造子（如归纳族那样），我们同时还为 $A$ 本身指定可以从 $B(a)$ 取输入的构造子。
+这可以被视为一个归纳族，其中索引与被索引类型同时归纳定义，或者作为一个互归纳定义，其中一个类型可以依赖于另一个。
+更复杂的依赖结构也是可能的。
+一般地，这些称为\define{归纳-归纳定义}。
+在本书的大部分内容中，我们不会使用它们，但它们的高阶变体（见\cref{cha:hits}）将在\cref{cha:real-numbers}的几个实验性例子中出现。
+
+\index{类型!归纳-递归}%
+\index{归纳-递归类型}%
+我们想提到的最后一个推广是\define{归纳-递归定义}，其中一个类型被归纳定义的同时在其上定义一个\emph{递归}函数。
+也就是说，我们固定一个已知类型 $P$，并为归纳类型 $A$ 给出构造子，同时使用 $A$ 的递归原理（由其构造子产生）定义函数 $f:A\to P$——带有扭曲的是 $A$ 的构造子也允许引用 $f$ 的值。
+我们还不知道如何从同伦论角度证明这样的定义是合理的，我们在本书中不会使用它们。
+
+\index{类型!归纳|)}%
+
+\section{相等类型和相等系统}
+\label{sec:identity-systems}
+
+\index{类型!相等!作为归纳}%
+我们现在想指出，在同伦类型论中起核心作用的\emph{相等类型}也可以被认为是归纳定义的。
+具体来说，它们是\cref{sec:generalizations}意义上的带索引的``归纳族''。
+事实上，有\emph{两种}方式将相等类型描述为
+归纳族，产生\cref{cha:typetheory}中描述的两个归纳原理——路径归纳和基于路径归纳。
+
+在两种定义中，类型 $A$ 都是参数。
+对于第一种定义，我们归纳定义族 $=_A : A\to A\to \type$，带有两个属于 $A$ 的索引，由以下构造子：
+\begin{itemize}
+\item 对任意 $a:A$，元素 $\refl a : a=_A a$。
+\end{itemize}
+类比其他归纳族，我们可以从这个定义提取归纳原理。
+它陈述为：给定任意 \narrowequation{C:\prd{a,b:A} (a=_A b) \to \type,} 连同 $d:\prd{a:A} C(a,a,\refl{a})$，存在 \narrowequation{f:\prd{a,b:A}{p:a=_A b} C(a,b,p)} 使得 $f(a,a,\refl a)\jdeq d(a)$。
+这正是相等类型的路径归纳原理。
+
+对于第二种定义，我们将一个元素 $a_0:A$ 与 $A:\type$ 一起视为参数，归纳定义族 $(a_0 =_A \blank):A\to \type$，带有属于 $A$ 的\emph{一个}索引，由以下构造子：
+\begin{itemize}
+\item 元素 $\refl{a_0} : a_0 =_A a_0$。
+\end{itemize}
+注意因为 $a_0:A$ 被固定为参数，构造子 $\refl{a_0}$ 在归纳定义中不是作为函数出现，而只是作为元素。
+这个定义的归纳原理说：给定 $C:\prd{b:A} (a_0 =_A b) \to \type$ 连同元素 $d:C(a_0,\refl{a_0})$，存在 $f:\prd{b:A}{p:a_0 =_A b} C(b,p)$ 满足 $f(a_0,\refl{a_0})\jdeq d$。
+这正是相等类型的基于路径归纳原理。
+
+将相等类型视为归纳类型在历史上引起了一些混淆，因为\cref{sec:bool-nat}中提到的直觉是归纳类型的所有元素都应该通过反复应用其构造子获得。
+对于普通归纳类型如 \bool 和 \nat，这是成立的：我们在\cref{thm:allbool-trueorfalse}中看到 \bool 的每个元素确实要么是 $\bfalse$ 要么是 $\btrue$，类似地可以证明 \nat 的每个元素要么是 $0$ 要么是后继。
+
+然而，这对相等类型\emph{不}成立：只有一个构造子 $\refl{}$，但并非每条路径都等于常数路径。
+更精确地，我们不能仅使用相等类型的归纳原理（任一个）证明 $a=_A a$ 的每个居留者都等于 $\refl a$。
+为了实际展示一个反例，我们需要某些额外的原理如泛等公理——回顾在\cref{thm:type-is-not-a-set}中我们使用泛等性展示了一条不等于 $\refl{\bool}$ 的特定路径 $\bool=_\type\bool$。
+
+\index{自由!归纳类型的生成}%
+\index{生成!类型的, 归纳|(}%
+要点是，如同伦-始代数的研究所验证的，归纳定义应该被视为由其构造子\emph{自由生成}的。
+当然，自由生成的结构可能包含其生成元以外的元素：例如，由两个符号 $x$ 和 $y$ 自由生成的群不仅包含 $x$ 和 $y$，还包含诸如 $xy$、$yx^{-1}y$ 和 $x^3y^2x^{-2}yx$ 等词。
+一般地，自由结构的元素不仅通过应用生成元获得，还通过应用环境结构的运算获得，如群运算（如果我们讨论的是自由群）。
+
+在归纳类型的情况下，我们讨论的是自由生成的\emph{类型}——那么类型结构的``运算''是什么？
+如果类型被视为像\emph{集合}，如类型论中传统上那样，则没有这样的运算，因此我们期望归纳类型中除了由其构造子产生的元素之外没有其他元素。
+在同伦类型论中，我们将类型视为像\emph{空间}或 $\infty$-广群，%
+\index{$\infty$-广群}
+在这种情况下\emph{路径}上有许多运算（连接、逆等）——这在\cref{cha:hits}中将很重要——但\emph{对象}（元素）上仍没有运算。
+因此，对我们来说仍然成立，例如，\bool 的每个元素要么是 $\bfalse$ 要么是 $\btrue$，\nat 的每个元素要么是 $0$ 要么是后继。
+
+然而，正如我们在\cref{cha:basics}中看到的，将类型视为 $\infty$-广群也需要将函数视为函子，这包括类型族 $B:A\to\type$。
+因此，相等类型 $(a_0 =_A \blank)$，被视为归纳类型族，实际上是一个\emph{自由生成的函子} $A\to\type$。
+具体地，它是由 $F(a_0)$ 的一个元素 $\refl{a_0}$ 自由生成的函子 $F:A\to\type$。
+而函子确实有对象上的运算，即 $A$ 的态射（路径）的作用。
+
+在范畴论中，\emph{米田引理}\index{米田!引理}告诉我们，对于任何范畴 $A$ 和对象 $a_0$，由 $F(a_0)$ 的一个元素自由生成的函子是可表函子 $\hom_A(a_0,\blank)$。
+因此，我们应该期望相等类型 $(a_0 =_A \blank)$ 是这个可表函子，这确实正是我们看待它的方式：$(a_0 =_A b)$ 是 $A$ 中从 $a_0$ 到 $b$ 的态射（路径）的空间。
+
+\index{生成!类型的, 归纳|)}
+
+\mentalpause
+
+将相等类型视为归纳族的一个原因是应用\cref{sec:appetizer-univalence,sec:htpy-inductive}的唯一性原理。
+具体地，我们可以通过给出 $A\times A$ 上满足相同归纳原理的另一个类型族来刻画类型 $A$ 的相等类型族（达到等价）。
+这建议了以下定义和定理。
+
+\indexsee{系统, 相等}{相等系统}%
+\index{相等!系统!在一点|(定义风格}%
+
+\begin{defn}\label{defn:identity-systems}
+  设 $A$ 是类型，$a_0:A$ 是元素。
+  \begin{itemize}
+  \item $(A,a_0)$ 上的\define{有基点谓词}
+    \indexdef{谓词!有基点}%
+    \indexdef{有基点!谓词}%
+    是族 $R:A\to\type$，配备元素 $r_0:R(a_0)$。
+  \item 对于有基点谓词 $(R,r_0)$ 和 $(S,s_0)$，映射族 $g:\prd{b:A} R(b) \to S(b)$ 是\define{有基点的}如果 $g(a_0, r_0)=s_0$。
+    我们有
+    \[ \mathsf{ppmap}(R,S) \defeq \sm{g:\prd{b:A} R(b) \to S(b)} (g(a_0, r_0)=s_0)。\]
+  \item $a_0$ 处的\define{相等系统}
+    是有基点谓词 $(R,r_0)$ 使得对任意类型族 $D:\prd{b:A} R(b) \to \type$ 和 $d:D(a_0,r_0)$，存在函数 $f:\prd{b:A}{r:R(b)} D(b,r)$ 使得 $f(a_0,r_0)=d$。
+\end{itemize}
+\end{defn}
+
+\begin{thm}\label{thm:identity-systems}
+  对于 $(A,a_0)$ 上的有基点谓词 $(R,r_0)$，以下逻辑等价。
+  \begin{enumerate}
+  \item $(R,r_0)$ 是 $a_0$ 处的相等系统。\label{item:identity-systems1}
+  \item 对任意有基点谓词 $(S,s_0)$，类型 $\mathsf{ppmap}(R,S)$ 是可缩的。\label{item:identity-systems2}
+  \item 对任意 $b:A$，函数 $\transfib{R}{\blank}{r_0} : (a_0 =_A b) \to R(b)$ 是等价。\label{item:identity-systems3}
+  \item 类型 $\sm{b:A} R(b)$ 是可缩的。\label{item:identity-systems4}
+  \end{enumerate}
+\end{thm}
+
+注意等价~\ref{item:identity-systems1}$\Leftrightarrow$\ref{item:identity-systems2}$\Leftrightarrow$\ref{item:identity-systems3}是\cref{lem:homotopy-induction-times-3}对相等类型 $a_0 =_A \blank$（被视为在 $A$ 的一个元素上变化的归纳族）的一个版本。
+当然，~\ref{item:identity-systems2}--\ref{item:identity-systems4}是纯命题，所以逻辑等价蕴含实际等价。
+（条件~\ref{item:identity-systems1}也是纯命题，但我们不会证明这一点。）
+还要注意与~\ref{item:identity-systems1}--\ref{item:identity-systems3}不同，陈述~\ref{item:identity-systems4}不引用 $a_0$ 或 $r_0$。
+
+\begin{proof}
+  首先，假设~\ref{item:identity-systems1}并设 $(S,s_0)$ 是有基点谓词。
+  定义 $D(b,r) \defeq S(b)$ 和 $d\defeq s_0: S(a_0) \jdeq D(a_0,r_0)$。
+  由于 $R$ 是相等系统，我们有 $f:\prd{b:A} R(b) \to S(b)$ 满足 $f(a_0,r_0) = s_0$；因此 $\mathsf{ppmap}(R,S)$ 有居留。
+  现在假设 $(f,f_r),(g,g_r) : \mathsf{ppmap}(R,S)$，定义 $D(b,r) \defeq (f(b,r) = g(b,r))$，令 $d \defeq f_r \ct \opp{g_r} : f(a_0,r_0) = s_0 = g(a_0,r_0)$。
+  再次由于 $R$ 是相等系统，我们有 $h:\prd{b:A}{r:R(b)} D(b,r)$ 使得 $h(a_0,r_0) = f_r \ct \opp{g_r}$。
+  由函数外延性和 $\Sigma$-类型和路径类型中路径的刻画，这些数据给出等式 $(f,f_r) = (g,g_r)$。
+  因此 $\mathsf{ppmap}(R,S)$ 是有居留的纯命题，从而可缩；所以~\ref{item:identity-systems2}成立。
+
+  现在假设~\ref{item:identity-systems2}，定义 $S(b) \defeq (a_0=b)$ 和 $s_0 \defeq \refl{a_0}:S(a_0)$。
+  则 $(S,s_0)$ 是有基点谓词，$\lamu{b:B}{p:a_0=b} \transfib{R}{p}{r} : \prd{b:A} S(b) \to R(b)$ 是从 $S$ 到 $R$ 的有基点映射族。
+  由假设，$\mathsf{ppmap}(R,S)$ 是可缩的，从而有居留，所以也存在从 $R$ 到 $S$ 的有基点映射族。
+  两个方向的复合分别是从 $R$ 到 $R$ 和从 $S$ 到 $S$ 的有基点映射族，因此分别等于恒等，因为 $\mathsf{ppmap}(R,R)$ 和 $\mathsf{ppmap}(S,S)$ 是可缩的。
+  因此~\ref{item:identity-systems3}成立。
+
+  现在假设~\ref{item:identity-systems3}，条件~\ref{item:identity-systems4}由\cref{thm:contr-paths}得出，使用 $\Sigma$-类型尊重等价（\cref{thm:total-fiber-equiv}的``如果''方向）的事实。
+
+  最后，假设~\ref{item:identity-systems4}，设 $D:\prd{b:A} R(b)\to  \type$ 和 $d:D(a_0,r_0)$。
+  我们可以等价地将 $D$ 表示为族 $D':(\sm{b:A} R(b)) \to \type$。
+  现在由于 $\sm{b:A} R(b)$ 是可缩的，我们有
+  \[p:\prd{u:\sm{b:A} R(b)} (a_0,r_0) = u。 \]
+  此外，由于可缩类型的路径类型再次可缩，我们有 $p((a_0,r_0)) = \refl{(a_0,r_0)}$。
+  定义 $f(u) \defeq \transfib{D'}{p(u)}{d}$，得到 $f:\prd{u:\sm{b:A} R(b)} D'(u)$，或等价地 $f:\prd{b:A}{r:R(b)} D(b,r)$。
+  最后，我们有
+  \[f(a_0,r_0) \jdeq \transfib{D'}{p((a_0,r_0))}{d} = \transfib{D'}{\refl{(a_0,r_0)}}{d} = d。\]
+  因此，~\ref{item:identity-systems1}成立。
+\end{proof}
+
+\index{相等!系统!在一点|)}%
+
+我们可以为相等类型 $=_A$（被视为在 $A$ 的两个元素上变化的族）推导一个类似的结果。
+
+\index{相等!系统|(定义风格}%
+
+\begin{defn}
+  类型 $A$ 上的\define{相等系统}
+  是族 $R:A\to A\to \type$，配备函数 $r_0:\prd{a:A} R(a,a)$，使得对任意类型族 $D:\prd{a,b:A} R(a,b) \to \type$ 和 $d:\prd{a:A} D(a,a,r_0(a))$，存在函数 $f:\prd{a,b:A}{r:R(a,b)} D(a,b,r)$ 使得对所有 $a:A$ 有 $f(a,a,r_0(a))=d(a)$。
+\end{defn}
+
+\begin{thm}\label{thm:ML-identity-systems}
+  对于配备 $r_0:\prd{a:A} R(a,a)$ 的 $R:A\to A\to\type$，以下逻辑等价。
+  \begin{enumerate}
+  \item $(R,r_0)$ 是 $A$ 上的相等系统。\label{item:MLis1}
+  \item 对所有 $a_0:A$，有基点谓词 $(R(a_0),r_0(a_0))$ 是 $a_0$ 处的相等系统。\label{item:MLis2}
+  \item 对任意 $S:A\to A\to\type$ 和 $s_0:\prd{a:A} S(a,a)$，类型
+    \[ \sm{g:\prd{a,b:A} R(a,b) \to S(a,b)} \prd{a:A} g(a,a,r_0(a)) = s_0(a) \]
+    是可缩的。\label{item:MLis3}
+  \item 对任意 $a,b:A$，映射 $\transfib{R(a)}{\blank}{r_0(a)} : (a =_A b) \to R(a,b)$ 是等价。\label{item:MLis4}
+  \item 对任意 $a:A$，类型 $\sm{b:A} R(a,b)$ 是可缩的。\label{item:MLis5}
+  \end{enumerate}
+\end{thm}
+\begin{proof}
+  等价~\ref{item:MLis1}$\Leftrightarrow$\ref{item:MLis2}完全遵循相等类型的路径归纳和基于路径归纳原理之间等价的证明；见\cref{sec:identity-types}。
+  与~\ref{item:MLis4}和~\ref{item:MLis5}的等价由\cref{thm:identity-systems}得出，而~\ref{item:MLis3}是直接的。
+\end{proof}
+
+\index{相等!系统|)}%
+
+这个刻画有趣的一个原因是它提供了陈述泛等性和函数外延性的另一种方式。
+\index{泛等公理}%
+宇宙 \UU 的泛等公理恰好说类型族
+\[ (\eqv{\blank}{\blank}) : \UU\to\UU\to\UU \]
+连同 $\idfunc : \prd{A:\UU} (\eqv AA)$ 满足\cref{thm:ML-identity-systems}\ref{item:MLis4}。
+因此，它等价于~\ref{item:MLis1}的相应版本，我们可以陈述如下。
+
+\begin{cor}[等价归纳]\label{thm:equiv-induction}
+  \index{归纳原理!等价的}%
+  \index{等价!归纳}%
+  给定任意类型族 \narrowequation{D:\prd{A,B:\UU} (\eqv AB) \to \type} 和函数 $d:\prd{A:\UU} D(A,A,\idfunc[A])$，存在 \narrowequation{f : \prd{A,B:\UU}{e:\eqv AB} D(A,B,e)} 使得对所有 $A:\UU$ 有 $f(A,A,\idfunc[A]) = d(A)$。
+\end{cor}
+
+换句话说，要证明关于所有等价的某事，只需对恒等映射证明即可。
+我们已经在\cref{lem:qinv-autohtpy}中使用了这个原理（没有一般性地陈述它）。
+
+类似地，函数外延性说对任意 $B:A\to\type$，类型族
+\[ (\blank\htpy\blank) : \Parens{\prd{a:A} B(a)} \to \Parens{\prd{a:A} B(a)} \to \type
+\]
+连同 $\lamu{f:\prd{a:A} B(a)}{a:A} \refl{f(a)}$ 满足\cref{thm:ML-identity-systems}\ref{item:MLis4}。
+因此，它也等价于~\ref{item:MLis1}的相应版本。
+
+\begin{cor}[同伦归纳]\label{thm:htpy-induction}
+  \index{归纳原理!同伦的}%
+  \index{同伦!归纳}%
+  给定任意 \narrowequation{D:\prd{f,g:\prd{a:A} B(a)} (f\htpy g) \to \type} 和 $d:\prd{f:\prd{a:A} B(a)} D(f,f,\lam{x}\refl{f(x)})$，存在
+  %
+  \begin{equation*}
+    k:\prd{f,g:\prd{a:A} B(a)}{h:f\htpy g} D(f,g,h)
+  \end{equation*}
+  %
+  使得对所有 $f$ 有 $k(f,f,\lam{x}\refl{f(x)}) = d(f)$。
+\end{cor}
+
+\sectionNotes
+
+归纳定义在数学中有悠久的历史，可以追溯至少到弗雷格和皮亚诺的自然数公理。\index{弗雷格}\index{皮亚诺} %
+更一般的``归纳谓词''并不罕见，但在集合论基础中，它们通常是显式构造的，要么作为适当子集类的交，要么使用沿序数的超限迭代，而不是被视为基本概念。
+
+在类型论中，归纳定义的特例可以追溯到 Martin-L\"of 的原始论文：\cite{martin-lof-hauptsatz}提出了归纳定义的谓词和关系的一般概念；归纳类型的概念在 Martin-L\"of 的第一篇类型论论文\cite{Martin-Lof-1973}中就已存在（但只有实例，没有作为一般概念）；
+然后在\cite{Martin-Lof-1979}中作为带 $\w$-类型的一般概念出现。\index{Martin-L\"of}%
+
+归纳类型的一般概念于1985年由 Constable 和 Mendler~\cite{DBLP:conf/lop/ConstableM85}引入。内涵类型论中归纳类型的一般模式在
+\cite{PfenningPaulinMohring, CoquandPaulin, Dybjer:1991}中被建议。
+
+归纳-递归定义的概念出现在\cite{Dybjer:2000}中。一个重要的类型论概念是树类型的概念（Post 系统在类型论中的一般表达），它出现在\cite{PeterssonSynek}中。
+
+自然数作为 $\nat$-代数范畴的始对象的泛性质归功于 Lawvere \cite{lawvere:adjinfound}\index{Lawvere}。
+这后来被~\cite{mp:wftrees}推广为将 $\w$-类型描述为多项式自函子的始代数。\index{自函子!代数}
+这种泛性质与相应归纳原理之间的相干同伦论等价（\cref{sec:initial-alg,sec:htpy-inductive}）归功于~\cite{ags:it-hott}。
+
+关于类型论的同伦论语义中归纳类型的实际构造，见~\cite{klv:ssetmodel,mvdb:wtypes,ls:hits}。
+
+\sectionExercises
+
+\begin{ex}\label{ex:ind-lst}
+  从\cref{sec:bool-nat}中作为归纳类型的定义推导列表类型 $\lst{A}$ 的归纳原理。\index{类型!列表}
+\end{ex}
+
+\begin{ex}\label{ex:same-recurrence-not-defeq}
+  构造两个判断地满足相同递推式\index{递推式} $(e_z, e_s)$ 但不判断相等的自然数上的函数。
+\end{ex}
+
+\begin{ex}\label{ex:one-function-two-recurrences}
+  在同一类型 $E$ 上构造两个不同的递推式 $(e_z,e_s)$，它们都被同一函数 $f:\nat\to E$ 判断地满足。
+\end{ex}
+
+\begin{ex}\label{ex:bool}
+  证明对任意类型族 $E : \bool \to \type$，归纳算子
+  \[ \ind{\bool}(E) : \big(E(\bfalse) \times E(\btrue)\big) \to \prd{b : \bool} E(b) \]
+  是等价。
+\end{ex}
+
+\begin{ex}\label{ex:ind-nat-not-equiv}
+  证明\cref{ex:bool}对 $\nat$ 的类似陈述不成立。
+\end{ex}
+
+\begin{ex}\label{ex:no-dep-uniqueness-failure}
+  证明如果我们对 $\w$-类型假设简单消去而不是依赖消去，唯一性性质（\cref{thm:w-uniq}的类似物）不成立。
+  即展示一个满足 $\w$-类型递归原理的类型，但其上的函数不由其递推式\index{递推式}唯一确定。
+\end{ex}
+
+\begin{ex}\label{ex:loop}
+  假设在\cref{sec:strictly-positive}开头类型 $C$ 的``归纳定义''中，我们将类型 \nat 替换为 \emptyt。
+  类似于~\eqref{eq:fake-recursor}，我们可能考虑这个类型的一个递归原理，其假设为
+  \[ h:(C\to\emptyt) \to (P\to\emptyt) \to P。 \]
+  证明即使没有计算规则，这个递归原理也是不一致的，即它允许我们构造 \emptyt 的元素。
+\end{ex}
+
+\begin{ex}\label{ex:loop2}
+  现在考虑一个具有一个构造子 $\mathsf{scott}:(D\to D) \to D$ 的``归纳类型'' $D$。
+  \index{Scott}%
+  \cref{sec:strictly-positive}中建议的 $C$ 的第二个递归子导致 $D$ 的以下递归子：
+  \[ \rec{D} : \prd{P:\UU} ((D\to D) \to (D\to P)\to P) \to D \to P \]
+  带计算规则 $\rec{D}(P,h,\mathsf{scott}(\alpha)) \jdeq h(\alpha,(\lam{d} \rec{D}(P,h,\alpha(d))))$。
+  证明这也导致矛盾。
+\end{ex}
+
+\begin{ex}\label{ex:inductive-lawvere}
+  设 $A$ 是任意类型，一般地考虑具有构造子 $\mathsf{lawvere}:(L_A\to A) \to L_A$ 的类型 $L_A$ 的``归纳定义''。
+  \cref{sec:strictly-positive}中建议的 $C$ 的第二个递归子导致 $L_A$ 的以下递归子：
+  \[ \rec{L_A} : \prd{P:\UU} ((L_A\to A) \to P) \to L_A\to P \]
+  带计算规则 $\rec{L_A}(P,h,\mathsf{lawvere}(\alpha)) \jdeq h(\alpha)$。
+  使用这个，证明 $A$ 有\define{不动点性质}，即对每个函数 $f:A\to A$，存在 $a:A$ 使得 $f(a)=a$。
+  \index{Lawvere}%
+  \index{不动点性质}%
+  特别地，如果 $A$ 是没有不动点性质的类型（如 $\emptyt$、$\bool$ 或 $\nat$），则 $L_A$ 是不一致的。
+\end{ex}
+
+\begin{ex}\label{ex:ilunit}
+  继续\cref{ex:inductive-lawvere}，考虑 $L_\unit$，它不是明显不一致的，因为 $\unit$ 确实有不动点性质。
+  为 $L_\unit$ 及其计算规则制定归纳原理，类似于其递归子，并使用它证明它是可缩的。
+\end{ex}
+
+\begin{ex}\label{ex:empty-inductive-type}
+在\cref{sec:bool-nat}中，我们定义了某类型 $A$ 的元素的有限列表类型 $\lst A$。
+考虑一个类似的归纳定义的类型 $\lost A$，其唯一构造子是
+\[ \cons: A \to \lost A \to \lost A。 \]
+证明 $\lost A$ 等价于 $\emptyt$。
+\end{ex}
+
+\begin{ex}\label{ex:Wprop}
+  假设 $A$ 是纯命题，$B:A\to \UU$。
+  \begin{enumerate}
+  \item 证明 $\wtype{a:A} B(a)$ 是纯命题。
+  \item 证明 $\wtype{a:A} B(a)$ 等价于 $\sm{a:A} \neg B(a)$。
+  \item 不使用 $\wtype{a:A} B(a)$，证明 $\sm{a:A} \neg B(a)$ 是\cref{sec:htpy-inductive}意义上的同伦 $\w$-类型 $\wtypeh{a:A} B(a)$。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:Wbounds}
+  设 $A:\UU$ 和 $B:A\to \UU$。
+  \begin{enumerate}
+  \item 证明 $\Parens{\sm{a:A} \neg B(a)} \to \Parens{\wtype{a:A} B(a)}$。
+  \item 证明 $\Parens{\wtype{a:A} B(a)} \to \Parens{\neg \prd{a:A} B(a)}$。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:Wdec}
+  设 $A:\UU$，假设 $B:A\to \UU$ 是可判定的，即 $\prd{a:A} (B(a)+\neg B(a))$（见\cref{defn:decidable-equality}）。
+  证明 $\Parens{\wtype{a:A} B(a)} \to \Parens{\sm{a:A} \neg B(a)}$。
+\end{ex}
+
+\begin{ex}\label{ex:Wbounds-loose}
+  证明以下逻辑等价。
+  \begin{enumerate}
+  \item 对任意 $A:\set$ 和 $B:A\to \prop$，$\Parens{\wtype{a:A} B(a)} \to \Brck{\sm{a:A} \neg B(a)}$。\label{item:Wbounds-loose-Sigma}
+  \item 对任意 $A:\set$ 和 $B:A\to \prop$，$\Parens{\neg \prd{a:A} B(a)} \to \Brck{\wtype{a:A} B(a)}$。\label{item:Wbounds-loose-Pi}
+  \item 排中律（如\cref{sec:intuitionism}中）。
+  \end{enumerate}
+  类似地，使用\cref{thm:not-lem}，证明假设~\ref{item:Wbounds-loose-Sigma}或~\ref{item:Wbounds-loose-Pi}中的任一蕴含对所有 $A:\UU$ 和 $B:A\to \UU$ 成立是不一致的。
+\end{ex}
+
+\begin{ex}\label{ex:Wimpred}
+  对于 $A:\UU$ 和 $B:A\to \UU$，定义
+  \[ W'_{A,B} \defeq \prd{R:\UU} \Parens{\prd{a:A} (B(a) \to R) \to R} \to R \]
+  $W'_{A,B}$ 称为 $\wtype{a:A} B(a)$ 的\define{非谓词编码}。
+  \index{非谓词!$\w$-类型的编码}%
+  \index{W-类型@$\w$-类型!非谓词编码}%
+  注意与 $\wtype{a:A} B(a)$ 不同，它生活在比 $A$ 和 $B$ 更高的宇宙中。
+  \begin{enumerate}
+  \item 证明 $W'_{A,B}$ 与 $\wtype{a:A} B(a)$ 逻辑等价（如\cref{sec:pat}中定义）。
+  \item 证明 $W'_{A,B}$ 蕴含 $\neg\neg \sm{a:A} \neg B(a)$。
+  \item 不使用 $\wtype{a:A} B(a)$，证明 $W'_{A,B}$ 满足与 $\wtype{a:A} B(a)$ 相同的\emph{递归}原理，用于定义到宇宙 $\UU$（它本身不属于）中类型的函数。
+  \item 使用\LEM，给出 $A:\UU$ 和 $B:A\to \UU$ 的例子，使得 $W'_{A,B}$ 不等价于 $\wtype{a:A} B(a)$。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:no-nullary-constructor}
+  证明对任意 $A:\UU$ 和 $B:A\to\UU$，我们有
+  \[ \eqv{\neg\Parens{\wtype{a:A} B(a)}}{\neg\Parens{\sm{a:A} \neg B(a)}}。 \]
+  换句话说，$\wtype{a:A} B(a)$ 是空的当且仅当它没有零元构造子。
+  （比较\cref{ex:empty-inductive-type}。）
+\end{ex}
+
+% Local Variables:
+% TeX-master: "../main-zh"
+% End:

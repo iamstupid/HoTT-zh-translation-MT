@@ -18,19 +18,19 @@
 
 | 文件 | 状态 | 译者 | 审校 | 备注 |
 |------|------|------|------|------|
-| introduction.tex | :white_large_square: | - | - | 约 55KB |
+| introduction.tex | :white_check_mark: | MT | - | 约 55KB |
 
 ## 第一部分：基础
 
 | 章节 | 文件 | 状态 | 译者 | 审校 | 备注 |
 |------|------|------|------|------|------|
-| 第1章 类型论 | preliminaries.tex | :white_large_square: | - | - | 约 140KB |
-| 第2章 同伦类型论 | basics.tex | :white_large_square: | - | - | 约 158KB |
-| 第3章 集合与逻辑 | logic.tex | :white_large_square: | - | - | 约 82KB |
-| 第4章 等价 | equivalences.tex | :white_large_square: | - | - | 约 57KB |
-| 第5章 归纳 | induction.tex | :white_large_square: | - | - | 约 96KB |
-| 第6章 高阶归纳类型 | hits.tex | :white_large_square: | - | - | 约 136KB |
-| 第7章 同伦n-类型 | hlevels.tex | :white_large_square: | - | - | 约 114KB |
+| 第1章 类型论 | preliminaries.tex | :white_check_mark: | MT | - | 约 140KB |
+| 第2章 同伦类型论 | basics.tex | :white_check_mark: | MT | - | 约 158KB |
+| 第3章 集合与逻辑 | logic.tex | :white_check_mark: | MT | - | 约 82KB |
+| 第4章 等价 | equivalences.tex | :white_check_mark: | MT | - | 约 57KB |
+| 第5章 归纳 | induction.tex | :white_check_mark: | MT | - | 约 96KB |
+| 第6章 高阶归纳类型 | hits.tex | :white_check_mark: | MT | - | 约 136KB |
+| 第7章 同伦n-类型 | hlevels.tex | :white_check_mark: | MT | - | 约 114KB |
 
 ## 第二部分：数学
 
@@ -58,12 +58,22 @@
 ## 统计
 
 - 总章节数：14（含导论和附录）
-- 已完成：0
+- 已完成：8（导论 + 第1-7章）
 - 翻译中：0
 - 审校中：0
-- 未开始：14
+- 未开始：6
 
 ## 更新日志
+
+### 2025-12-15
+- 完成导论翻译（机器翻译初稿）
+- 完成第1章 类型论 翻译
+- 完成第2章 同伦类型论 翻译
+- 完成第3章 集合与逻辑 翻译
+- 完成第4章 等价 翻译
+- 完成第5章 归纳 翻译
+- 完成第6章 高阶归纳类型 翻译
+- 完成第7章 同伦n-类型 翻译（Part 1 基础部分完成）
 
 ### 2024-XX-XX
 - 项目初始化
