@@ -1,0 +1,323 @@
+% 中文版宏定义
+% Chinese Version Macros
+% 注意：ctex 已由 ctexbook 文档类加载，此处不要重复加载
+
+% 中文字体设置 (ctexbook 默认使用系统字体，如需自定义可取消注释)
+% \setCJKmainfont{SimSun}[BoldFont=SimHei, ItalicFont=KaiTi]
+% \setCJKsansfont{SimHei}
+% \setCJKmonofont{FangSong}
+
+% 章节标题中文化
+% 注意：章节编号使用阿拉伯数字，章节标题显示使用中文格式
+\renewcommand{\partname}{第}
+\renewcommand{\thepart}{\chinese{part}}
+\renewcommand{\chaptername}{第}
+% \thechapter 保持阿拉伯数字，这样节编号为 "1.1" 而非 "一章.1"
+% 章标题格式由 ctexbook 的 chapter/name 和 chapter/number 控制
+
+% ctex 格式设置
+% 章标题显示格式
+\ctexset{
+  chapter = {
+    name = {第,章},
+    number = \arabic{chapter}
+  },
+  part = {
+    name = {第,部分},
+    number = \arabic{part}
+  }
+}
+
+% 强制重置 \thechapter 和 \thepart 为纯阿拉伯数字
+% 这是为了确保 cleveref 正常工作
+\makeatletter
+\renewcommand{\thechapter}{\@arabic\c@chapter}
+\renewcommand{\thepart}{\@arabic\c@part}
+\makeatother
+\renewcommand{\contentsname}{目录}
+\renewcommand{\listfigurename}{插图目录}
+\renewcommand{\listtablename}{表格目录}
+\renewcommand{\bibname}{参考文献}
+\renewcommand{\indexname}{索引}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\appendixname}{附录}
+
+% 定理环境中文化 (使用 \providecommand 避免重复定义错误)
+\providecommand{\theoremname}{定理}
+\providecommand{\lemmaname}{引理}
+\providecommand{\corollaryname}{推论}
+\providecommand{\propositionname}{命题}
+\providecommand{\definitionname}{定义}
+\providecommand{\remarkname}{注记}
+\providecommand{\examplename}{例}
+\providecommand{\exercisename}{练习}
+\renewcommand{\proofname}{证明}  % 已由 amsthm 定义，需用 renewcommand
+\providecommand{\solutionname}{解}
+\providecommand{\notename}{注}
+\providecommand{\axiomname}{公理}
+
+% HoTT 特定术语命令
+\newcommand{\zhtype}{类型}
+\newcommand{\zhuniverse}{宇宙}
+\newcommand{\zhpath}{路径}
+\newcommand{\zhhomotopy}{同伦}
+\newcommand{\zhequivalence}{等价}
+\newcommand{\zhunivalence}{泛等性}
+\newcommand{\zhcontractible}{可缩的}
+\newcommand{\zhtruncation}{截断}
+\newcommand{\zhfiber}{纤维}
+\newcommand{\zhfibration}{纤维化}
+\newcommand{\zhinduction}{归纳}
+\newcommand{\zhrecursion}{递归}
+\newcommand{\zhtransport}{传输}
+
+% 中英文对照命令
+% 用于在正文中标注英文原词
+% 例如: \en{homotopy type theory}{同伦类型论}
+\newcommand{\en}[2]{#2\footnote{英文: #1}}
+
+% 术语首次出现时使用
+% 例如: \term{同伦类型论}{homotopy type theory}
+\newcommand{\term}[2]{\textbf{#1} (#2)}
+
+% 数学术语（不需要翻译的专有名词）
+\newcommand{\mathterm}[1]{\textit{#1}}
+
+% narrowmultline 环境 (来自原书的 opt-*.tex)
+\newenvironment{narrowmultline*}{\csname multline*\endcsname}{\csname endmultline*\endcsname}
+\newenvironment{narrowmultline}{\csname multline\endcsname}{\csname endmultline\endcsname}
+
+% 断行命令 (用于 narrowmultline 环境)
+\providecommand{\narrowbreak}{\\}
+
+% 来自原书 opt-*.tex 的布局命令 (作为空操作)
+\providecommand{\OPTwidow}{}
+\providecommand{\OPTsmalltable}{}
+\providecommand{\mentalpause}{\par\medskip}
+
+% narrowequation 环境 (用于窄方程)
+\providecommand{\narrowequation}[1]{\begin{equation*}#1\end{equation*}}
+
+% 修复 \eqref 方程引用问题
+% hyperref 和 cleveref 可能会干扰 amsmath 的 \eqref
+% 重新定义以确保正常工作
+\makeatletter
+\renewcommand{\eqref}[1]{\textup{(\ref{#1})}}
+\makeatother
+
+% cleveref 中文配置
+% 首先设置引用名称 (用于默认格式和多引用)
+\crefname{chapter}{章}{章}
+\Crefname{chapter}{章}{章}
+\crefname{section}{节}{节}
+\Crefname{section}{节}{节}
+\crefname{part}{部分}{部分}
+\Crefname{part}{部分}{部分}
+\crefname{appendix}{附录}{附录}
+\Crefname{appendix}{附录}{附录}
+\crefname{figure}{图}{图}
+\Crefname{figure}{图}{图}
+\crefname{table}{表}{表}
+\Crefname{table}{表}{表}
+\crefname{equation}{公式}{公式}
+\Crefname{equation}{公式}{公式}
+
+% 章的格式 - 使用阿拉伯数字
+\crefformat{chapter}{第~#2#1#3~章}
+\Crefformat{chapter}{第~#2#1#3~章}
+\crefmultiformat{chapter}{第~#2#1#3~章}{ 和第~#2#1#3~章}{、第~#2#1#3~章}{ 和第~#2#1#3~章}
+\Crefmultiformat{chapter}{第~#2#1#3~章}{ 和第~#2#1#3~章}{、第~#2#1#3~章}{ 和第~#2#1#3~章}
+\crefrangeformat{chapter}{第~#3#1#4~章至第~#5#2#6~章}
+\Crefrangeformat{chapter}{第~#3#1#4~章至第~#5#2#6~章}
+
+% 节的格式
+\crefformat{section}{第~#2#1#3~节}
+\Crefformat{section}{第~#2#1#3~节}
+\crefmultiformat{section}{第~#2#1#3~节}{ 和第~#2#1#3~节}{、第~#2#1#3~节}{ 和第~#2#1#3~节}
+\Crefmultiformat{section}{第~#2#1#3~节}{ 和第~#2#1#3~节}{、第~#2#1#3~节}{ 和第~#2#1#3~节}
+\crefrangeformat{section}{第~#3#1#4~节至第~#5#2#6~节}
+\Crefrangeformat{section}{第~#3#1#4~节至第~#5#2#6~节}
+
+% 小节
+\crefformat{subsection}{第~#2#1#3~小节}
+\Crefformat{subsection}{第~#2#1#3~小节}
+
+% 部分
+\crefformat{part}{第#2#1#3部分}
+\Crefformat{part}{第#2#1#3部分}
+\crefmultiformat{part}{第#2#1#3部分}{ 和第#2#1#3部分}{、第#2#1#3部分}{ 和第#2#1#3部分}
+\Crefmultiformat{part}{第#2#1#3部分}{ 和第#2#1#3部分}{、第#2#1#3部分}{ 和第#2#1#3部分}
+
+% 附录
+\crefformat{appendix}{附录~#2#1#3}
+\Crefformat{appendix}{附录~#2#1#3}
+
+% 图表公式
+\crefformat{figure}{图~#2#1#3}
+\Crefformat{figure}{图~#2#1#3}
+\crefformat{table}{表~#2#1#3}
+\Crefformat{table}{表~#2#1#3}
+\crefformat{equation}{公式~(#2#1#3)}
+\Crefformat{equation}{公式~(#2#1#3)}
+
+% 定理类型的引用名称
+\crefname{thm}{定理}{定理}
+\Crefname{thm}{定理}{定理}
+\crefname{lem}{引理}{引理}
+\Crefname{lem}{引理}{引理}
+\crefname{cor}{推论}{推论}
+\Crefname{cor}{推论}{推论}
+\crefname{defn}{定义}{定义}
+\Crefname{defn}{定义}{定义}
+\crefname{rmk}{注记}{注记}
+\Crefname{rmk}{注记}{注记}
+\crefname{eg}{例}{例}
+\Crefname{eg}{例}{例}
+\crefname{ex}{练习}{练习}
+\Crefname{ex}{练习}{练习}
+
+% 定理类型的引用格式
+\crefformat{thm}{定理~#2#1#3}
+\Crefformat{thm}{定理~#2#1#3}
+\crefformat{lem}{引理~#2#1#3}
+\Crefformat{lem}{引理~#2#1#3}
+\crefformat{cor}{推论~#2#1#3}
+\Crefformat{cor}{推论~#2#1#3}
+\crefformat{defn}{定义~#2#1#3}
+\Crefformat{defn}{定义~#2#1#3}
+\crefformat{rmk}{注记~#2#1#3}
+\Crefformat{rmk}{注记~#2#1#3}
+\crefformat{eg}{例~#2#1#3}
+\Crefformat{eg}{例~#2#1#3}
+\crefformat{ex}{练习~#2#1#3}
+\Crefformat{ex}{练习~#2#1#3}
+
+% 修复 ctex 与 cleveref 章节引用的兼容性问题
+% ctex 的计数器格式与 cleveref 不完全兼容
+% 创建自定义章节引用命令来绕过这个问题
+
+% 自定义章引用命令 - 直接输出 "第X章" 格式
+\newcommand{\zhchapter}[1]{%
+  第\ref{#1}章%
+}
+
+% 自定义节引用命令
+\newcommand{\zhsection}[1]{%
+  第~\ref{#1}~节%
+}
+
+% 自定义部分引用命令
+\newcommand{\zhpart}[1]{%
+  第\ref{#1}部分%
+}
+
+% 保存原始的 cref 命令并重新定义
+% 由于 ctex 污染了 cleveref 的内部数据，我们根据标签前缀来判断类型
+% 并直接使用 \ref 来避免 cleveref 的损坏数据
+\makeatletter
+\let\origcref\cref
+\let\origCref\Cref
+
+% 单标签引用的内部命令
+\newcommand{\@singlecref}[1]{%
+  \@ifundefined{r@#1}{??}{%
+    \in@{cha:}{#1}%
+    \ifin@
+      第~\ref{#1}~章%
+    \else
+      \in@{part:}{#1}%
+      \ifin@
+        第\ref{#1}部分%
+      \else
+        \in@{sec:}{#1}%
+        \ifin@
+          第~\ref{#1}~节%
+        \else
+          \in@{thm:}{#1}%
+          \ifin@
+            定理~\ref{#1}%
+          \else
+            \in@{lem:}{#1}%
+            \ifin@
+              引理~\ref{#1}%
+            \else
+              \in@{cor:}{#1}%
+              \ifin@
+                推论~\ref{#1}%
+              \else
+                \in@{defn:}{#1}%
+                \ifin@
+                  定义~\ref{#1}%
+                \else
+                  \in@{rmk:}{#1}%
+                  \ifin@
+                    注记~\ref{#1}%
+                  \else
+                    \in@{eg:}{#1}%
+                    \ifin@
+                      例~\ref{#1}%
+                    \else
+                      \in@{ex:}{#1}%
+                      \ifin@
+                        练习~\ref{#1}%
+                      \else
+                        \in@{eq:}{#1}%
+                        \ifin@
+                          公式~(\ref{#1})%
+                        \else
+                          \in@{fig:}{#1}%
+                          \ifin@
+                            图~\ref{#1}%
+                          \else
+                            \in@{tab:}{#1}%
+                            \ifin@
+                              表~\ref{#1}%
+                            \else
+                              % 其他类型直接使用 ref 避免 cleveref 损坏数据
+                              \ref{#1}%
+                            \fi
+                          \fi
+                        \fi
+                      \fi
+                    \fi
+                  \fi
+                \fi
+              \fi
+            \fi
+          \fi
+        \fi
+      \fi
+    \fi
+  }%
+}
+
+% 处理逗号分隔的多标签引用
+\newcounter{@crefcount}
+\newcommand{\@processcreflist}[1]{%
+  \setcounter{@crefcount}{0}%
+  \@for\@crefitem:=#1\do{%
+    \stepcounter{@crefcount}%
+    \ifnum\value{@crefcount}>1 { 和 }\fi
+    \expandafter\@singlecref\expandafter{\@crefitem}%
+  }%
+}
+
+% 重新定义 cref，支持逗号分隔的多标签
+\renewcommand{\cref}[1]{%
+  \in@{,}{#1}%
+  \ifin@
+    \@processcreflist{#1}%
+  \else
+    \@singlecref{#1}%
+  \fi
+}
+
+\renewcommand{\Cref}[1]{\cref{#1}}
+
+% 处理 crefrange - 简化为 "X 至 Y" 格式
+\let\origcrefrange\crefrange
+\renewcommand{\crefrange}[2]{%
+  \@singlecref{#1}~至~\@singlecref{#2}%
+}
+\makeatother

@@ -1,0 +1,1741 @@
+﻿% 第1章 类型论 / Chapter 1: Type Theory
+% 翻译状态：进行中
+% 译者：Claude
+% 审校：
+
+\section{类型论 vs 集合论}
+\label{sec:types-vs-sets}
+\label{sec:axioms}
+
+\index{type theory}
+同伦类型论（除其他方面外）是数学的一种基础语言，即 Zermelo--Fraenkel\index{set theory!Zermelo--Fraenkel} 集合论的一种替代方案。
+然而，它在几个重要方面与集合论的行为不同，这需要一些时间来适应。
+仔细解释这些差异需要我们在此处比本书其余部分更加形式化。
+如导论所述，我们的目标是\emph{非形式地}书写类型论；但对于习惯于集合论的数学家来说，开始时更精确可以帮助避免一些常见的误解和错误。
+
+我们注意到，集合论基础有两个层次：一阶逻辑\index{first-order!logic}的演绎系统，以及在这个系统内部表述的特定理论的公理，如 ZFC。
+因此，集合论不仅仅是关于集合的，而是关于集合（第二层的对象）和命题（第一层的对象）之间的相互作用。
+
+相比之下，类型论是它自己的演绎系统：它不需要在任何上层结构（如一阶逻辑）内部表述。
+类型论不是像集合论那样有两个基本概念——集合和命题，而是只有一个基本概念：\emph{类型}。
+命题（我们可以证明、反驳、假设、否定等的陈述\footnote{令人困惑的是，将命题一词与定理同义使用也是一种常见做法（可追溯到欧几里得）。
+  我们将限制自己使用逻辑学家的用法，根据这种用法，\emph{命题}\indexfoot{proposition}是\emph{可被}证明的陈述，而\emph{定理}\indexfoot{theorem}（或引理\indexfoot{lemma}或推论\indexfoot{corollary}）是\emph{已被}证明的这样的陈述。
+因此$0=1$及其否定$\neg(0=1)$都是命题，但只有后者是定理。}）通过第~\pageref{tab:pov}~页\cref{tab:pov}所示的对应关系与特定类型等同。
+因此，\emph{证明定理}的数学活动被等同于\emph{构造对象}的数学活动的一个特例——在这种情况下，是构造一个表示命题的类型的居民。
+
+\index{deductive system}%
+这引导我们到类型论和集合论之间的另一个区别，但要解释它，我们必须先简要介绍一下演绎系统的一般概念。
+非形式地说，演绎系统是推导称为\define{判断}的事物的\define{规则}的集合。
+\indexdef{rule}%
+\indexdef{judgment}%
+如果我们把演绎系统想象成一个形式游戏，
+\index{game!deductive system as}%
+那么判断就是我们通过遵循游戏规则所达到的局面。
+我们也可以把演绎系统想象成一种代数理论，在这种情况下，判断是元素（像群的元素），而演绎规则是运算（像群乘法）。
+从逻辑的角度来看，判断可以被认为是外部陈述，存在于元理论中，与理论本身的内部陈述相对。
+
+在一阶逻辑的演绎系统中（集合论基于此），只有一种判断：给定命题有证明。
+也就是说，每个命题 $A$ 产生一个判断$A$ 有证明，所有判断都是这种形式。
+一阶逻辑的规则，如从 $A$ 和 $B$ 推出 $A\wedge B$，实际上是证明构造的规则，它说的是：给定判断$A$ 有证明和$B$ 有证明，我们可以推导出$A\wedge B$ 有证明。
+注意，判断$A$ 有证明与\emph{命题} $A$ 本身存在于不同的层次，后者是理论的内部陈述。
+
+类型论的基本判断，类似于$A$ 有证明，写作$a:A$，读作项 $a$ 具有类型 $A$，或更宽松地说$a$ 是 $A$ 的元素（或者在同伦类型论中，$a$ 是 $A$ 的点）。
+\indexdef{term}%
+\indexdef{element}%
+\indexdef{point!of a type}%
+当 $A$ 是表示命题的类型时，$a$ 可以被称为 $A$ 可证性的\emph{见证}\index{witness!to the truth of a proposition}，或 $A$ 真值的\emph{证据}\index{evidence, of the truth of a proposition}（甚至是 $A$ 的\emph{证明}\index{proof}，但我们将尽量避免这种容易混淆的术语）。
+在这种情况下，判断 $a:A$ 在类型论中可推导（对于某个 $a$）恰好当类似的判断$A$ 有证明在一阶逻辑中可推导时（模去假设的公理和数学编码的差异，我们将在全书中讨论）。
+
+另一方面，如果类型 $A$ 被更多地当作集合而非命题处理（尽管我们将看到，这种区别可能变得模糊），那么$a:A$可以被视为类似于集合论陈述$a\in A$。
+然而，有一个本质区别： $a:A$是一个\emph{判断}，而$a\in A$是一个\emph{命题}。
+特别是，当在类型论内部工作时，我们不能做出诸如如果 $a:A$，那么不是 $b:B$这样的陈述，也不能反驳判断$a:A$。
+
+思考这一点的好方法是：在集合论中，成员关系是一种可能在两个预先存在的对象$a$和$A$之间成立或不成立的关系，而在类型论中，我们不能孤立地谈论一个元素$a$：每个元素\emph{本质上}是某个类型的元素，而且那个类型（一般而言）是唯一确定的。
+因此，当我们非形式地说设 $x$ 是自然数时，在集合论中这是设 $x$ 是一个东西并假设 $x\in\nat$的简写，而在类型论中设 $x:\nat$是一个原子陈述：我们不能在不指定其类型的情况下引入一个变量。\index{membership}
+
+乍一看，这似乎是一个令人不适的限制，但它可以说更接近于设 $x$ 是自然数的直觉数学含义。
+在实践中，似乎每当我们确实\emph{需要}$a\in A$是一个命题而非判断时，总是有一个环境集合 $B$，其中 $a$ 已知是 $B$ 的元素，而 $A$ 已知是 $B$ 的子集。
+这种情况在类型论中也很容易表示，只需取 $a$ 为类型 $B$ 的元素，$A$ 为 $B$ 上的谓词；参见 \cref{subsec:prop-subsets}。
+
+类型论和集合论之间的最后一个区别是对相等性的处理。
+数学中熟悉的相等性概念是一个命题：例如，我们可以反驳一个等式或假设一个等式作为假设。
+由于在类型论中，命题是类型，这意味着相等性是一个类型：对于元素 $a,b:A$（即 $a:A$ 且 $b:A$），我们有一个类型$\id[A]ab$。
+（当然，在\emph{同伦}类型论中，这个相等性命题可能以不熟悉的方式行为：参见 \cref{sec:identity-types,cha:basics}，以及本书的其余部分）。
+当 $\id[A]ab$ 有居民时，我们说 $a$ 和 $b$ 是\define{（命题地）相等的}。
+\index{propositional!equality}%
+\index{equality!propositional}%
+
+然而，在类型论中还需要一个相等性\emph{判断}，与判断$x:A$存在于同一层次。\index{judgment}
+\symlabel{defn:judgmental-equality}%
+这被称为\define{判断相等性}
+\indexdef{equality!judgmental}%
+\indexdef{judgmental equality}%
+或\define{定义相等性}，
+\indexdef{equality!definitional}%
+\indexsee{definitional equality}{equality, definitional}%
+我们将其写作 $a\jdeq b : A$ 或简写为 $a \jdeq b$。
+把它理解为定义上相等是有帮助的。
+例如，如果我们通过方程 $f(x)=x^2$ 定义函数 $f:\nat\to\nat$，那么表达式 $f(3)$ \emph{定义上}等于 $3^2$。
+在理论内部，否定或假设一个定义相等性是没有意义的；我们不能说如果 $x$ 定义上等于 $y$，那么 $z$ 定义上不等于 $w$。
+两个表达式是否定义上相等只是展开定义的问题；特别是，它是算法上\index{algorithm}可判定的（尽管该算法必然是元理论的，而非理论内部的）。\index{decidable!definitional equality}
+
+随着类型论变得更加复杂，判断相等性可能比这更加微妙，但这是一个好的起点直觉。
+或者，如果我们把演绎系统看作代数理论，那么判断相等性就是该理论中的相等性，类似于群元素之间的相等性——唯一可能混淆的是，类型论的演绎系统\emph{内部}还有一个对象（即类型$a=b$），它在内部表现为相等性的概念。
+
+我们\emph{想要}判断相等性概念的原因是它可以控制另一种形式的判断$a:A$。
+例如，假设我们给出了 $3^2=9$ 的证明，即我们对某个 $p$ 推导出了判断 $p:(3^2=9)$。
+那么同一个见证 $p$ 应该算作 $f(3)=9$ 的证明，因为 $f(3)$ \emph{定义上}就是 $3^2$。
+表示这一点的最好方式是一条规则：给定判断 $a:A$ 和 $A\jdeq B$，我们可以推导判断 $a:B$。
+
+因此，对我们而言，类型论将是一个基于两种形式判断的演绎系统：
+\begin{center}
+\medskip
+\begin{tabular}{cl}
+  \toprule
+  判断 & 含义\\
+  \midrule
+  $a : A$       & $a$ 是类型 $A$ 的对象\\
+  $a \jdeq b : A$ & $a$ 和 $b$ 是类型 $A$ 的定义上相等的对象\\
+  \bottomrule
+\end{tabular}
+\medskip
+\end{center}
+%
+\symlabel{defn:defeq}%
+当引入定义相等性时，即定义一个东西等于另一个东西时，我们将使用符号$\defeq$。
+因此，上面函数 $f$ 的定义将写作 $f(x)\defeq x^2$。
+
+因为判断不能组合成更复杂的陈述，符号$:$和$\jdeq$比任何其他东西结合得都更松散。%
+\footnote{在形式化\indexfoot{mathematics!formalized}类型论中，逗号和推导符号可以结合得更加松散。
+  例如，$x:A,y:B\vdash c:C$ 被解析为 $((x:A),(y:B))\vdash (c:C)$。
+  然而，在本书中，我们在 \cref{cha:rules} 之前避免使用这种记法。}
+因此，例如，$p:\id{x}{y}$应该被解析为$p:(\id{x}{y})$，这是有意义的，因为$\id{x}{y}$是一个类型，而不是$\id{(p:x)}{y}$，后者是没有意义的，因为$p:x$是一个判断，不能等于任何东西。
+类似地，$A\jdeq \id{x}{y}$只能被解析为$A\jdeq(\id{x}{y})$，尽管在这种极端情况下，无论如何都应该加上括号以帮助理解。
+此外，稍后我们将陷入链接等式的常见记法——例如写 $a=b=c=d$ 表示$a=b$ 且 $b=c$ 且 $c=d$，因此 $a=d$——我们也会在这种链中包含判断相等性。
+上下文通常足以使意图清晰。
+
+这也许也是提到常见数学记法$f:A\to B$的合适地方，该记法表达 $f$ 是从 $A$ 到 $B$ 的函数这一事实，可以被视为一个类型判断，因为我们使用$A\to B$作为从 $A$ 到 $B$ 的函数类型的记法（这是类型论中的标准做法；参见 \cref{sec:pi-types}）。
+
+\index{assumption|(defstyle}%
+判断可以依赖于形如 $x:A$ 的\emph{假设}，其中 $x$ 是变量
+\indexdef{variable}%
+而 $A$ 是类型。
+例如，我们可以在假设 $m,n : \nat$ 的情况下构造对象 $m + n : \nat$。
+另一个例子是，假设 $A$ 是类型，$x,y : A$，以及 $p : \id[A]{x}{y}$，我们可以构造元素 $p^{-1} : \id[A]{y}{x}$。
+所有这些假设的集合称为\define{上下文}；%
+\index{context}
+从拓扑观点来看，它可以被认为是参数\index{parameter!space}空间。
+事实上，技术上上下文必须是假设的有序列表，因为后面的假设可能依赖于前面的假设：假设 $x:A$ 只能在类型 $A$ 中出现的任何变量的假设\emph{之后}做出。
+
+如果假设 $x:A$ 中的类型 $A$ 表示一个命题，那么该假设是\emph{假说}的类型论版本：
+\indexdef{hypothesis}%
+我们假设命题 $A$ 成立。
+当类型被视为命题时，我们可以省略它们的证明的名称。
+因此，在上面的第二个例子中，我们可以说：假设 $\id[A]{x}{y}$，我们可以证明 $\id[A]{y}{x}$。
+然而，由于我们正在做证明相关的数学，
+\index{mathematics!proof-relevant}%
+我们将经常把证明作为对象来引用。
+例如，在上面的例子中，我们可能想要确立 $p^{-1}$ 连同传递性和自反性的证明表现得像一个群胚；参见 \cref{cha:basics}。
+
+注意，在\emph{假设}这个词的这种含义下，我们可以假设一个命题相等性（通过假设变量 $p:x=y$），但我们不能假设一个判断相等性 $x\jdeq y$，因为它不是可以有元素的类型。
+然而，我们可以做一些看起来像假设判断相等性的其他事情：如果我们有一个涉及变量 $x:A$ 的类型或元素，那么我们可以用任何特定元素 $a:A$ \emph{代换} $x$ 以获得一个更具体的类型或元素。
+我们有时会使用诸如现在假设 $x\jdeq a$这样的语言来指代这个代换过程，尽管它不是上面引入的技术意义上的\emph{假设}。
+\index{assumption|)}%
+
+同样，我们也不能\emph{证明}一个判断相等性，因为它不是我们可以展示见证的类型。
+然而，我们有时会将判断相等性作为定理的一部分来陈述，例如存在 $f:A\to B$ 使得 $f(x)\jdeq y$。
+这应该被视为做出两个独立的判断：首先我们对某个元素 $f$ 做出判断 $f:A\to B$，然后我们做出额外的判断 $f(x)\jdeq y$。
+
+在本章的其余部分，我们尝试给出类型论的非形式表述，足以满足本书的目的；我们在 \cref{cha:rules} 中给出更形式化的说明。
+除了一些相当明显的规则（如判断上相等的东西总是可以相互代换\index{substitution}）之外，类型论的规则可以分组为\emph{类型构造子}。
+每个类型构造子由构造类型的方式（可能使用先前构造的类型）组成，以及构造和行为规则用于该类型的元素。
+在大多数情况下，这些规则遵循相当可预测的模式，但我们不会在此处试图使其精确；然而参见 \cref{sec:finite-product-types} 的开头以及 \cref{cha:induction}。\index{type theory!informal}
+
+\index{axiom!versus rules}%
+\index{rule!versus axioms}%
+本章介绍的类型论的一个重要方面是，它完全由\emph{规则}组成，没有任何\emph{公理}。
+在用判断描述演绎系统时，\emph{规则}允许我们从一组判断推导出另一个判断，而\emph{公理}是我们一开始就给定的判断。
+如果我们把演绎系统想象成一个形式游戏，那么规则是游戏的规则，而公理是起始位置。
+如果我们把演绎系统想象成代数理论，那么规则是理论的运算，而公理是该理论某个特定自由模型的\emph{生成元}。
+
+在集合论中，唯一的规则是一阶逻辑的规则（如允许我们从$A$ 有证明和$B$ 有证明推导出$A\wedge B$ 有证明的规则）：关于集合行为的所有信息都包含在公理中。
+相比之下，在类型论中，通常是\emph{规则}包含所有信息，不需要公理。
+例如，在 \cref{sec:finite-product-types} 中，我们将看到有一条规则允许我们从$a:A$和$b:B$推导出判断$(a,b):A\times B$，而在集合论中，类似的陈述将是（配对公理的结果）。
+
+仅使用规则来表述类型论的优势在于规则是程序性的。
+特别是，这个性质使类型论的良好计算性质（如正则性）成为可能（尽管它不自动保证）。\index{canonicity}
+然而，虽然这种风格对传统类型论有效，但我们还不理解如何以这种方式表述\emph{同伦}类型论所需的一切。
+特别是，在 \cref{sec:compute-pi,sec:compute-universe,cha:hits} 中，我们将不得不通过引入额外的公理来增强本章介绍的类型论规则，特别是\emph{泛等公理}。
+然而，在本章中，我们限于传统的基于规则的类型论。
+
+
+\section{函数类型}
+\label{sec:function-types}
+
+\index{type!function|(defstyle}%
+\indexsee{function type}{type, function}%
+给定类型 $A$ 和 $B$，我们可以构造\define{函数}的类型 $A \to B$，
+\index{function|(defstyle}%
+\indexsee{map}{function}%
+\indexsee{mapping}{function}%
+其定义域为 $A$，陪域为 $B$。
+我们有时也将函数称为\define{映射}。
+\index{domain!of a function}%
+\index{codomain, of a function}%
+\index{function!domain of}%
+\index{function!codomain of}%
+\index{functional relation}%
+与集合论不同，函数不是定义为
+函数关系；相反，它们是类型论中的原始概念。
+我们通过规定我们可以对函数做什么、如何构造它们以及它们诱导什么等式来解释函数类型。
+
+给定函数 $f : A \to B$ 和定义域的元素 $a : A$，我们可以\define{应用}
+\indexdef{application!of function}%
+\indexdef{function!application}%
+\indexsee{evaluation}{application, of a function}
+函数以获得陪域 $B$ 的元素，
+记作 $f(a)$，称为 $f$ 在 $a$ 处的\define{值}。
+\indexdef{value!of a function}%
+在类型论中，省略括号\index{parentheses}并简单地将 $f(a)$ 写作 $f\,a$ 是常见的，我们有时也会这样做。
+
+但是我们如何构造 $A \to B$ 的元素呢？有两种等价的方式：
+要么通过直接定义，要么使用
+$\lambda$-抽象。通过定义引入函数
+\indexdef{definition!of function, direct}%
+意味着
+我们通过给它一个名字——比如 $f$——来引入一个函数，并通过给出方程
+\begin{equation}
+  \label{eq:expldef}
+  f(x) \defeq \Phi
+\end{equation}
+来定义 $f : A \to B$，
+其中 $x$ 是变量
+\index{variable}%
+而 $\Phi$ 是可能使用 $x$ 的表达式。
+为了使这有效，我们必须在假设 $x:A$ 的情况下检验 $\Phi : B$。
+
+现在我们可以通过用 $a$ 替换 $\Phi$ 中的变量 $x$ 来计算 $f(a)$。作为例子，考虑由 $f(x) \defeq x+x$ 定义的函数 $f : \nat \to \nat$。（我们将在 \cref{sec:inductive-types} 中定义 $\nat$ 和 $+$。）
+那么 $f(2)$ 判断上等于 $2+2$。
+
+如果我们不想为函数引入名字，我们可以使用
+\define{$\lambda$-抽象}。
+\index{lambda abstraction@$\lambda$-abstraction|defstyle}%
+\indexsee{function!lambda abstraction@$\lambda$-abstraction}{$\lambda$-abstraction}%
+\indexsee{abstraction!lambda-@$\lambda$-}{$\lambda$-abstraction}%
+给定类型为 $B$ 的表达式 $\Phi$，它可能使用 $x:A$，如上所述，我们写 $\lam{x:A} \Phi$ 来表示由~\eqref{eq:expldef}定义的同一个函数。
+因此，我们有
+\[ (\lamt{x:A}\Phi) : A \to B. \]
+对于前一段的例子，我们有类型判断
+\[ (\lam{x:\nat}x+x) : \nat \to \nat. \]
+作为另一个例子，对于任何类型 $A$ 和 $B$ 以及任何元素 $y:B$，我们有一个\define{常值函数}
+\indexdef{constant!function}%
+\indexdef{function!constant}%
+$(\lam{x:A} y): A\to B$。
+
+我们通常省略 $\lambda$-抽象中变量 $x$ 的类型，写成 $\lam{x}\Phi$，因为类型 $x:A$ 可以从函数 $\lam x \Phi$ 具有类型 $A\to B$ 的判断推断出来。
+按照惯例，变量绑定$\lam{x}$的作用域
+\indexdef{variable!scope of}%
+\indexdef{scope}%
+是表达式的整个剩余部分，除非用括号\index{parentheses}分隔。
+因此，例如，$\lam{x} x+x$ 应该被解析为 $\lam{x} (x+x)$，而不是 $(\lam{x}x)+x$（在这种情况下，后者无论如何都是类型错误的）。
+
+另一种等价记法是
+\symlabel{mapsto}%
+\[ (x \mapsto \Phi) : A \to B. \]
+\symlabel{blank}%
+我们有时也可以在表达式 $\Phi$ 中使用空白$\blank$代替变量，来表示隐式的 $\lambda$-抽象。
+例如，$g(x,\blank)$ 是写 $\lam{y} g(x,y)$ 的另一种方式。
+
+现在 $\lambda$-抽象是一个函数，所以我们可以将它应用到参数 $a:A$。
+然后我们有以下\define{计算规则}\indexdef{computation rule!for function types}\footnote{这个等式的使用通常被称为 \define{$\beta$-变换}
+\indexsee{beta-conversion@$\beta $-conversion}{$\beta$-reduction}%
+\indexsee{conversion!beta@$\beta $-}{$\beta$-reduction}%
+或 \define{$\beta$-归约}。%
+\index{beta-reduction@$\beta $-reduction|footstyle}%
+\indexsee{reduction!beta@$\beta $-}{$\beta$-reduction}%
+}，这是一个定义等式：
+\[(\lamu{x:A}\Phi)(a) \jdeq \Phi'\]
+其中 $\Phi'$ 是
+将 $\Phi$ 中所有 $x$ 的出现替换为 $a$ 的表达式。
+继续上面的例子，我们有
+%
+\[ (\lamu{x:\nat}x+x)(2) \jdeq 2+2. \]
+%
+注意，从任何函数 $f:A\to B$，我们可以构造一个 lambda 抽象函数 $\lam{x} f(x)$。
+由于这按定义是将 $f$ 应用到其参数的函数，我们认为它定义上等于 $f$：\footnote{这个等式的使用通常被称为 \define{$\eta$-变换}
+\indexsee{eta-conversion@$\eta $-conversion}{$\eta$-expansion}%
+\indexsee{conversion!eta@$\eta $-}{$\eta$-expansion}%
+或 \define{$\eta$-展开}。
+\index{eta-expansion@$\eta $-expansion|footstyle}%
+\indexsee{expansion, eta-@expansion, $\eta $-}{$\eta$-expansion}%
+}
+\[ f \jdeq (\lam{x} f(x)). \]
+这个等式是\define{函数类型的唯一性原则}\indexdef{uniqueness!principle!for function types}，因为它表明 $f$ 被其值唯一确定。
+
+通过使用 $\lambda$-抽象，带有显式参数的定义引入函数可以归约为简单定义：即，我们可以将
+\[ f(x) \defeq \Phi \]
+对 $f: A\to B$ 的定义读作
+\[ f \defeq \lamu{x:A}\Phi.\]
+
+当进行涉及变量的计算时，当用也涉及变量的表达式替换变量时，我们必须小心，因为我们想要保持表达式的绑定结构。所谓\emph{绑定结构}\indexdef{binding structure}是指
+由 $\lambda$、$\Pi$ 和 $\Sigma$（后者我们很快会遇到）等绑定器在变量引入处和使用处之间生成的不可见链接。作为例子，考虑定义为
+\[ f(x) \defeq \lamu{y:\nat} x + y \]
+的 $f : \nat \to (\nat \to \nat)$。
+现在如果我们在某处假设了 $y : \nat$，那么 $f(y)$ 是什么？简单地在定义 $f(x)$ 的表达式$\lam{y}x+y$中用 $y$ 替换 $x$ 是错误的，得到 $\lamu{y:\nat} y + y$，因为这意味着 $y$ 被\define{捕获}了。
+\indexdef{capture, of a variable}%
+\indexdef{variable!captured}%
+以前，被代换的\index{substitution} $y$ 是指我们的假设，但现在它指的是 $\lambda$-抽象的参数。因此，这种朴素的代换会破坏绑定结构，允许我们执行语义上不健全的计算。
+
+但在这个例子中 $f(y)$ \emph{是}什么？注意，约束（或哑）变量
+\indexdef{variable!bound}%
+\indexdef{variable!dummy}%
+\indexsee{bound variable}{variable, bound}%
+\indexsee{dummy variable}{variable, bound}%
+如表达式 $\lamu{y:\nat} x + y$ 中的 $y$
+只有局部含义，可以一致地用任何其他变量替换，同时保持绑定结构。事实上，$\lamu{y:\nat} x + y$ 被声明为判断上等于\footnote{这个等式的使用通常被称为 \define{$\alpha$-变换}。
+\indexfoot{alpha-conversion@$\alpha $-conversion}
+\indexsee{conversion!alpha@$\alpha$-}{$\alpha$-conversion}
+}
+$\lamu{z:\nat} x + z$。由此可得
+$f(y)$ 判断上等于 $\lamu{z:\nat} y + z$，这就回答了我们的问题。（除了 $z$，任何与 $y$ 不同的变量都可以使用，产生相等的结果。）
+
+当然，这对任何数学家来说都应该是熟悉的：这与以下事实是同一现象：如果 $f(x) \defeq \int_1^2 \frac{dt}{x-t}$，那么 $f(t)$ 不是 $\int_1^2 \frac{dt}{t-t}$ 而是 $\int_1^2 \frac{ds}{t-s}$。
+$\lambda$-抽象绑定哑变量的方式与积分完全相同。
+
+我们已经看到了如何定义单变量函数。定义多变量函数的一种方式是使用笛卡尔积，这将在后面介绍；具有参数 $A$ 和 $B$ 且结果在 $C$ 中的函数将被赋予类型 $f : A \times B \to C$。然而，还有另一种避免使用积类型的选择，称为\define{柯里化}
+\indexdef{currying}%
+\indexdef{function!currying of}%
+（以数学家 Haskell Curry 命名）。
+\index{programming}%
+
+柯里化的思想是将两个输入 $a:A$ 和 $b:B$ 的函数表示为一个接受\emph{一个}输入 $a:A$ 并返回\emph{另一个函数}的函数，后者再接受第二个输入 $b:B$ 并返回结果。
+也就是说，我们认为双变量函数属于迭代函数类型，$f : A \to (B \to C)$。
+我们也可以不带括号\index{parentheses}地写成 $f : A \to B \to C$，默认右结合\index{associativity!of function types}。然后给定 $a : A$ 和 $b : B$，
+我们可以将 $f$ 应用到 $a$，然后将结果应用到 $b$，得到
+$f(a)(b) : C$。为了避免括号泛滥，我们允许自己
+将 $f(a)(b)$ 写作 $f(a,b)$，尽管没有涉及积类型。
+当完全省略函数参数周围的括号时，我们将 $f\,a\,b$ 写作 $(f\,a)\,b$，现在默认结合性是左结合的，使 $f$ 以正确的顺序应用到其参数。
+
+我们带显式参数定义的记法扩展到这种情况：我们可以通过给出方程
+\[ f(x,y) \defeq \Phi\]
+来定义具名函数 $f : A \to B \to C$，
+其中 $\Phi:C$ 假设 $x:A$ 和 $y:B$。使用 $\lambda$-抽象\index{lambda abstraction@$\lambda$-abstraction}这对应于
+\[ f \defeq \lamu{x:A}{y:B} \Phi, \]
+也可以写作
+\[ f \defeq x \mapsto y \mapsto \Phi. \]
+我们也可以通过写多个空白来隐式地对多个变量抽象，例如 $g(\blank,\blank)$ 意味着 $\lam{x}{y} g(x,y)$。
+对三个或更多参数的函数进行柯里化是我们刚才描述的直接推广。
+
+\index{type!function|)}%
+\index{function|)}%
+
+
+\section{宇宙与族}
+\label{sec:universes}
+
+到目前为止，我们一直非形式地使用表达式$A$ 是类型。我们将通过引入\define{宇宙}来使这更加精确。
+\index{type!universe|(defstyle}%
+\indexsee{universe}{type, universe}%
+宇宙是一个其元素是类型的类型。如同朴素集合论，
+我们可能希望有一个包含自身的所有类型的宇宙 $\UU_\infty$
+（即满足 $\UU_\infty : \UU_\infty$）。
+然而，如同集合论，这是不健全的，即我们可以从它推导出每个类型，
+包括表示命题假的空类型（见 \cref{sec:coproduct-types}），都是有居民的。
+例如，使用集合作为树的表示，我们可以直接编码 Russell
+悖论\index{paradox} \cite{coquand:paradox}。
+
+为了避免悖论，我们引入宇宙的层级
+\indexsee{hierarchy!of universes}{type, universe}%
+\[ \UU_0 : \UU_1 : \UU_2 : \cdots \]
+其中每个宇宙 $\UU_i$ 是下一个宇宙 $\UU_{i+1}$ 的元素。此外，我们假设我们的宇宙是
+\define{累积的}，
+\indexdef{type!universe!cumulative}%
+\indexdef{cumulative!universes}%
+即第 $i$ 个宇宙的所有元素也是第 $(i+1)$ 个宇宙的元素，即如果
+$A:\UU_i$ 则也有 $A:\UU_{i+1}$。
+这很方便，但有一个稍微不愉快的后果，即元素不再有唯一的类型，并且在其他方面也有些棘手，这里不需要关心；见注记。
+
+当我们说 $A$ 是类型时，我们的意思是它居住在某个宇宙 $\UU_i$ 中。我们通常想要避免显式提及层级
+\indexdef{universe level}%
+\indexsee{level}{universe level or $n$-type}%
+\indexsee{type!universe!level}{universe level}%
+$i$，
+只是假设层级可以以一致的方式分配；因此我们可以写 $A:\UU$ 省略层级。这样我们甚至可以写
+$\UU:\UU$，它可以读作 $\UU_i:\UU_{i+1}$，索引已被隐式省略。以这种风格写宇宙被称为
+\define{典型歧义}。
+\indexdef{typical ambiguity}%
+这很方便但有点危险，因为它允许我们写出看起来有效但重现自指悖论的证明。
+如果对一个论证是否正确有任何疑问，检查的方法是尝试一致地为其中出现的所有宇宙分配层级。
+当假设某个宇宙 \UU 时，我们可以将属于 \UU 的类型称为\define{小类型}。
+\indexdef{small!type}%
+\indexdef{type!small}%
+
+为了对在给定类型 $A$ 上变化的类型的集合建模，我们使用陪域为宇宙的函数 $B : A \to \UU$。这些函数被称为
+\define{类型族}（或有时称为\emph{依赖类型}）；
+\indexsee{family!of types}{type, family of}%
+\indexdef{type!family of}%
+\indexsee{type!dependent}{type, family of}%
+\indexsee{dependent!type}{type, family of}%
+它们对应于集合论中使用的集合族。
+
+\symlabel{fin}%
+类型族的一个例子是有限集族 $\Fin
+: \nat \to \UU$，其中 $\Fin(n)$ 是恰好有 $n$ 个元素的类型。
+（我们还不能\emph{定义}族 $\Fin$——事实上，我们甚至还没有引入它的定义域 $\nat$——但我们很快就能够做到；见 \cref{ex:fin}。）
+我们可以将 $\Fin(n)$ 的元素记为 $0_n,1_n,\dots,(n-1)_n$，带有下标以强调如果 $n$ 与 $m$ 不同则 $\Fin(n)$ 的元素与 $\Fin(m)$ 的元素不同，并且它们都不同于普通自然数（我们将在 \cref{sec:inductive-types} 中介绍）。
+\index{finite!sets, family of}%
+
+一个更平凡（但非常重要）的类型族例子是类型 $B:\UU$ 的\define{常值}类型族
+\indexdef{constant!type family}%
+\indexdef{type!family of!constant}%
+，它当然是常值函数 $(\lam{x:A} B):A\to\UU$。
+
+作为\emph{非}例子，在我们的类型论版本中，没有类型族$\lam{i:\nat} \UU_i$。
+事实上，没有足够大的宇宙作为它的陪域。
+此外，我们甚至不将宇宙 $\UU_i$ 的索引 $i$ 与类型论的自然数 \nat 等同（后者将在 \cref{sec:inductive-types} 中介绍）。
+
+\index{type!universe|)}%
+
+\section{依赖函数类型（$\Pi$-类型）}
+\label{sec:pi-types}
+
+\index{type!dependent function|(defstyle}%
+\index{function!dependent|(defstyle}%
+\indexsee{dependent!function}{function, dependent}%
+\indexsee{type!Pi-@$\Pi$-}{type, dependent function}%
+\indexsee{Pi-type@$\Pi$-type}{type, dependent function}%
+在类型论中，我们经常使用函数类型的更一般版本，称为 \define{$\Pi$-类型}或\define{依赖函数类型}。$\Pi$-类型的元素是
+其陪域类型可以根据函数应用到的定义域元素而变化的函数，称为\define{依赖函数}。名称$\Pi$-类型
+的使用是因为这种类型也可以被视为在给定类型上的笛卡尔积。
+
+给定类型 $A:\UU$ 和族 $B:A \to \UU$，我们可以构造
+依赖函数的类型 $\prd{x:A}B(x) : \UU$。
+这种类型有许多替代记法，如
+\[ \tprd{x:A} B(x) \qquad \dprd{x:A}B(x) \qquad \lprd{x:A} B(x). \]
+如果 $B$ 是常值族，那么依赖积类型就是普通函数类型：
+\[\tprd{x:A} B \jdeq (A \to B).\]
+事实上，$\Pi$-类型的所有构造都是普通函数类型上相应构造的推广。
+
+\indexdef{definition!of function, direct}%
+我们可以通过显式定义引入依赖函数：为了
+定义 $f : \prd{x:A}B(x)$，其中 $f$ 是要定义的依赖函数的名称，我们需要一个可能涉及变量 $x:A$ 的表达式 $\Phi : B(x)$，
+\index{variable}%
+我们写
+\[ f(x) \defeq \Phi \qquad \mbox{对于 $x:A$}。\]
+或者，我们可以使用 \define{$\lambda$-抽象}%
+\index{lambda abstraction@$\lambda$-abstraction|defstyle}%
+\begin{equation}
+  \label{eq:lambda-abstraction}
+  \lamu{x:A} \Phi \ :\ \prd{x:A} B(x).
+\end{equation}
+\indexdef{application!of dependent function}%
+\indexdef{function!dependent!application}%
+与非依赖函数一样，我们可以将依赖函数 $f : \prd{x:A}B(x)$ \define{应用}到参数 $a:A$ 以获得元素 $f(a):B(a)$。
+等式与普通函数类型相同，即我们有以下计算规则：
+\index{computation rule!for dependent function types}%
+给定 $a:A$ 我们有 $f(a) \jdeq \Phi'$ 以及
+$(\lamu{x:A} \Phi)(a) \jdeq \Phi'$，其中 $\Phi'$ 是通过将 $\Phi$ 中所有 $x$ 的出现替换为 $a$（像往常一样避免变量捕获）得到的。
+类似地，对于任何 $f:\prd{x:A} B(x)$，我们有唯一性原则 $f\jdeq (\lam{x} f(x))$。
+\index{uniqueness!principle!for dependent function types}%
+
+作为例子，回顾 \cref{sec:universes} 中有一个类型族 $\Fin:\nat\to\UU$，其值是标准有限集，元素为 $0_n,1_n,\dots,(n-1)_n : \Fin(n)$。
+然后有一个依赖函数 $\fmax : \prd{n:\nat} \Fin(n+1)$
+返回每个非空有限类型的最大元素，$\fmax(n) \defeq n_{n+1}$。
+\index{finite!sets, family of}%
+与 $\Fin$ 本身一样，我们还不能定义 $\fmax$，但很快就能够；见 \cref{ex:fin}。
+
+另一类重要的依赖函数类型，我们现在可以定义，是在给定宇宙上\define{多态}的函数
+\indexdef{function!polymorphic}%
+\indexdef{polymorphic function}%
+。
+多态函数是以类型作为其参数之一，然后作用于该类型的元素（或从它构造的其他类型）的函数。
+\symlabel{idfunc}%
+\indexdef{function!identity}%
+\indexdef{identity!function}%
+一个例子是多态恒等函数 $\idfunc : \prd{A:\UU} A \to A$，我们将其定义为 $\idfunc{} \defeq \lam{A:\type}{x:A} x$。
+（像 $\lambda$-抽象一样，$\Pi$ 自动在表达式的其余部分上定界\index{scope}，除非有分隔符；因此 $\idfunc : \prd{A:\UU} A \to A$ 意味着 $\idfunc : \prd{A:\UU} (A \to A)$。
+这个惯例虽然在数学中不常见，但在类型论中很常见。）
+
+我们有时将依赖函数的某些参数写作下标。
+例如，我们可以等价地通过 $\idfunc[A](x) \defeq x$ 定义多态恒等函数。
+此外，如果参数可以从上下文推断，我们可以完全省略它。
+例如，如果 $a:A$，那么写 $\idfunc(a)$ 是无歧义的，因为 $\idfunc$ 必须意味着 $\idfunc[A]$ 才能应用到 $a$。
+
+另一个不太平凡的多态函数例子是交换操作，它交换（柯里化的）双参数函数的参数顺序：
+\[ \mathsf{swap} : \prd{A:\UU}{B:\UU}{C:\UU} (A\to B\to C) \to (B\to A \to C). \]
+我们可以将其定义为
+\[ \mathsf{swap}(A,B,C,g) \defeq \lam{b}{a} g(a)(b). \]
+我们也可以等价地将类型参数写作下标：
+\[ \mathsf{swap}_{A,B,C}(g)(b,a) \defeq g(a,b). \]
+
+注意，正如我们对普通函数所做的那样，我们使用柯里化来定义具有
+多个参数的依赖函数（如 $\mathsf{swap}$）。然而，在依赖的情况下，第二个定义域可能
+依赖于第一个，而陪域可能依赖于两者。即，
+给定 $A:\UU$ 和类型族 $B : A \to \UU$ 以及 $C : \prd{x:A}B(x) \to \UU$，我们可以构造
+具有两个参数的函数的类型 $\prd{x:A}{y : B(x)} C(x,y)$。
+在 $B$ 是常值且等于 $A$ 的情况下，我们可以简化记法写作 $\prd{x,y:A}$；例如，$\mathsf{swap}$ 的类型也可以写作
+\[ \mathsf{swap} : \prd{A,B,C:\UU} (A\to B\to C) \to (B\to A \to C). \]
+最后，给定 $f:\prd{x:A}{y : B(x)} C(x,y)$ 和参数 $a:A$ 和 $b:B(a)$，我们有 $f(a)(b) : C(a,b)$，
+和以前一样，我们将其写作 $f(a,b) : C(a,b)$。
+
+\index{type!dependent function|)}%
+\index{function!dependent|)}%
+
+
+\section{积类型}
+\label{sec:finite-product-types}
+
+给定类型 $A,B:\UU$ 我们引入类型 $A\times B:\UU$，我们称之为它们的\define{笛卡尔积}。
+\indexsee{cartesian product}{type, product}%
+\indexsee{type!cartesian product}{type, product}%
+\index{type!product|(defstyle}%
+\indexsee{product!of types}{type, product}%
+我们还引入一个零元积类型，称为\define{单位类型} $\unit : \UU$。
+\indexsee{nullary!product}{type, unit}%
+\indexsee{unit!type}{type, unit}%
+\index{type!unit|(defstyle}%
+我们打算让 $A\times B$ 的元素是序对 $\tup{a}{b} : A \times B$，其中 $a:A$ 且 $b:B$，而 $\unit$ 的唯一元素是某个特定对象 $\ttt : \unit$。
+\indexdef{pair!ordered}%
+然而，与集合论不同——在集合论中我们将有序对定义为特定的集合然后将它们全部收集到笛卡尔积中——在类型论中，有序对是原始概念，正如函数一样。
+
+\begin{rmk}\label{rmk:introducing-new-concepts}
+  在类型论中引入新种类的类型有一个一般模式。
+  我们已经在 \cref{sec:function-types,sec:pi-types}\footnote{上面对宇宙的描述是一个例外。}中看到了这个模式，所以值得强调一般形式。
+  为了指定一个类型，我们指定：
+  \begin{enumerate}
+  \item 如何通过\define{形成规则}形成这种类型的新类型。
+    \indexdef{formation rule}%
+    \index{rule!formation}%
+（例如，当 $A$ 是类型且 $B$ 是类型时，我们可以形成函数类型 $A \to B$。当 $A$ 是类型且对于 $x:A$ 有 $B(x)$ 是类型时，我们可以形成依赖函数类型 $\prd{x:A} B(x)$。）
+
+  \item 如何构造该类型的元素。
+    这些被称为该类型的\define{构造子}或\define{引入规则}。
+    \indexdef{constructor}%
+    \indexdef{rule!introduction}%
+    \indexdef{introduction rule}%
+    （例如，函数类型有一个构造子，$\lambda$-抽象。
+    回顾像 $f(x)\defeq 2x$ 这样的直接定义可以等价地表述为
+    $\lambda$-抽象 $f\defeq \lam{x} 2x$。）
+
+  \item 如何使用该类型的元素。
+    这些被称为该类型的\define{消除子}或\define{消除规则}。
+    \indexsee{rule!elimination}{eliminator}%
+    \indexsee{elimination rule}{eliminator}%
+    \indexdef{eliminator}%
+    （例如，函数类型有一个消除子，即函数应用。）
+
+  \item
+    \define{计算规则}\indexdef{computation rule}\footnote{也称为 \define{$\beta$-归约}\index{beta-reduction@$\beta $-reduction|footstyle}}，表达消除子如何作用于构造子。
+（例如，对于函数，计算规则说 $(\lamu{x:A}\Phi)(a)$ 判断上等于将 $a$ 代入 $\Phi$ 中的 $x$。）
+
+  \item
+    可选的\define{唯一性原则}\indexdef{uniqueness!principle}\footnote{也称为 \define{$\eta$-展开}\index{eta-expansion@$\eta $-expansion|footstyle}}，表达
+映射进入或映射出该类型的唯一性。
+对于某些类型，唯一性原则刻画了映射到该类型的映射，通过陈述
+该类型的每个元素由将消除子应用于它的结果唯一确定，并且可以通过应用构造子从这些结果重构——从而表达构造子如何作用于消除子，与计算规则对偶。
+（例如，对于函数，唯一性原则说任何函数 $f$ 判断上等于展开的函数 $\lamu{x} f(x)$，因此被其值唯一确定。）
+对于其他类型，唯一性原则说从该类型出发的每个映射（函数）由某些数据唯一确定。（一个例子是 \cref{sec:coproduct-types} 中引入的余积类型，其唯一性原则在 \cref{sec:universal-properties} 中提到。）
+
+    当唯一性原则不作为判断相等性规则时，它通常仍然可以作为从该类型的其他规则得出的\emph{命题}相等性来证明。
+    在这种情况下，我们称之为\define{命题唯一性原则}。
+    \indexdef{uniqueness!principle, propositional}%
+    \indexsee{propositional!uniqueness principle}{uniqueness principle, propositional}%
+    （在后面的章节中，我们偶尔也会遇到\emph{命题计算规则}。）
+    \indexdef{computation rule!propositional}%
+  \end{enumerate}
+\cref{sec:syntax-more-formally} 中的推理规则相应地组织和命名；例如，参见 \cref{sec:more-formal-pi}，其中每种可能性都实现了。
+\end{rmk}
+
+构造序对的方式是显然的：给定 $a:A$ 和 $b:B$，我们可以形成 $(a,b):A\times B$。
+类似地，有一种唯一的方式来构造 $\unit$ 的元素，即我们有 $\ttt:\unit$。
+我们期望$A\times B$ 的每个元素都是序对，这是积的唯一性原则；我们不将此断言为类型论的规则，但稍后我们将证明它作为命题相等性。
+
+现在，我们如何\emph{使用}序对，即如何定义从积类型出发的函数？
+让我们首先考虑非依赖函数 $f : A\times B \to C$ 的定义。
+由于我们打算 $A\times B$ 的唯一元素是序对，我们期望能够通过规定
+当 $f$ 应用于序对 $\tup{a}{b}$ 时的结果来定义这样的函数。
+我们可以通过提供函数 $g : A \to B \to C$ 来规定这些结果。
+因此，我们引入一条新规则（积的消除规则），它说对于任何这样的 $g$，我们可以通过
+\[ f(\tup{a}{b}) \defeq g(a)(b) \]
+定义函数 $f : A\times B \to C$。
+我们在此避免写 $g(a,b)$，以强调 $g$ 不是积上的函数。
+（然而，在本书后面，我们经常将 $g(a,b)$ 既用于积上的函数，也用于柯里化的双变量函数。）
+这个定义方程是积类型的计算规则\index{computation rule!for product types}。
+
+注意，在集合论中，我们会通过以下事实来证明上述 $f$ 的定义：$A\times B$ 的每个元素都是有序对，因此只需在这样的序对上定义 $f$ 就足够了。
+相比之下，类型论颠倒了这种情况：我们假设一旦我们指定了 $A\times B$ 上的函数在序对上的值，它就是良定义的，从这个（或更精确地说，从它对依赖函数的更一般版本，见下文）我们将能够\emph{证明} $A\times B$ 的每个元素都是序对。
+从范畴论的角度来看，我们可以说我们将积 $A\times B$ 定义为指数 $B\to C$ 的左伴随，后者我们已经介绍了。
+
+作为例子，我们可以推导出\define{投影}
+\indexsee{function!projection}{projection}%
+\indexsee{component, of a pair}{projection}%
+\indexdef{projection!from cartesian product type}%
+函数
+\symlabel{defn:proj}%
+\begin{align*}
+  \fst & :  A \times B \to A \\
+  \snd & :  A \times B \to B
+\end{align*}
+及定义方程
+\begin{align*}
+  \fst(\tup{a}{b}) & \defeq  a \\
+  \snd(\tup{a}{b}) & \defeq  b.
+\end{align*}
+%
+\symlabel{defn:recursor-times}%
+与其每次想要定义函数时都调用这个函数定义原则，另一种方法是在一个普遍情况下调用它一次，然后在所有其他情况下简单地应用得到的函数。
+也就是说，我们可以定义一个类型为
+\begin{equation}
+  \rec{A\times B} : \prd{C:\UU}(A \to B \to C) \to A \times B \to C
+\end{equation}
+的函数，
+及定义方程
+\[\rec{A\times B}(C,g,\tup{a}{b}) \defeq g(a)(b). \]
+然后与其通过定义方程直接定义像 $\fst$ 和 $\snd$ 这样的函数，我们可以定义
+\begin{align*}
+  \fst &\defeq \rec{A\times B}(A, \lam{a}{b} a)\\
+  \snd &\defeq \rec{A\times B}(B, \lam{a}{b} b).
+\end{align*}
+我们将函数 $\rec{A\times B}$ 称为积类型的\define{递归子}
+\indexsee{recursor}{recursion principle}%
+。名称递归子在这里有些不幸，因为没有发生递归。它来自积类型是归纳类型的一般框架的退化例子这一事实，对于像自然数这样的类型，递归子实际上将是递归的。我们也可以谈论笛卡尔积的\define{递归原则}，意思是我们可以如上所述通过给出它在序对上的值来定义函数 $f:A\times B\to C$ 的事实。
+\index{recursion principle!for cartesian product}%
+
+我们留给读者作为简单练习来证明递归子可以从投影推导出来，反之亦然。
+
+\symlabel{defn:recursor-unit}%
+我们也有单位类型的递归子：
+\[\rec{\unit} : \prd{C:\UU}C \to \unit \to C\]
+及定义方程
+\[ \rec{\unit}(C,c,\ttt) \defeq c. \]
+虽然我们包含它以保持类型定义的模式，但 $\unit$ 的递归子是完全无用的，
+因为我们可以通过简单地忽略类型 $\unit$ 的参数来直接定义这样的函数。
+
+为了能够在积类型上定义\emph{依赖}函数，我们必须
+推广递归子。给定 $C: A \times B \to \UU$，我们可以
+通过提供函数
+\narrowequation{
+ g : \prd{x:A}\prd{y:B} C(\tup{x}{y})
+}
+定义函数 $f : \prd{x : A \times B} C(x)$，
+及定义方程
+\[ f(\tup x y) \defeq g(x)(y). \]
+例如，通过这种方式，我们可以证明命题唯一性原则，它说 $A\times B$ 的每个元素都等于一个序对。
+\index{uniqueness!principle, propositional!for product types}%
+具体地，我们可以构造一个函数
+\[ \uniq{A\times B} : \prd{x:A \times B} (\id[A\times B]{\tup{\fst {(x)}}{\snd {(x)}}}{x}). \]
+这里我们使用了恒等类型，我们将在下面的 \cref{sec:identity-types} 中介绍。
+然而，我们现在需要知道的只是对于任何 $x:A$ 有一个自反性元素 $\refl{x} : \id[A]{x}{x}$。
+给定这个，我们可以定义
+\label{uniquenessproduct}
+\[ \uniq{A\times B}(\tup{a}{b}) \defeq \refl{\tup{a}{b}}. \]
+这个构造有效，因为在 $x \defeq \tup{a}{b}$ 的情况下，我们可以
+使用投影的定义方程计算
+\[ \tup{\fst(\tup{a}{b})}{\snd{(\tup{a}{b})}} \jdeq \tup{a}{b} \]
+因此，
+\[ \refl{\tup{a}{b}} : \id{\tup{\fst(\tup{a}{b})}{\snd{(\tup{a}{b})}}}{\tup{a}{b}} \]
+类型良好，因为等式两边判断上相等。
+
+更一般地，能够以这种方式定义依赖函数意味着要证明积的所有元素的性质，只需
+为其规范元素——有序对——证明它就足够了。
+当我们谈到像自然数这样的归纳类型时，类似的性质将是能够通过归纳写证明的能力。
+因此，如果我们像上面那样在普遍情况下应用这个原则一次，我们称得到的函数为积类型的\define{归纳}：给定 $A,B : \UU$ 我们有
+\symlabel{defn:induction-times}%
+\[ \ind{A\times B} : \prd{C:A \times B \to \UU}
+\Parens{\prd{x:A}{y:B} C(\tup{x}{y})} \to \prd{x:A \times B} C(x) \]
+及定义方程
+\[ \ind{A\times B}(C,g,\tup{a}{b}) \defeq g(a)(b). \]
+类似地，我们可以说在序对上定义的依赖函数是从笛卡尔积的\define{归纳原则}获得的
+\index{induction principle}%
+\index{induction principle!for product}%
+。
+容易看出，递归子只是在族 $C$ 是常值的情况下归纳的特例。
+因为归纳描述了如何使用积类型的元素，归纳也被称为\define{（依赖）消除子}，
+\indexsee{eliminator!of inductive type!dependent}{induction principle}%
+而递归则被称为\define{非依赖消除子}。
+\indexsee{eliminator!of inductive type!non-dependent}{recursion principle}%
+\indexsee{non-dependent eliminator}{recursion principle}%
+\indexsee{dependent eliminator}{induction principle}%
+
+% 我们可以将归纳命题性地解读为：对所有序对成立的性质对积类型的所有元素成立。
+
+单位类型的归纳比递归子更有用：
+\symlabel{defn:induction-unit}%
+\[ \ind{\unit} : \prd{C:\unit \to \UU} C(\ttt) \to \prd{x:\unit}C(x)\]
+及定义方程
+\[ \ind{\unit}(C,c,\ttt) \defeq c. \]
+归纳使我们能够证明 $\unit$ 的命题唯一性原则，它断言其唯一的居民是 $\ttt$。
+即，我们可以构造
+\label{uniquenessunit}
+\[\uniq{\unit} : \prd{x:\unit} \id{x}{\ttt} \]
+通过使用定义方程
+\[\uniq{\unit}(\ttt) \defeq \refl{\ttt} \]
+或者等价地通过使用归纳：
+\[\uniq{\unit} \defeq \ind{\unit}(\lamu{x:\unit} \id{x}{\ttt},\refl{\ttt}). \]
+
+\index{type!product|)}%
+\index{type!unit|)}%
+
+\section{依赖对类型（$\Sigma$-类型）}
+\label{sec:sigma-types}
+
+\index{type!dependent pair|(defstyle}%
+\indexsee{type!dependent sum}{type, dependent pair}%
+\indexsee{type!Sigma-@$\Sigma$-}{type, dependent pair}%
+\indexsee{Sigma-type@$\Sigma$-type}{type, dependent pair}%
+\indexsee{sum!dependent}{type, dependent pair}%
+
+正如我们将函数类型（\cref{sec:function-types}）推广到依赖函数类型（\cref{sec:pi-types}），将 \cref{sec:finite-product-types} 的积类型推广为允许序对的第二分量的类型依赖于第一分量的选择通常也是有用的。这被称为\define{依赖对类型}或\define{$\Sigma$-类型}，因为在集合论中它对应于给定类型上的索引和（在余积或不交并的意义上）。
+
+给定类型 $A:\UU$ 和族 $B : A \to \UU$，依赖对类型写作 $\sm{x:A} B(x) : \UU$。
+可选的记法有
+\[ \tsm{x:A} B(x) \hspace{2cm} \dsm{x:A}B(x) \hspace{2cm} \lsm{x:A} B(x). \]
+与 $\lambda$-抽象和 $\Pi$ 等其他绑定构造一样，$\Sigma$ 自动将作用域\index{scope}延伸到表达式的其余部分（除非有分隔符），因此例如 $\sm{x:A} B(x) \to C$ 意味着 $\sm{x:A} (B(x) \to C)$。
+
+\symlabel{defn:dependent-pair}%
+\indexdef{pair!dependent}%
+构造依赖对类型元素的方式是配对：给定 $a:A$ 和 $b:B(a)$，我们有 $\tup{a}{b} : \sm{x:A} B(x)$。
+如果 $B$ 是常值的，那么依赖对类型就是普通的笛卡尔积类型：
+\[ \Parens{\sm{x:A} B} \jdeq (A \times B).\]
+$\Sigma$-类型上的所有构造都作为积类型构造的直接推广出现，依赖函数常常替换非依赖函数。
+
+例如，递归原则%
+\index{recursion principle!for dependent pair type}
+说明要定义从 $\Sigma$-类型出发的非依赖函数
+$f : (\sm{x:A} B(x)) \to C$，我们提供一个函数
+$g : \prd{x:A} B(x) \to C$，然后我们可以通过定义方程定义 $f$
+\[ f(\tup{a}{b}) \defeq g(a)(b). \]
+\indexdef{projection!from dependent pair type}%
+例如，我们可以从 $\Sigma$-类型推导第一投影：
+\symlabel{defn:dependent-proj1}%
+\begin{equation*}
+  \fst : \Parens{\sm{x : A}B(x)} \to A
+\end{equation*}
+通过定义方程
+\begin{equation*}
+  \fst(\tup{a}{b}) \defeq a.
+\end{equation*}
+然而，由于序对
+\narrowequation{
+  (a,b):\sm{x:A} B(x)
+}
+的第二分量的类型是 $B(a)$，第二投影必须是\emph{依赖}函数，其类型涉及第一投影函数：
+\symlabel{defn:dependent-proj2}%
+\[ \snd : \prd{p:\sm{x : A}B(x)}B(\fst(p)). \]
+因此我们需要 $\Sigma$-类型的\emph{归纳}原则%
+\index{induction principle!for dependent pair type}
+（依赖消除子）。
+这说明要从 $\Sigma$-类型构造到族 $C : (\sm{x:A} B(x)) \to \UU$ 的依赖函数，我们需要一个函数
+\[ g : \prd{a:A}{b:B(a)} C(\tup{a}{b}). \]
+然后我们可以推导一个函数
+\[ f : \prd{p : \sm{x:A}B(x)} C(p) \]
+及定义方程\index{computation rule!for dependent pair type}
+\[ f(\tup{a}{b}) \defeq g(a)(b).\]
+应用这个并令 $C(p)\defeq B(\fst(p))$，我们可以定义
+\narrowequation{
+\snd : \prd{p:\sm{x : A}B(x)}B(\fst(p))
+}
+及明显的方程
+\[ \snd(\tup{a}{b})  \defeq  b. \]
+为了说服自己这是正确的，我们注意到使用 $\fst$ 的定义方程有 $B (\fst(\tup{a}{b})) \jdeq B(a)$，而确实 $b : B(a)$。
+
+我们可以将递归和归纳原则打包成 $\Sigma$ 的递归子：
+\symlabel{defn:recursor-sm}%
+\[ \rec{\sm{x:A}B(x)} : \dprd{C:\UU}\Parens{\tprd{x:A} B(x) \to C} \to
+\Parens{\tsm{x:A}B(x)} \to C \]
+及定义方程
+\[ \rec{\sm{x:A}B(x)}(C,g,\tup{a}{b}) \defeq g(a)(b) \]
+以及相应的归纳算子：
+\symlabel{defn:induction-sm}%
+\begin{narrowmultline*}
+  \ind{\sm{x:A}B(x)} : \narrowbreak
+    \dprd{C:(\sm{x:A} B(x)) \to \UU}
+    \Parens{\tprd{a:A}{b:B(a)} C(\tup{a}{b})}
+    \to \dprd{p : \sm{x:A}B(x)} C(p)
+\end{narrowmultline*}
+及定义方程
+\[ \ind{\sm{x:A}B(x)}(C,g,\tup{a}{b}) \defeq g(a)(b). \]
+如前所述，递归子是当族 $C$ 是常值时归纳的特例。
+
+作为进一步的例子，考虑以下原则，其中 $A$ 和 $B$ 是类型且 $R:A\to B\to \UU$：
+\[ \ac : \Parens{\tprd{x:A} \tsm{y :B} R(x,y)} \to
+\Parens{\tsm{f:A\to B} \tprd{x:A} R(x,f(x))}.
+\]
+我们可以将 $R$ 视为 $A$ 和 $B$ 之间的证明相关关系
+\index{mathematics!proof-relevant}%
+，其中 $R(a,b)$ 是 $a:A$ 和 $b:B$ 相关的见证类型。
+那么 $\ac$ 直观地说如果我们有一个依赖函数 $g$ 为每个 $a:A$ 分配一个依赖对 $(b,r)$，其中 $b:B$ 且 $r:R(a,b)$，那么我们有一个函数 $f:A\to B$ 和一个依赖函数为每个 $a:A$ 分配一个 $R(a,f(a))$ 的见证。
+我们的直觉告诉我们可以直接将 $g$ 的值分解成它们的分量。
+确实，使用我们刚刚定义的投影，我们可以定义：
+\[ \ac(g) \defeq \Parens{\lamu{x:A} \fst(g(x)),\, \lamu{x:A} \snd(g(x))}. \]
+为了验证这是类型良好的，注意如果 $g:\prd{x:A} \sm{y :B} R(x,y)$，我们有
+\begin{align*}
+\lamu{x:A} \fst(g(x)) &: A \to  B, \\
+\lamu{x:A} \snd(g(x)) &: \tprd{x:A} R(x,\fst(g(x))).
+\end{align*}
+此外，类型 $\prd{x:A} R(x,\fst(g(x)))$ 是将 \ac{} 的陪域中被求和的类型族 $\lamu{f:A\to B} \tprd{x:A} R(x,f(x))$ 应用于函数 $\lamu{x:A} \fst(g(x))$ 的结果：
+\[ \tprd{x:A} R(x,\fst(g(x))) \jdeq
+\Parens{\lamu{f:A\to B} \tprd{x:A} R(x,f(x))}\big(\lamu{x:A} \fst(g(x))\big). \]
+因此，我们有
+\[ \Parens{\lamu{x:A} \fst(g(x)),\, \lamu{x:A} \snd(g(x))} : \tsm{f:A\to B} \tprd{x:A} R(x,f(x))\]
+如所需。
+
+如果我们将 $\Pi$ 读作对所有而将 $\Sigma$ 读作存在，那么函数 $\ac$ 的类型表达的是：
+\emph{如果对所有 $x:A$ 存在 $y:B$ 使得 $R(x,y)$，那么存在函数 $f : A \to B$ 使得对所有 $x:A$ 有 $R(x,f(x))$}。
+由于这听起来像是选择公理的一个版本，函数 \ac{} 传统上被称为\define{类型论选择公理}，正如我们刚刚展示的，它可以直接从类型论的规则证明，而不必作为公理接受。
+\index{axiom!of choice!type-theoretic}%
+然而，注意实际上没有涉及选择，因为选择已经在前提中给出：我们所要做的只是将它拆分成两个函数：一个代表选择，另一个代表其正确性。
+在 \cref{sec:axiom-choice} 中我们将给出另一个更接近通常形式的选择公理表述。
+
+依赖对类型常用于定义数学结构的类型，这些结构通常由若干相互依赖的数据组成。
+举一个简单的例子，假设我们想定义\define{原群}\indexdef{magma}为一个类型 $A$ 连同一个二元运算 $m:A\to A\to A$。
+短语连同\index{together with}（以及同义的配备）\index{equipped with}的精确含义是一个原群是由类型 $A:\UU$ 和运算 $m:A\to A\to A$ 组成的\emph{序对} $(A,m)$。
+由于这个序对的第二分量 $m$ 的类型 $A\to A\to A$ 依赖于它的第一分量 $A$，这样的序对属于依赖对类型。
+因此，定义原群是一个类型 $A$ 连同一个二元运算 $m:A\to A\to A$应该理解为定义\emph{原群的类型}为
+\[ \mathsf{Magma} \defeq \sm{A:\UU} (A\to A\to A). \]
+给定一个原群，我们用第一投影 $\proj1$ 提取它的底层类型（它的载体\index{carrier}），用第二投影 $\proj2$ 提取它的运算。
+当然，由多于两片数据构建的结构需要迭代的对类型，它们可能只是部分依赖的；例如带点原群（配备基点 $e:A$ 的原群 $(A,m)$）的类型是
+\[ \mathsf{PointedMagma} \defeq \sm{A:\UU} (A\to A\to A) \times A. \]
+我们通常还想对这样的结构施加公理，例如使带点原群成为幺半群或群。
+这也可以用 $\Sigma$-类型完成；见 \cref{sec:pat}。
+
+在本书的其余部分，我们有时会明确说明这种定义，但最终我们相信读者能将它们从英语翻译成 $\Sigma$-类型。
+我们也通常遵循常见的数学实践，对这种结构及其载体使用相同的字母（这相当于在记法中隐含适当的投影函数）：即，我们会说原群 $A$ 及其运算 $m:A\to A\to A$。
+
+注意 $\mathsf{PointedMagma}$ 的规范元素形如 $(A,(m,e))$，其中 $A:\UU$，$m:A\to A\to A$，且 $e:A$。
+由于这种迭代 $\Sigma$-类型出现的频率，我们使用有序三元组、四元组等的通常记法来表示向右结合的嵌套对。
+即，我们有 $(x,y,z) \defeq (x,(y,z))$ 和 $(x,y,z,w)\defeq (x,(y,(z,w)))$，等等。
+
+\index{type!dependent pair|)}%
+
+\section{余积类型}
+\label{sec:coproduct-types}
+
+给定 $A,B:\UU$，我们引入它们的\define{余积}类型 $A+B:\UU$。
+\indexsee{coproduct}{type, coproduct}%
+\index{type!coproduct|(defstyle}%
+\indexsee{disjoint!sum}{type, coproduct}%
+\indexsee{disjoint!union}{type, coproduct}%
+\indexsee{sum!disjoint}{type, coproduct}%
+\indexsee{union!disjoint}{type, coproduct}%
+这对应于集合论中的\emph{不交并}，我们也可以用这个名称称呼它。
+在类型论中，与函数和积的情况一样，余积必须是基本构造，因为没有预先给定的类型的并的概念。
+我们还引入一个零元版本：\define{空类型 $\emptyt:\UU$}。
+\indexsee{nullary!coproduct}{type, empty}%
+\indexsee{empty type}{type, empty}%
+\index{type!empty|(defstyle}%
+
+有两种方式构造 $A+B$ 的元素，要么作为 $\inl(a) : A+B$（对于 $a:A$），要么作为 $\inr(b):A+B$（对于 $b:B$）。
+（名称 $\inl$ 和 $\inr$ 是左注入和右注入的缩写。）
+没有方式构造空类型的元素。
+
+\index{recursion principle!for coproduct}
+要构造一个非依赖函数 $f : A+B \to C$，我们需要函数 $g_0 : A \to C$ 和 $g_1 : B \to C$。然后 $f$ 通过定义方程定义
+\begin{align*}
+  f(\inl(a)) &\defeq g_0(a), \\
+  f(\inr(b)) &\defeq g_1(b).
+\end{align*}
+也就是说，函数 $f$ 是通过\define{分情况分析}定义的。
+\indexdef{case analysis}%
+如前所述，我们可以推导递归子：
+\symlabel{defn:recursor-plus}%
+\[ \rec{A+B} : \dprd{C:\UU}(A \to C) \to (B\to C) \to A+B \to C\]
+及定义方程
+\begin{align*}
+\rec{A+B}(C,g_0,g_1,\inl(a)) &\defeq g_0(a), \\
+\rec{A+B}(C,g_0,g_1,\inr(b)) &\defeq g_1(b).
+\end{align*}
+
+\index{recursion principle!for empty type}
+我们总是可以构造函数 $f : \emptyt \to C$ 而不必给出任何定义方程，因为没有 \emptyt{} 的元素需要在其上定义 $f$。
+因此，$\emptyt$ 的递归子是
+\symlabel{defn:recursor-emptyt}%
+\[\rec{\emptyt} : \tprd{C:\UU} \emptyt \to C,\]
+它构造从空类型到任何其他类型的规范函数。
+在逻辑上，它对应于原则 \textit{ex falso quodlibet}（从假可推出任何事）。
+\index{ex falso quodlibet@\textit{ex falso quodlibet}}
+
+\index{induction principle!for coproduct}
+要从余积构造依赖函数 $f:\prd{x:A+B}C(x)$，我们假定给定族
+$C: (A + B) \to \UU$，并要求
+\begin{align*}
+  g_0 &: \prd{a:A} C(\inl(a)), \\
+  g_1 &: \prd{b:B} C(\inr(b)).
+\end{align*}
+这产生 $f$ 及定义方程：\index{computation rule!for coproduct type}
+\begin{align*}
+  f(\inl(a)) &\defeq g_0(a), \\
+  f(\inr(b)) &\defeq g_1(b).
+\end{align*}
+我们将这个模式打包成余积的归纳原则：
+\symlabel{defn:induction-plus}%
+\begin{narrowmultline*}
+  \ind{A+B} :
+  \dprd{C: (A + B) \to \UU}
+  \Parens{\tprd{a:A} C(\inl(a))} \to \narrowbreak
+  \Parens{\tprd{b:B} C(\inr(b))} \to \tprd{x:A+B}C(x).
+\end{narrowmultline*}
+如前所述，当族 $C$ 是常值时递归子出现。
+
+\index{induction principle!for empty type}
+空类型的归纳原则
+\symlabel{defn:induction-emptyt}%
+\[ \ind{\emptyt} : \prd{C:\emptyt \to \UU}{z:\emptyt} C(z) \]
+给我们一种定义从空类型出发的平凡依赖函数的方式。
+
+\index{type!coproduct|)}%
+\index{type!empty|)}%
+
+
+\section{布尔类型}
+\label{sec:type-booleans}
+
+\indexsee{boolean!type of}{type of booleans}%
+\index{type!of booleans|(defstyle}%
+布尔类型 $\bool:\UU$ 旨在恰好有两个元素
+$\bfalse,\btrue : \bool$。很明显我们可以用余积
+\index{type!coproduct}%
+和单位\index{type!unit}类型将这个类型构造为 $\unit + \unit$。然而，
+由于它被频繁使用，我们在这里给出明确的规则。
+事实上，我们将观察到我们也可以反过来从 $\Sigma$-类型和 $\bool$ 推导二元余积。
+
+\index{recursion principle!for type of booleans}
+要推导函数 $f : \bool \to C$，我们需要 $c_0,c_1 : C$ 并添加定义方程
+\begin{align*}
+  f(\bfalse) &\defeq c_0, \\
+  f(\btrue)  &\defeq c_1.
+\end{align*}
+递归子对应于函数式编程中的 if-then-else 构造：
+\symlabel{defn:recursor-bool}%
+\[ \rec{\bool} : \prd{C:\UU}  C \to C \to \bool \to C \]
+及定义方程
+\begin{align*}
+  \rec{\bool}(C,c_0,c_1,\bfalse) &\defeq c_0, \\
+  \rec{\bool}(C,c_0,c_1,\btrue)  &\defeq c_1.
+\end{align*}
+
+\index{induction principle!for type of booleans}
+给定 $C : \bool \to \UU$，要推导依赖函数
+$f : \prd{x:\bool}C(x)$，我们需要 $c_0:C(\bfalse)$ 和 $c_1 : C(\btrue)$，在这种情况下我们可以给出定义方程
+\begin{align*}
+  f(\bfalse) &\defeq c_0, \\
+  f(\btrue)  &\defeq c_1.
+\end{align*}
+我们将此打包成归纳原则
+\symlabel{defn:induction-bool}%
+\[ \ind{\bool} : \dprd{C:\bool \to \UU}  C(\bfalse) \to C(\btrue)
+\to \tprd{x:\bool} C(x) \]
+及定义方程
+\begin{align*}
+  \ind{\bool}(C,c_0,c_1,\bfalse) &\defeq c_0, \\
+  \ind{\bool}(C,c_0,c_1,\btrue)  &\defeq c_1.
+\end{align*}
+
+作为例子，使用归纳原则我们可以推出，正如预期的，$\bool$ 的每个元素要么是 $\btrue$ 要么是 $\bfalse$。
+如前所述，为了陈述这一点，我们使用尚未引入的等式类型，但我们只需要知道每个东西都等于它自己：$\refl{x}:x=x$。
+因此，我们构造一个
+\begin{equation}\label{thm:allbool-trueorfalse}
+  \prd{x:\bool}(x=\bfalse)+(x=\btrue)
+\end{equation}
+的元素，即一个函数为每个 $x:\bool$ 分配一个等式 $x=\bfalse$ 或等式 $x=\btrue$。
+我们使用 \bool{} 的归纳原则定义这个元素，令 $C(x) \defeq (x=\bfalse)+(x=\btrue)$；
+两个输入是 $\inl(\refl{\bfalse}) : C(\bfalse)$ 和 $\inr(\refl{\btrue}):C(\btrue)$。
+换言之，我们的 \eqref{thm:allbool-trueorfalse} 的元素是
+\[ \ind{\bool}\big(\lam{x}(x=\bfalse)+(x=\btrue),\, \inl(\refl{\bfalse}),\, \inr(\refl{\btrue})\big). \]
+
+我们已经说过 $\Sigma$-类型可以被视为类似于索引不交并，而余积是二元不交并。
+很自然地期望二元不交并 $A+B$ 可以被构造为双元素类型 \bool{} 上的索引不交并。
+为此我们需要一个类型族 $P:\bool\to\type$ 使得 $P(\bfalse)\jdeq A$ 且 $P(\btrue)\jdeq B$。
+确实，我们可以精确地通过 $\bool$ 的递归原则获得这样的族。
+\index{type!family of}%
+（能够通过归纳和递归定义\emph{类型族}，使用宇宙 $\UU$ 本身是一个类型这一事实，是类型论的一个微妙而重要的方面。）
+因此，我们本可以定义
+\index{type!coproduct}%
+\[ A + B \defeq \sm{x:\bool} \rec{\bool}(\UU,A,B,x) \]
+及
+\begin{align*}
+  \inl(a) &\defeq \tup{\bfalse}{a}, \\
+  \inr(b) &\defeq \tup{\btrue}{b}.
+\end{align*}
+我们留给读者作为练习从这个定义推导余积类型的归纳原则。
+（另见 \cref{ex:sum-via-bool,sec:appetizer-univalence}。）
+
+我们可以将同样的想法应用于积和 $\Pi$-类型：我们本可以定义
+\[ A \times B \defeq \prd{x:\bool}\rec{\bool}(\UU,A,B,x). \]
+序对可以用 \bool{} 的归纳构造：
+\[ \tup{a}{b} \defeq \ind{\bool}(\rec{\bool}(\UU,A,B),a,b) \]
+而投影是直接的应用
+\begin{align*}
+  \fst(p) &\defeq p(\bfalse), \\
+  \snd(p) &\defeq p(\btrue).
+\end{align*}
+以这种方式定义的二元积的归纳原则的推导更加复杂，并且需要函数外延性，我们将在 \cref{sec:compute-pi} 中引入。
+此外，我们不能得到相同的判断等式；见 \cref{ex:prod-via-bool}。
+这是将一种类型编码为另一种类型时的一个反复出现的问题；我们将在 \cref{sec:htpy-inductive} 中回到这个问题。
+
+我们有时会分别将 $\bool$ 的元素 $\bfalse$ 和 $\btrue$ 称为假和真。
+然而，注意与经典\index{mathematics!classical}数学不同，我们不使用 $\bool$ 的元素作为真值
+\index{value!truth}%
+或作为命题。
+（相反我们将命题与类型等同；见 \cref{sec:pat}。）
+特别是，类型 $A \to \bool$ 通常不是 $A$ 的幂集\index{power set}；它只代表 $A$ 的可判定子集（见 \cref{cha:logic}）。
+\index{decidable!subset}%
+
+\index{type!of booleans|)}%
+
+
+\section{自然数}
+\label{sec:inductive-types}
+
+\indexsee{type!of natural numbers}{natural numbers}%
+\index{natural numbers|(defstyle}%
+\indexsee{number!natural}{natural numbers}%
+到目前为止，我们有通过抽象操作构造新类型的规则，但要做具体的数学，我们还需要一些具体的类型，如数的类型。
+最基本的这种类型是自然数类型 $\nat : \UU$；一旦我们有了这个，我们可以构造整数、有理数、实数等等（见 \cref{cha:real-numbers}）。
+
+$\nat$ 的元素使用 $0 : \nat$\indexdef{zero} 和后继\indexdef{successor}运算 $\suc : \nat \to \nat$ 构造。
+当表示自然数时，我们采用通常的十进制记法 $1 \defeq \suc(0)$，$2 \defeq \suc(1)$，$3 \defeq \suc(2)$，\dots。
+
+自然数的基本性质是我们可以通过递归定义函数并通过归纳进行证明——这里递归和归纳这两个词有了更熟悉的含义。
+\index{recursion principle!for natural numbers}%
+要通过递归从自然数构造非依赖函数 $f : \nat \to C$，只需提供一个起点 $c_0 : C$ 和一个下一步函数 $c_s : \nat \to C \to C$。
+这产生 $f$ 及定义方程\index{computation rule!for natural numbers}
+\begin{align*}
+  f(0) &\defeq c_0, \\
+  f(\suc(n)) &\defeq c_s(n,f(n)).
+\end{align*}
+我们说 $f$ 是通过\define{原始递归}定义的。
+\indexdef{primitive!recursion}%
+\indexdef{recursion!primitive}%
+
+作为例子，我们来看如何定义一个将其参数加倍的自然数函数。
+在这种情况下我们有 $C\defeq \nat$。
+我们首先需要提供 $\dbl(0)$ 的值，这很容易：我们令 $c_0 \defeq 0$。
+接下来，要计算自然数 $n$ 的 $\dbl(\suc(n))$ 的值，我们首先计算 $\dbl(n)$ 的值，然后执行两次后继运算。
+这由递推式\index{recurrence} $c_s(n,y) \defeq \suc(\suc(y))$ 捕获。
+注意 $c_s$ 的第二个参数 $y$ 代表\emph{递归调用}\index{recursive call} $\dbl(n)$ 的结果。
+
+因此，以这种方式通过原始递归定义 $\dbl:\nat\to\nat$，我们得到定义方程：
+\begin{align*}
+  \dbl(0) &\defeq 0\\
+  \dbl(\suc(n)) &\defeq \suc(\suc(\dbl(n))).
+\end{align*}
+这确实有正确的计算行为：例如，我们有
+\begin{align*}
+  \dbl(2) &\jdeq \dbl(\suc(\suc(0)))\\
+  & \jdeq c_s(\suc(0), \dbl(\suc(0))) \\
+                 & \jdeq \suc(\suc(\dbl(\suc(0)))) \\
+                 & \jdeq \suc(\suc(c_s(0,\dbl(0)))) \\
+                 & \jdeq \suc(\suc(\suc(\suc(\dbl(0))))) \\
+                 & \jdeq \suc(\suc(\suc(\suc(c_0)))) \\
+                 & \jdeq \suc(\suc(\suc(\suc(0))))\\
+                 &\jdeq 4.
+\end{align*}
+我们也可以通过原始递归定义多变量函数，方法是柯里化并允许 $C$ 是函数类型。
+\indexdef{addition!of natural numbers}
+例如，我们用 $C \defeq \nat \to \nat$ 和以下起点和下一步数据定义加法 $\add : \nat \to \nat \to \nat$：
+\begin{align*}
+  c_0 & : \nat \to \nat \\
+  c_0 (n) & \defeq n \\
+  c_s & : \nat \to (\nat \to \nat) \to (\nat \to \nat) \\
+  c_s(m,g)(n) & \defeq \suc(g(n)).
+\end{align*}
+因此我们得到 $\add : \nat \to \nat \to \nat$ 满足定义等式
+\begin{align*}
+  \add(0,n) &\jdeq n \\
+  \add(\suc(m),n) &\jdeq \suc(\add(m,n)).
+\end{align*}
+照例，我们将 $\add(m,n)$ 写成 $m+n$。
+请读者验证 $2+2\jdeq 4$。
+
+如在以前的情况中，我们可以将原始递归原则打包成递归子：
+\[\rec{\nat}  : \dprd{C:\UU} C \to (\nat \to C \to C) \to \nat \to C \]
+及定义方程
+\symlabel{defn:recursor-nat}%
+\begin{align*}
+\rec{\nat}(C,c_0,c_s,0)  &\defeq c_0, \\
+\rec{\nat}(C,c_0,c_s,\suc(n)) &\defeq c_s(n,\rec{\nat}(C,c_0,c_s,n)).
+\end{align*}
+使用 $\rec{\nat}$ 我们可以将 $\dbl$ 和 $\add$ 表示如下：
+\begin{align}
+\dbl &\defeq \rec\nat\big(\nat,\, 0,\, \lamu{n:\nat}{y:\nat} \suc(\suc(y))\big) \label{eq:dbl-as-rec}\\
+\add &\defeq \rec{\nat}\big(\nat \to \nat,\, \lamu{n:\nat} n,\, \lamu{m:\nat}{g:\nat \to \nat}{n :\nat} \suc(g(n))\big).
+\end{align}
+当然，所有仅使用原始递归原则可定义的函数都将是\emph{可计算的}。
+（然而，高阶函数类型的存在——即以其他函数作为参数的函数——确实意味着我们可以定义比通常的原始递归函数更多的函数；见例如 \cref{ex:ackermann}。）
+这在构造性数学中是合适的；
+\index{mathematics!constructive}%
+在 \cref{sec:intuitionism,sec:axiom-choice} 中我们将看到如何扩充类型论使我们可以定义更一般的数学函数。
+
+\index{induction principle!for natural numbers}
+我们现在遵循与其他类型相同的方法，将原始递归推广到依赖函数以获得\emph{归纳原则}。
+因此，假定给定族 $C : \nat \to \UU$，元素 $c_0 : C(0)$，和函数 $c_s : \prd{n:\nat} C(n) \to C(\suc(n))$；那么我们可以构造 $f : \prd{n:\nat} C(n)$ 及定义方程：\index{computation rule!for natural numbers}
+\begin{align*}
+  f(0) &\defeq c_0, \\
+  f(\suc(n)) &\defeq c_s(n,f(n)).
+\end{align*}
+我们也可以将此打包成单个函数
+\symlabel{defn:induction-nat}%
+\[\ind{\nat}  : \dprd{C:\nat\to \UU} C(0) \to \Parens{\tprd{n : \nat} C(n) \to C(\suc(n))} \to \tprd{n : \nat} C(n) \]
+及定义方程
+\begin{align*}
+\ind{\nat}(C,c_0,c_s,0)  &\defeq c_0, \\
+\ind{\nat}(C,c_0,c_s,\suc(n)) &\defeq c_s(n,\ind{\nat}(C,c_0,c_s,n)).
+\end{align*}
+这里我们终于看到了与经典的归纳证明概念的联系。
+回想在类型论中我们用类型表示命题，通过居于相应类型来证明命题。
+特别地，自然数的\emph{性质}由类型族 $P:\nat\to\type$ 表示。
+从这个观点看，上述归纳原则说的是如果我们能证明 $P(0)$，且对任何 $n$ 我们能假设 $P(n)$ 证明 $P(\suc(n))$，那么对所有 $n$ 我们有 $P(n)$。
+这当然正是对自然数归纳证明的通常原则。
+
+\index{associativity!of addition!of natural numbers}
+作为例子，考虑我们如何表示 $+$ 是结合的显式证明。
+（我们实际上不会以这种风格写出证明，但它作为理解归纳如何在类型论中形式表示的有用例子。）
+要推导
+\[\assoc : \prd{i,j,k:\nat} \id{i + (j + k)}{(i + j) + k}, \]
+只需提供
+\[ \assoc_0 :  \prd{j,k:\nat} \id{0 + (j + k)}{(0+ j) + k} \]
+和
+\begin{narrowmultline*}
+  \assoc_s  : \prd{i:\nat} \left(\prd{j,k:\nat} \id{i + (j + k)}{(i + j) + k}\right)
+   \narrowbreak
+   \to \prd{j,k:\nat} \id{\suc(i) + (j + k)}{(\suc(i) + j) + k}.
+\end{narrowmultline*}
+要推导 $\assoc_0$，回想 $0+n \jdeq n$，因此 $0 + (j + k) \jdeq j+k \jdeq (0+ j) + k$。
+因此我们可以直接令
+\[ \assoc_0(j,k) \defeq \refl{j+k}. \]
+对于 $\assoc_s$，回想 $+$ 的定义给出 $\suc(m)+n \jdeq \suc(m+n)$，因此
+\begin{align*}
+   \suc(i) + (j + k)  &\jdeq \suc(i+(j+k)) \qquad\text{且}\\
+   (\suc(i)+j)+k &\jdeq \suc((i+j)+k).
+\end{align*}
+因此，$\assoc_s$ 的输出类型等价于 $\id{\suc(i+(j+k))}{\suc((i+j)+k)}$。
+但它的输入（归纳假设）
+\index{hypothesis!inductive}%
+\index{inductive!hypothesis}%
+产出 $\id{i+(j+k)}{(i+j)+k}$，所以只需援引如果两个自然数相等，那么它们的后继也相等这一事实。
+（我们将在 \cref{lem:map} 中使用恒等类型的归纳原则证明这个显然的事实。）
+我们将后一个事实称为
+$\apfunc{\suc} :
+(\id[\nat]{m}{n}) \to (\id[\nat]{\suc(m)}{\suc(n)})$，所以我们可以定义
+\[\assoc_s(i,h,j,k) \defeq \apfunc{\suc}(h(j,k)). \]
+将这些与 $\ind{\nat}$ 放在一起，我们得到结合性的证明。
+
+\index{natural numbers|)}%
+
+
+\section{模式匹配与递归}
+\label{sec:pattern-matching}
+
+\index{pattern matching|(defstyle}%
+\indexsee{matching}{pattern matching}%
+\index{definition!by pattern matching|(}%
+自然数比到目前为止考虑的类型引入了额外的微妙之处。
+在余积的情况下，例如，我们可以用递归子定义函数 $f:A+B\to C$：
+\[ f \defeq \rec{A+B}(C, g_0, g_1) \]
+或者通过给出定义方程：
+\begin{align*}
+  f(\inl(a)) &\defeq g_0(a)\\
+  f(\inr(b)) &\defeq g_1(b).
+\end{align*}
+从前一个表达式到后一个表达式，我们只需使用递归子的计算规则。
+反过来，给定任何定义方程
+\begin{align*}
+  f(\inl(a)) &\defeq \Phi_0\\
+  f(\inr(b)) &\defeq \Phi_1
+\end{align*}
+其中 $\Phi_0$ 和 $\Phi_1$ 是可能分别涉及变量
+\index{variable}%
+$a$ 和 $b$ 的表达式，我们可以用 $\lambda$-抽象\index{lambda abstraction@$\lambda$-abstraction}将这些方程等价地用递归子表达：
+\[ f\defeq \rec{A+B}(C, \lam{a} \Phi_0, \lam{b} \Phi_1).\]
+然而在自然数的情况下，像 $\dbl$ 这样的函数的定义方程：
+\begin{align}
+  \dbl(0) &\defeq 0 \label{eq:dbl0}\\
+  \dbl(\suc(n)) &\defeq \suc(\suc(\dbl(n)))\label{eq:dblsuc}
+\end{align}
+在右侧涉及\emph{函数 $\dbl$ 本身}。
+然而，我们仍然希望能够给出这些方程而不是 \eqref{eq:dbl-as-rec} 作为 \dbl{} 的定义，因为它们更加方便和可读。
+解决方案是将 \eqref{eq:dblsuc} 右侧的表达式$\dbl(n)$解读为代表递归调用的结果，在形式 $\dbl\defeq \rec{\nat}(\nat,c_0,c_s)$ 的定义中它将是 $c_s$ 的第二个参数。
+
+更一般地，如果我们有函数 $f:\nat\to C$ 的定义如
+\begin{align*}
+  f(0) &\defeq \Phi_0\\
+  f(\suc(n)) &\defeq \Phi_s
+\end{align*}
+其中 $\Phi_0$ 是类型 $C$ 的表达式，而 $\Phi_s$ 是类型 $C$ 的表达式，可能涉及变量 $n$ 以及符号$f(n)$，我们可以将其翻译成定义
+\[ f \defeq \rec{\nat}(C,\,\Phi_0,\,\lam{n}{r} \Phi_s') \]
+其中 $\Phi_s'$ 是通过将$f(n)$的所有出现替换为新变量 $r$ 从 $\Phi_s$ 获得的。
+
+这种通过递归（或更一般地，通过归纳）定义函数（或依赖函数）的风格非常方便，我们经常采用它。
+它被称为通过\define{模式匹配}定义。
+当然，这与计算机程序员如何定义一个函数体实际包含对自身递归调用的递归函数非常相似。
+然而，与程序员不同，我们对可以进行什么样的递归调用有限制：为了使这样的定义可用递归原则重新表达，被定义的函数 $f$ 只能作为复合符号$f(n)$的一部分出现在 $f(\suc(n))$ 的函数体中。
+否则，我们可以写出无意义的函数如
+\begin{align*}
+  f(0)&\defeq 0\\
+  f(\suc(n)) &\defeq f(\suc(\suc(n))).
+\end{align*}
+如果程序员写这样的函数，它会在任何正输入上无限地调用自己，进入无限循环并且永远不返回值。
+然而在数学中，要配得上这个名称，一个\emph{函数}必须总是为每个输入值关联一个唯一的输出值，所以这是不可接受的。
+
+当我们在 \cref{cha:induction,cha:hits,cha:real-numbers} 中引入更复杂的归纳类型时，这一点将更加重要。
+每当我们引入一种新的归纳定义时，我们总是首先推导它的归纳原则。
+只有这样我们才引入一种适当的模式匹配作为归纳原则的简写。
+
+\index{pattern matching|)}%
+\index{definition!by pattern matching|)}%
+
+\section{命题即类型}
+\label{sec:pat}
+
+\index{proposition!as types|(defstyle}%
+\index{logic!propositions as types|(}%
+如导论中所述，在类型论中证明一个命题为真对应于展示该命题对应的类型的一个元素。
+\index{evidence, of the truth of a proposition}%
+\index{witness!to the truth of a proposition}%
+\index{proof|(}
+我们将这个类型的元素视为命题为真的\emph{证据}或\emph{见证}。（它们有时甚至被称为\emph{证明}，但这个术语可能会误导，所以我们通常避免使用它。）
+然而一般来说，我们不会显式构造见证；相反我们用普通的数学散文呈现证明，以可以翻译成类型的元素的方式。
+这与在经典集合论中的推理没有区别，在那里我们也不期望看到使用谓词逻辑规则和集合论公理的显式推导。
+
+然而，类型论对证明的观点在重要方面是不同的。
+类型论逻辑的基本原则是命题不仅仅是真或假，而是可以被看作其真的所有可能见证的集合。
+在这种概念下，证明不仅是交流数学的手段，而且是与更熟悉的对象如数、映射、群等同等地位的数学对象。
+因此，由于类型分类可用的数学对象并支配它们如何交互，命题不过是特殊的类型——即其元素是证明的类型。
+
+\index{propositional!logic}%
+\index{logic!propositional}%
+使这种等同可行的基本观察是，我们在用英语表达的命题上的\emph{逻辑}运算与其见证类型上的\emph{类型论}运算之间有以下自然对应。
+\index{false}%
+\index{true}%
+\index{conjunction}%
+\index{disjunction}%
+\index{implication}%
+\begin{center}
+\medskip
+\begin{tabular}{ll}
+  \toprule
+  英语 & 类型论\\
+  \midrule
+  真 & $\unit$ \\
+  假 & $\emptyt$ \\
+  $A$ 且 $B$ & $A \times B$ \\
+  $A$ 或 $B$ & $A + B$ \\
+  若 $A$ 则 $B$ & $A \to B$ \\
+  $A$ 当且仅当 $B$ & $(A \to B) \times (B \to A)$ \\
+  非 $A$ &  $A \to \emptyt$ \\
+  \bottomrule
+\end{tabular}
+\medskip
+\end{center}
+
+对应的要点是在每种情况下，构造和使用右边类型元素的规则对应于关于左边命题推理的规则。
+例如，证明$A$ 且 $B$形式陈述的基本方式是证明 $A$ 并且也证明 $B$，而构造 $A\times B$ 的元素的基本方式是作为序对 $(a,b)$，其中 $a$ 是 $A$ 的元素（或见证）而 $b$ 是 $B$ 的元素（或见证）。
+如果我们想用$A$ 且 $B$证明其他事情，我们可以自由地在证明中同时使用 $A$ 和 $B$，类似于 $A\times B$ 的归纳原则如何允许我们通过使用 $A$ 和 $B$ 的元素从它构造函数。
+
+类似地，证明蕴含\index{implication}若 $A$ 则 $B$的基本方式是假设 $A$ 并证明 $B$，而构造 $A\to B$ 的元素的基本方式是给出一个表达式表示 $B$ 的元素（见证），它可能涉及类型 $A$ 的未指定变量元素（见证）。
+使用蕴含若 $A$ 则 $B$的基本方式是如果我们知道 $A$ 则推出 $B$，类似于我们可以将函数 $f:A\to B$ 应用于 $A$ 的元素来产生 $B$ 的元素。
+我们强烈鼓励读者做练习验证支配其他类型构造子的规则合理地翻译成逻辑。
+
+特别值得注意的是空类型 $\emptyt$ 对应于假。\index{false}
+当从逻辑上讲时，我们将 $\emptyt$ 的居民称为\define{矛盾}：
+\indexdef{contradiction}%
+因此没有方式证明矛盾，%
+\footnote{更精确地说，没有\emph{基本的}方式证明矛盾，即 \emptyt{} 没有构造子。
+如果我们的类型论是不一致的，那么会有某种更复杂的方式构造 $\emptyt$ 的元素。}
+而从矛盾可以推出任何东西。
+我们还定义类型 $A$ 的\define{否定}
+\indexdef{negation}%
+为
+%
+\begin{equation*}
+  \neg A \ \defeq\ A \to \emptyt.
+\end{equation*}
+%
+因此，$\neg A$ 的见证是函数 $A \to \emptyt$，我们可以通过假设 $x : A$ 并推导 $\emptyt$ 的元素来构造它。
+\index{proof!by contradiction}%
+\index{logic!constructive vs classical}
+注意虽然我们获得的逻辑是构造的，如导论中讨论的，这种反证法（假设 $A$ 并推导矛盾，得出 $\neg A$）在构造上是完全有效的：它只是援引否定的\emph{含义}。
+不被允许的那种反证法是假设 $\neg A$ 并推导矛盾作为证明 $A$ 的方式。
+构造地，这样的论证只允许我们得出 $\neg\neg A$，读者可以验证没有明显的方式从 $\neg\neg A$（即从 $(A\to \emptyt)\to\emptyt$）得到 $A$。
+
+\mentalpause
+
+上述将逻辑连接词翻译成类型形成操作被称为\define{命题即类型}：它给我们一种方式将用英语写的命题及其证明翻译成类型及其元素。
+例如，假设我们想证明以下重言式（德摩根定律之一）：
+\index{law!de Morgan's|(}%
+\index{de Morgan's laws|(}%
+\begin{equation}\label{eq:tautology1}
+  \text{\emph{若非 $A$ 且非 $B$，则非（$A$ 或 $B$）}}
+\end{equation}
+这个事实的普通英语证明可能如下。
+\begin{quote}
+  假设非 $A$ 且非 $B$，并且也假设 $A$ 或 $B$；我们将推导矛盾。
+  有两种情况。
+  若 $A$ 成立，则由于非 $A$，我们有矛盾。
+  类似地，若 $B$ 成立，则由于非 $B$，我们也有矛盾。
+  因此在任一情况下我们都有矛盾，所以非（$A$ 或 $B$）。
+\end{quote}
+现在，根据上面给出的规则，对应于我们的重言式 \eqref{eq:tautology1} 的类型是
+\begin{equation}\label{eq:tautology2}
+  (A\to \emptyt) \times (B\to\emptyt) \to (A+B\to\emptyt)
+\end{equation}
+所以我们应该能够将上述证明翻译成这个类型的元素。
+
+作为这种翻译如何工作的例子，让我们描述一个数学家阅读上述英语证明时如何可能同时在头脑中构造 \eqref{eq:tautology2} 的元素。
+介绍短语假设非 $A$ 且非 $B$翻译成定义一个函数，隐式应用其定义域 $(A\to\emptyt)\times (B\to\emptyt)$ 上笛卡尔积的递归原则。
+这引入了未命名的变量
+\index{variable}%
+（假设）
+\index{hypothesis}%
+类型分别为 $A\to\emptyt$ 和 $B\to\emptyt$。
+当翻译成类型论时，我们必须给这些变量命名；让我们称它们为 $x$ 和 $y$。
+此时我们对 \eqref{eq:tautology2} 的元素的部分定义可以写成
+\[ f((x,y)) \defeq\; \Box\;:A+B\to\emptyt \]
+带有一个类型为 $A+B\to\emptyt$ 的洞 $\Box$ 表示还需要做什么。
+（我们可以等价地写 $f \defeq \rec{(A\to\emptyt)\times (B\to\emptyt)}(A+B\to\emptyt,\lam{x}{y} \Box)$，使用递归子而不是模式匹配。）
+下一个短语也假设 $A$ 或 $B$；我们将推导矛盾表示通过函数定义填充这个洞，引入另一个未命名假设 $z:A+B$，导致证明状态：
+\[ f((x,y))(z) \defeq \;\Box\; :\emptyt. \]
+现在说有两种情况表示分情况分析，即应用余积 $A+B$ 的递归原则。
+如果我们用递归子写这个，它将是
+\[ f((x,y))(z) \defeq \rec{A+B}(\emptyt,\lam{a} \Box,\lam{b}\Box,z) \]
+而如果我们用模式匹配写，它将是
+\begin{align*}
+  f((x,y))(\inl(a)) &\defeq \;\Box\;:\emptyt\\
+  f((x,y))(\inr(b)) &\defeq \;\Box\;:\emptyt.
+\end{align*}
+注意在两种情况下我们现在有两个类型为 $\emptyt$ 的洞要填充，对应于我们必须推导矛盾的两种情况。
+最后，从 $a:A$ 和 $x:A\to\emptyt$ 得出矛盾只是将函数 $x$ 应用于 $a$，在另一种情况下类似。
+\index{application!of hypothesis or theorem}%
+（注意应用函数的短语与应用假设或定理的短语的方便巧合。）
+因此我们最终的定义是
+\begin{align*}
+  f((x,y))(\inl(a)) &\defeq x(a)\\
+  f((x,y))(\inr(b)) &\defeq y(b).
+\end{align*}
+
+作为练习，你应该通过对任何类型 $A$ 和 $B$ 展示
+\[ ((A + B) \to \emptyt) \to (A \to \emptyt) \times (B \to \emptyt) \]
+的元素来验证相反的重言式\emph{若非（$A$ 或 $B$），则（非 $A$）且（非 $B$）}，使用我们刚刚引入的规则。
+
+\index{logic!classical vs constructive|(}
+然而，并非所有经典\index{mathematics!classical}重言式在这种解释下都成立。
+例如，规则
+\emph{若非（$A$ 且 $B$），则（非 $A$）或（非 $B$）}是无效的：我们一般不能构造相应类型
+\[ ((A \times B) \to \emptyt) \to (A \to \emptyt) + (B \to \emptyt)\]
+的元素。
+这反映了类型论的自然命题即类型逻辑是\emph{构造的}这一事实。
+这意味着它不包括某些经典原则，如排中律（\LEM{}）\index{excluded middle}
+或反证法，\index{proof!by contradiction}
+以及依赖于它们的其他原则，如德摩根定律的这个实例。
+\index{law!de Morgan's|)}%
+\index{de Morgan's laws|)}%
+
+哲学上，构造逻辑之所以如此称呼，是因为它限于可以\emph{有效地}执行的构造，也就是说那些具有计算意义的构造。
+不太精确地说，这意味着有某种算法\index{algorithm}逐步指定如何构建对象（以及作为特殊情况，如何看出定理为真）。
+这要求省略 \LEM{}，因为没有\emph{有效的}\index{effective!procedure}程序来判定命题是真还是假。
+
+类型论逻辑的构造性意味着它有内在的计算意义，这对计算机科学家来说很有趣。
+它还意味着类型论提供\emph{公理自由}。\index{axiomatic freedom}
+例如，虽然默认情况下没有见证 \LEM{} 的构造，但逻辑仍然与存在这样的构造兼容（见 \cref{sec:intuitionism}）。
+因此，因为类型论不\emph{否认} \LEM{}，我们可以一致地将其作为假设添加，并无限制地常规工作。
+在这方面，类型论丰富而非限制了常规数学实践。
+
+我们鼓励不熟悉构造逻辑的读者通过更多例子来熟悉它。
+见 \cref{ex:tautologies,ex:not-not-lem} 获取一些建议。
+\index{logic!classical vs constructive|)}
+
+\mentalpause
+
+到目前为止我们只讨论了命题逻辑。
+\index{quantifier}%
+\index{quantifier!existential}%
+\index{quantifier!universal}%
+\index{predicate!logic}%
+\index{logic!predicate}%
+现在我们考虑\emph{谓词}逻辑，其中除了且和或等逻辑连接词外我们还有量词存在和对所有。
+在这种情况下，类型扮演双重角色：它们作为命题并且也作为常规意义上的类型，即我们量化的域。
+类型 $A$ 上的谓词表示为族 $P : A \to \UU$，为每个元素 $a : A$ 分配类型 $P(a)$ 对应于 $P$ 对 $a$ 成立的命题。我们现在用量词的解释扩展上述翻译：
+\begin{center}
+  \medskip
+  \begin{tabular}{ll}
+    \toprule
+    英语 & 类型论\\
+    \midrule
+    对所有 $x:A$，$P(x)$ 成立 & $\prd{x:A} P(x)$ \\
+    存在 $x:A$ 使得 $P(x)$ & $\sm{x:A}$ $P(x)$ \\
+    \bottomrule
+  \end{tabular}
+  \medskip
+\end{center}
+如前所述，我们可以证明（构造）谓词逻辑的重言式翻译成有居民的类型。
+例如，\emph{若对所有 $x:A$，$P(x)$ 且 $Q(x)$，则（对所有 $x:A$，$P(x)$）且（对所有 $x:A$，$Q(x)$）}翻译为
+\[ (\tprd{x:A} P(x) \times Q(x)) \to (\tprd{x:A} P(x)) \times (\tprd{x:A} Q(x)). \]
+这个重言式的非形式证明可能如下：
+\begin{quote}
+  假设对所有 $x$，$P(x)$ 且 $Q(x)$。
+  首先，我们假定给定 $x$ 并证明 $P(x)$。
+  由假设，我们有 $P(x)$ 且 $Q(x)$，因此我们有 $P(x)$。
+  其次，我们假定给定 $x$ 并证明 $Q(x)$。
+  再次由假设，我们有 $P(x)$ 且 $Q(x)$，因此我们有 $Q(x)$。
+\end{quote}
+第一句开始通过引入其假设的见证来定义蕴含作为函数：\index{hypothesis}
+\[ f(p) \defeq \;\Box\; : (\tprd{x:A} P(x)) \times (\tprd{x:A} Q(x)). \]
+此时有一个隐式使用的配对构造子来产生积类型的元素，在这个例子中由首先和其次这两个词多少标示：
+\[ f(p) \defeq \Big( \;\Box\; : \tprd{x:A} P(x) \;,\; \Box\; : \tprd{x:A}Q(x) \;\Big). \]
+短语我们假定给定 $x$ 并证明 $P(x)$现在表示以通常方式定义\emph{依赖}函数，为其输入引入变量
+\index{variable}%
+。
+由于这在配对构造子内部，自然将其写成 $\lambda$-抽象\index{lambda abstraction@$\lambda$-abstraction}：
+\[ f(p) \defeq \Big( \; \lam{x} \;\big(\Box\; : P(x)\big) \;,\; \Box\; : \tprd{x:A}Q(x) \;\Big). \]
+现在我们有 $P(x)$ 且 $Q(x)$援引假设，得到 $p(x) : P(x)\times Q(x)$，而因此我们有 $P(x)$隐式应用适当的投影：
+\[ f(p) \defeq \Big( \; \lam{x} \proj1(p(x))  \;,\; \Box\; : \tprd{x:A}Q(x) \;\Big). \]
+接下来的两句以明显的方式填充另一个洞：
+\[ f(p) \defeq \Big( \; \lam{x} \proj1(p(x))  \;,\; \lam{x} \proj2(p(x)) \; \Big). \]
+当然，我们一直用作例子的英语证明比数学家通常在实践中使用的要冗长得多；它们更像是在证明入门课程中使用的那种语言。
+执业数学家已经学会填补空白，所以在实践中我们可以省略大量细节，我们通常会这样做。
+然而，证明有效性的标准始终是它们可以翻译回相应类型的元素的构造。
+
+\symlabel{leq-nat}%
+作为更具体的例子，考虑如何定义自然数的不等式。
+一个自然的定义是 $n\le m$ 当存在 $k:\nat$ 使得 $n+k=m$。
+（这再次使用了我们将在下一节引入的恒等类型，但我们不需要关于它们的太多内容。）
+在命题即类型翻译下，这将产生：
+\[ (n\le m) \defeq \sm{k:\nat} (\id{n+k}{m}). \]
+读者被邀请从这个定义证明 $\le$ 的熟悉性质。
+对于严格不等式，有几个自然的选择，如
+\[ (n<m) \defeq \sm{k:\nat} (\id{n+\suc(k)}{m}) \]
+或
+\[ (n<m) \defeq (n\le m) \times \neg(\id{n}{m}). \]
+前者在构造数学中更自然，但在这种情况下它实际上等价于后者，因为 $\nat$ 有可判定相等（见 \cref{sec:intuitionism,prop:nat-is-set}）。
+\index{decidable!equality}%
+
+类型 $\sm{x:A} P(x)$ 还有另一种解释。
+由于它的居民是元素 $x:A$ 连同 $P(x)$ 成立的见证，我们不将 $\sm{x:A} P(x)$ 视为命题存在 $x:A$ 使得 $P(x)$，而可以将其视为满足 $P(x)$ 的所有元素 $x:A$ 的类型，即 $A$ 的子类型。
+\index{subtype}%
+
+我们将在 \cref{subsec:prop-subsets} 中回到这种解释。
+现在，我们注意到它允许我们将公理纳入我们在 \cref{sec:sigma-types} 中讨论的作为数学结构的类型的定义中。
+例如，假设我们想定义\define{半群}\index{semigroup}为类型 $A$ 配备二元运算 $m:A\to A\to A$（即原群\index{magma}）并且对所有 $x,y,z:A$ 有 $m(x,m(y,z)) = m(m(x,y),z)$。
+后一个命题由类型
+\[\prd{x,y,z:A} m(x,m(y,z)) = m(m(x,y),z)\]
+表示，所以半群的类型是
+\[ \semigroup \defeq \sm{A:\UU}{m:A\to A\to A} \prd{x,y,z:A} m(x,m(y,z)) = m(m(x,y),z), \]
+即由半群组成的 $\mathsf{Magma}$ 的子类型。
+从 $\semigroup$ 的居民我们可以通过应用适当的投影提取载体 $A$、运算 $m$ 和公理的见证。
+我们将在 \cref{sec:equality-of-structures} 中回到这个例子。
+
+还要注意我们可以使用类型论中的宇宙来表示高阶逻辑——即我们可以对所有命题或所有谓词进行量化。
+例如，我们可以将命题\emph{对所有性质 $P : A \to \UU$，若 $P(a)$ 则 $P(b)$}表示为
+\[ \prd{P : A \to \UU} P(a) \to P(b) \]
+其中 $A : \UU$ 且 $a,b : A$。
+然而，\emph{先验地}这个命题生活在与我们量化的命题不同的、更高的宇宙中；即
+\[ \Parens{\prd{P : A \to \UU_i} P(a) \to P(b)} : \UU_{i+1}. \]
+我们将在 \cref{subsec:prop-subsets} 中回到这个问题。
+
+\mentalpause
+
+我们在这里描述了命题的证明相关
+\index{mathematics!proof-relevant}%
+翻译，其中析取和存在语句的证明携带一些信息。
+例如，如果我们有 $A+B$ 的居民，视为$A$ 或 $B$的见证，那么我们知道它来自 $A$ 还是 $B$。
+类似地，如果我们有 $\sm{x:A} P(x)$ 的居民，视为存在 $x:A$ 使得 $P(x)$的见证，那么我们知道元素 $x$ 是什么（它是给定居民的第一投影）。
+
+作为这种逻辑的证明相关性质的结果，我们可能有$A$ 当且仅当 $B$（回忆这意味着 $(A\to B)\times (B\to A)$），但类型 $A$ 和 $B$ 表现出不同的行为。
+例如，容易验证$\mathbb{N}$ 当且仅当 $\unit$，但显然 $\mathbb{N}$ 和 $\unit$ 在重要方面不同。
+陈述$\mathbb{N}$ 当且仅当 $\unit$只告诉我们当\emph{作为纯粹命题看待}时，类型 $\mathbb{N}$ 代表与 $\unit$ 相同的命题（在这种情况下是真命题）。
+我们有时用$A$ 和 $B$ 是\define{逻辑等价}的来表达$A$ 当且仅当 $B$。
+\indexdef{logical equivalence}%
+\indexdef{equivalence!logical}%
+这要与将在 \cref{sec:basics-equivalences,cha:equivalences} 中引入的更强的\emph{类型等价}概念区分开：
+虽然 $\mathbb{N}$ 和 $\unit$ 逻辑等价，但它们不是等价类型。
+
+在 \cref{cha:logic} 中我们将引入一类称为纯粹命题的类型，对它们等价与逻辑等价一致。
+使用这些类型，我们将引入对上述逻辑的修改，这在某些情况下是适当的，其中析取和存在中包含的额外信息被丢弃。
+
+最后，我们注意到命题即类型对应可以反过来看，允许我们将任何类型 $A$ 视为命题，我们通过展示 $A$ 的元素来证明它。
+有时我们将这个命题表述为$A$ 是\define{有居民的}。
+\indexdef{inhabited type}%
+\indexsee{type!inhabited}{inhabited type}%
+即，当我们说 $A$ 有居民时，我们的意思是我们给出了 $A$ 的一个（特定的）元素，但我们选择不给那个元素命名。
+类似地，说 $A$ \emph{没有居民}与给出 $\neg A$ 的元素是一样的。
+特别是，空类型 $\emptyt$ 显然没有居民，因为 $\neg \emptyt \jdeq (\emptyt \to \emptyt)$ 被 $\idfunc[\emptyt]$ 居于。\footnote{这不应与类型论一致这一陈述混淆，后者是\emph{元理论}声明说不可能通过遵循类型论规则获得 $\emptyt$ 的元素。\indexfoot{consistency}}
+
+\index{proof|)}%
+\index{proposition!as types|)}%
+\index{logic!propositions as types|)}%
+
+\section{恒等类型}
+\label{sec:identity-types}
+
+\index{type!identity|(defstyle}%
+\indexsee{identity!type}{type, identity}%
+\indexsee{type!equality}{type, identity}%
+\indexsee{equality!type}{type, identity}%
+虽然前面的构造可以看作是标准集合论构造的推广，但我们处理恒等的方式似乎是类型论特有的。
+根据命题即类型的概念，同一类型的两个元素 $a,b:A$ 相等的\emph{命题}必须对应于某个\emph{类型}。
+由于这个命题依赖于 $a$ 和 $b$ 是什么，这些\define{等式类型}或\define{恒等类型}必须是依赖于 $A$ 的两个副本的类型族。
+
+我们可以将这个族写成 $\idtypevar{A}:A\to A\to\type$（不要与恒等函数 $\idfunc[A]$ 混淆），使得 $\idtype[A]ab$ 是表示 $a$ 和 $b$ 之间相等命题的类型。
+然而一旦我们熟悉了命题即类型，使用标准的等式符号也是方便的；因此$\id{a}{b}$也将是对应于 $a$ 等于 $b$ 的命题的\emph{类型} $\idtype[A]ab$ 的记法。
+为清楚起见，我们也可以写$\id[A]{a}{b}$来指定类型 $A$。
+如果我们有 $\id[A]{a}{b}$ 的元素，我们可以说 $a$ 和 $b$ \define{相等}，或者有时是\define{命题相等}，如果我们想强调这与 \cref{sec:types-vs-sets} 中讨论的判断等式 $a\jdeq b$ 不同。
+\indexdef{equality!propositional}%
+\indexdef{propositional!equality}%
+
+正如我们在 \cref{sec:pat} 中指出的命题即类型版本的或和存在可以包含比命题为真这一事实更多的信息，没有什么阻止类型 $\id{a}{b}$ 也包含更多信息。
+确实，这是同伦解释的基石，在那里我们将 $\id{a}{b}$ 的见证视为空间 $A$ 中 $a$ 和 $b$ 之间的\emph{路径}\indexdef{path}或\emph{等价}。正如空间的两点之间可以有多于一条路径，两个对象相等可以有多于一个见证。换言之，我们可以将 $\id{a}{b}$ 视为 $a$ 和 $b$ 的\emph{认同}\indexdef{identification}的类型，而 $a$ 和 $b$ 可能有许多不同的认同方式。
+我们将在 \cref{cha:basics} 中回到这种解释；现在我们专注于恒等类型的基本规则。
+就像本章考虑的所有其他类型一样，它将有形成、引入、消除和计算规则，它们在形式上以完全相同的方式行为。
+
+形成规则说给定类型 $A:\UU$ 和两个元素 $a,b:A$，我们可以在同一宇宙中形成类型 $(\id[A]{a}{b}):\UU$。
+构造 $\id{a}{b}$ 的元素的基本方式是知道 $a$ 和 $b$ 是相同的。
+因此，引入规则是依赖函数
+\[\refl{} : \prd{a:A} (\id[A]{a}{a})\]
+称为\define{自反性}，
+\indexdef{reflexivity!of equality}%
+它说 $A$ 的每个元素都等于它自己（以指定的方式）。我们将 $\refl{a}$ 视为点 $a$ 处的常值路径\indexdef{path!constant}\indexsee{loop!constant}{path, constant}。
+
+特别是，这意味着如果 $a$ 和 $b$ \emph{判断上}相等，$a\jdeq b$，那么我们也有元素 $\refl{a} : \id[A]{a}{b}$。
+这是类型良好的，因为 $a\jdeq b$ 意味着类型 $\id[A]{a}{b}$ 也判断上等于 $\id[A]{a}{a}$，这是 $\refl{a}$ 的类型。
+
+恒等类型的归纳原则（即消除规则）是类型论最微妙的部分之一，对同伦解释至关重要。
+我们首先考虑它的一个重要结果，即等量可以代换等量原则，如下所述：
+\index{indiscernibility of identicals}%
+\index{equals may be substituted for equals}%
+\begin{description}
+\item[等同者不可区分：]
+对于每个族
+\[
+C : A \to \UU
+\]
+有函数
+\[
+f : \prd{x,y:A}{p:\id[A] x y} C(x) \to C(y)
+\]
+使得
+\[
+f(x,x,\refl{x}) \defeq \idfunc[C(x)].
+\]
+\end{description}
+这说的是每个类型族 $C$ 都尊重等式，即将 $C$ 应用于 $A$ 的\emph{相等}元素也产生结果类型之间的函数。所显示的等式陈述与自反性相关的函数是恒等函数（我们将看到，一般来说，函数 $f(x,y,p): C(x) \to C(y)$ 总是类型等价）。
+
+等同者不可区分可以被视为恒等类型的递归原则，类似于上面给出的布尔和自然数的递归原则。
+正如 $\rec{\nat}$ 给出对于某种类型的任何其他类型 $C$ 的指定映射 $\nat\to C$，等同者不可区分给出从 $\id[A] x y$ 到 $A$ 上某些其他自反二元关系的指定映射，即那些对某一元谓词 $C(x)$ 形如 $C(x) \to C(y)$ 的关系。
+我们也可以表述更一般的递归原则，关于更一般形式 $C(x,y)$ 的自反关系。
+然而，为了完全刻画恒等类型，我们必须将这个递归原则推广到归纳原则，它不仅考虑从 $\id[A] x y$ 出发的映射，还考虑其上的族。
+换言之，我们不仅考虑允许等量代换等量，还要考虑等式的证据 $p$。
+
+\subsection{路径归纳}
+
+\index{generation!of a type, inductive|(}
+恒等类型的归纳原则称为\define{路径归纳}，
+\index{path!induction|(}%
+\index{induction principle!for identity type|(}%
+鉴于 \cref{cha:basics} 导论中将解释的同伦解释。它可以被看作是说恒等类型的族由形如 $\refl{x}: \id{x}{x}$ 的元素自由生成。
+
+\begin{description}
+\item[路径归纳：]
+  给定族
+  \[ C : \prd{x,y:A} (\id[A]{x}{y}) \to \UU \]
+  和函数
+  \[ c :  \prd{x:A} C(x,x,\refl{x}),\]
+  有函数
+  \[ f : \prd{x,y:A}{p:\id[A]{x}{y}} C(x,y,p) \]
+  使得
+  \[ f(x,x,\refl{x}) \defeq c(x). \]
+\end{description}
+
+注意就像积、余积、自然数等的归纳原则一样，路径归纳允许我们定义表现出适当计算行为的\emph{指定}函数。
+就像我们有从 $c_0:C$ 和 $c_s:\nat \to C \to C$ 通过递归定义的\emph{那个}函数 $f:\nat\to C$，它还满足 $f(0)\jdeq c_0$ 和 $f(\suc(n))\jdeq c_s(n,f(n))$，我们有从 $c :  \prd{x:A} C(x,x,\refl{x})$ 通过路径归纳定义的\emph{那个}函数 $f : \dprd{x,y:A}{p:\id[A]{x}{y}} C(x,y,p)$，它还满足 $f(x,x,\refl{x}) \jdeq c(x)$。
+
+为了理解这个原则的含义，首先考虑 $C$ 不依赖于 $p$ 的更简单情况。那么我们有 $C:A\to A\to \UU$，我们可以将其视为依赖于 $A$ 的两个元素的谓词。我们感兴趣的是知道何时命题 $C(x,y)$ 对某对元素 $x,y:A$ 成立。在这种情况下，路径归纳的假设说我们知道 $C(x,x)$ 对所有 $x:A$ 成立，即如果我们在序对 $x, x$ 处求值 $C$，我们得到真命题——所以 $C$ 是自反关系。结论则告诉我们只要 $\id{x}{y}$，$C(x,y)$ 就成立。这正是上面提到的对自反关系的更一般递归原则。
+
+规则的一般归纳形式允许 $C$ 也依赖于 $x$ 和 $y$ 之间恒等的见证 $p:\id{x}{y}$。在前提中，我们不仅用 $x,x$ 替换 $x, y$，还同时用自反性替换 $p$：要证明所有元素 $x,y$ 及它们之间的路径 $p : \id{x}{y}$ 的性质，只需考虑元素是 $x,x$ 且路径是 $\refl{x}: \id{x}{x}$ 的所有情况。如果我们只将类型视为集合，不清楚这给我们带来什么好处，但由于 $x$ 和 $y$ 之间可能有许多不同的认同 $p : \id{x}{y}$，在考虑类型 $\id[A]{x}{y}$ 上的族时追踪它们是有意义的。
+在 \cref{cha:basics} 中我们将看到这对同伦解释非常重要。
+
+如果我们将路径归纳打包成单个函数，它采取形式：
+\symlabel{defn:induction-ML-id}%
+\begin{narrowmultline*}
+  \indid{A} :  \dprd{C : \prd{x,y:A} (\id[A]{x}{y}) \to \UU}
+  \Parens{\tprd{x:A} C(x,x,\refl{x})} \to
+  \narrowbreak
+  \dprd{x,y:A}{p:\id[A]{x}{y}}   C(x,y,p)
+\end{narrowmultline*}
+及等式\index{computation rule!for identity types}
+\[ \indid{A}(C,c,x,x,\refl{x}) \defeq c(x). \]
+函数 $\indid{A}$ 传统上称为 $J$。
+\indexsee{J@$J$}{induction principle for identity type}%
+我们将在 \cref{lem:transport} 中证明等同者不可区分是路径归纳的实例，并给它一个新名字和记法。
+
+\mentalpause
+
+给定证明 $p : \id{a}{b}$，
+路径归纳要求我们用相同的未知元素 $x$ 同时替换 $a$ 和 $b$；因此为了定义族 $C$ 的元素，对于 $A$ 的所有相等元素对，只需在对角线上定义它就足够了。
+然而在某些证明中，通过用 $a$ 替换 $b$ 的所有出现（或反之）来利用方程 $p : \id{a}{b}$ 更简单，因为有时对等式中提到的特定元素 $a$ 比对一般未知 $x$ 更容易完成证明的其余部分。这促使恒等类型有第二个归纳原则，它说类型族 $\id[A]{a}{x}$ 由元素 $\refl{a} : \id{a}{a}$ 生成。如下所示，这第二个原则等价于第一个；它只是有时是更方便的表述。
+
+\index{path!induction based}%
+\index{induction principle!for identity type!based}%
+\begin{description}
+\item[基点路径归纳：]
+  固定元素 $a:A$，并假定给定族
+  \[ C : \prd{x:A} (\id[A]{a}{x}) \to \UU \]
+  和元素
+  \[ c : C(a,\refl{a}). \]
+  则我们得到函数
+  \[ f : \prd{x:A}{p:\id{a}{x}} C(x,p) \]
+  使得
+  \[ f(a,\refl{a}) \defeq c.\]
+\end{description}
+
+这里，$C(x,p)$ 是类型族，其中 $x$ 是 $A$ 的元素而 $p$ 是恒等类型 $\id[A]{a}{x}$ 的元素，对于固定的 $a$ 在 $A$ 中。基点路径归纳原则说要为所有 $x$ 和 $p$ 定义这个族的元素，只需考虑 $x$ 是 $a$ 且 $p$ 是 $\refl{a} : \id{a}{a}$ 的情况。
+
+打包成函数，基点路径归纳变成：
+\symlabel{defn:induction-PM-id}%
+\begin{align*}
+  \indidb{A} :  \dprd{a:A}{C : \prd{x:A} (\id[A]{a}{x}) \to \UU}
+  C(a,\refl{a}) \to \dprd{x:A}{p : \id[A]{a}{x}} C(x,p)
+\end{align*}
+及等式
+\[ \indidb{A}(a,C,c,a,\refl{a}) \defeq c. \]
+
+下面，我们证明路径归纳和基点路径归纳是等价的。因此，我们有时会马虎地将基点路径归纳也简单称为路径归纳，依靠读者从证明的形式推断是哪个原则。
+
+\begin{rmk}\label{rmk:the-only-path-is-refl}
+  直观地，自然数的归纳原则表达了每个自然数要么是 $0$ 要么对某个自然数 $n$ 形如 $\suc(n)$ 的事实，所以如果我们对这些情况证明性质（在第二种情况下有归纳假设），那么我们就对所有自然数证明了它。
+  类似地，$A+B$ 的归纳原则表达了 $A+B$ 的每个元素要么形如 $\inl(a)$ 要么形如 $\inr(b)$ 的事实，等等。
+  将同样的解读应用于路径归纳，我们可能说路径归纳表达了每条路径形如 \refl{a} 的事实，所以如果我们对自反性路径证明性质，那么我们就对所有路径证明了它。
+
+  然而，这种解读在路径的同伦解释的背景下相当令人困惑，其中两个元素 $a$ 和 $b$ 可能有许多不同的认同方式，因此恒等类型有许多不同的元素！
+  怎么可能有许多不同的路径，但同时我们有一个归纳原则断言唯一的路径是自反性？
+
+关键观察是被归纳定义的不是恒等\emph{类型}，而是恒等\emph{族}。
+特别是，路径归纳说类型的\emph{族} $(\id[A]{x}{y})$，当 $x,y$ 变化于 $A$ 的所有元素时，由形如 $\refl{x}$ 的元素归纳定义。
+这意味着要给出依赖于恒等族的\emph{一般}元素 $(x,y,p)$ 的任何其他族 $C(x,y,p)$ 的元素，只需考虑形如 $(x,x,\refl{x})$ 的情况。
+在同伦解释中，这说三元组 $(x,y,p)$ 的类型，其中 $x$ 和 $y$ 是路径 $p$ 的端点（换言之，$\Sigma$-类型 $\sm{x,y:A}(\id{x}{y})$），由每点 $x$ 处的常值环路归纳生成。
+如我们将在 \cref{cha:basics} 中看到的，在同伦论中对应于 $\sm{x,y:A}(\id{x}{y})$ 的空间是\emph{自由路径空间}——$A$ 中端点可变的路径的空间——确实这个空间的任何点都同伦于某点处的常值环路，因为我们可以简单地沿给定路径收缩它的一个端点。
+类似的事实在类型论中也成立：我们可以通过对 $p:x=y$ 的路径归纳证明 $\id[\sm{x,y:A}(\id{x}{y})]{(x,y,p)}{(x,x,\refl{x})}$。
+
+类似地，基点路径归纳说对于固定的 $a:A$，类型的\emph{族} $(\id[A]{a}{y})$，当 $y$ 变化于 $A$ 的所有元素时，由元素 $\refl{a}$ 归纳定义。
+因此，要给出依赖于这个族的一般元素 $(y,p)$ 的任何其他族 $C(y,p)$ 的元素，只需考虑情况 $(a,\refl{a})$。
+同伦地，这表达了从某选定点出发的路径的空间（那点处的\emph{基点路径空间}，类型论上是 $\sm{y:A} (\id{a}{y})$）可缩到选定点处的常值环路。
+同样，相应的事实在类型论中也成立：我们可以通过对 $p:a=y$ 的基点路径归纳证明 $\id[\sm{y:A}(\id{a}{y})]{(y,p)}{(a,\refl{a})}$。
+还要注意根据 \cref{sec:pat} 中提到的 $\Sigma$-类型作为子类型的解释，类型 $\sm{y:A}(\id{a}{y})$ 可以被视为等于 $a$ 的所有 $A$ 的元素的类型，即单点子集\index{type!singleton} $\{a\}$ 的类型论版本。
+
+路径归纳和基点路径归纳都不提供给出族 $C(p)$ 的元素的方式，其中 $p$ 有\emph{两个固定端点} $a$ 和 $b$。
+特别是，对于依赖于环路的族 $C: (\id[A]{a}{a}) \to \UU$，我们\emph{不能}应用路径归纳只考虑 $C(\refl{a})$ 的情况，因此我们不能证明所有环路都是自反性。
+因此，归纳定义恒等族并不禁止恒等类型特定实例中的非自反性路径。
+换言之，路径 $p:\id{x}{x}$ 作为 $(\id{x}{x})$ 的元素可能不等于自反性，但序对 $(x,p)$ 仍然会等于序对 $(x,\refl{x})$ 作为 $\sm{y:A}(\id{x}{y})$ 的元素。
+
+作为拓扑例子，考虑穿孔圆盘 \narrowequation{\setof{ (x,y) | 0 < x^2+y^2 < 2 }} 中从 $(1,0)$ 出发绕 $(0,0)$ 处的洞一圈后返回 $(1,0)$ 的环路。
+如果我们将两个端点都固定在 $(1,0)$，这个环路不能在保持在穿孔圆盘内的同时变形为常值路径，就像绕杆子缠绕的绳子如果我们握住两端就不能拉进来。
+然而，如果我们允许一个端点变化，环路可以收缩回常值，就像如果我们只握住一端就总能收回绳子。
+\end{rmk}
+
+\index{path!induction|)}%
+\index{induction principle!for identity type|)}%
+\index{generation!of a type, inductive|)}
+
+\subsection{路径归纳与基点路径归纳的等价性}
+
+上面引入的两个恒等类型归纳原则是等价的。
+容易看出路径归纳可从基点路径归纳原则推出。
+确实，让我们假设路径归纳的前提：
+\begin{align*}
+C &: \prd{x,y:A}(\id[A]{x}{y}) \to \UU,\\
+c &: \prd{x:A} C(x,x,\refl{x}).
+\end{align*}
+现在，给定元素 $x:A$，我们可以将上述两者实例化，得到
+\begin{align*}
+C' &: \prd{y:A} (\id[A]{x}{y}) \to \UU,  \\
+C' &\defeq C(x), \\
+c' &: C'(x,\refl{x}), \\
+c' &\defeq c(x).
+\end{align*}
+显然，$C'$ 和 $c'$ 匹配基点路径归纳的前提，因此我们可以构造
+\begin{equation*}
+  g : \prd{y:A}{p : \id{x}{y}} C'(y,p)
+\end{equation*}
+及定义等式
+\[ g(x,\refl{x}) \defeq c'.\]
+现在我们观察到 $g$ 的陪域等于 $C(x,y,p)$。
+因此，释放我们的假设 $x:A$，我们可以推导函数
+\[ f : \prd{x,y:A}{p : \id[A]{x}{y}} C(x,y,p) \]
+及所需的判断等式 $f(x,x,\refl{x}) \judgeq g(x,\refl{x}) \defeq c' \defeq c(x)$。
+
+另一个证明是观察到任何这样的 $f$ 都可以作为 $\indid{A}$ 的实例获得，所以只需将 $\indid{A}$ 用 $\indidb{A}$ 定义为
+\[ \indid{A}(C,c,x,y,p) \defeq \indidb{A}(x,C(x),c(x),y,p). \]
+
+另一个方向更棘手；不清楚我们如何能用路径归纳的特定实例推导基点路径归纳的特定实例。我们能做的是构造路径归纳的一个实例，它一次证明基点路径归纳的所有可能实例化。
+定义
+\begin{align*}
+D &: \prd{x,y:A} (\id[A]{x}{y}) \to \UU, \\
+D(x,y,p) &\defeq \prd{C : \prd{z:A} (\id[A]{x}{z}) \to \UU} C(x,\refl{x}) \to C(y,p).
+\end{align*}
+然后我们可以构造函数
+\begin{align*}
+d &: \prd{x : A} D(x,x,\refl{x}), \\
+d &\defeq \lamu{x:A}\lamu{C:\prd{z:A}{p : \id[A]{x}{z}} \UU}\lam{c:C(x,\refl{x})} c
+\end{align*}
+因此使用路径归纳得到
+\[ f : \prd{x,y:A}{p:\id[A]{x}{y}} D(x,y,p) \]
+及 $f(x,x,\refl{x}) \defeq d(x)$。展开 $D$ 的定义，我们可以扩展 $f$ 的类型：
+\[ f : \prd{x,y:A}{p:\id[A]{x}{y}}{C : \prd{z:A} (\id[A]{x}{z}) \to \UU} C(x,\refl{x}) \to C(y,p). \]
+现在给定 $a:A$ 连同 $x:A$ 和 $p:\id[A]{a}{x}$，我们可以推导基点路径归纳的结论：
+\[ f(a,x,p,C,c) : C(x,p). \]
+注意我们也获得正确的定义等式。
+
+另一个证明是观察到基点路径归纳的任何使用都是 $\indidb{A}$ 的实例并定义
+\begin{narrowmultline*}
+\indidb{A}(a,C,c,x,p) \defeq \narrowbreak
+\indid{A}
+  \begin{aligned}[t]
+    \big(
+    &\big(\lamu{x,y:A}{p:\id[A]{x}{y}} \tprd{C : \prd{z:A} (\id[A]{x}{z}) \to \UU} C(x,\refl{x}) \to C(y,p) \big),\\
+    &(\lamu{x:A}{C:\prd{z:A} (\id[A]{x}{z}) \to \UU}{d:C(x,\refl{x})} d),
+     a, x, p\big)(C, c).
+   \end{aligned}
+\end{narrowmultline*}
+
+
+注意上面给出的构造使用宇宙。即，如果我们想用 $C : \prd{x:A} (\id[A]{a}{x}) \to \UU_i$ 建模 $\indidb{A}$，我们需要用
+%
+\[ D:\prd{x,y:A} (\id[A]{x}{y}) \to \UU_{i+1} \]
+%
+使用 $\indid{A}$，因为 $D$ 对给定类型的所有 $C$ 进行量化。虽然这与我们对宇宙的定义兼容，但也可以不使用宇宙推导 $\indidb{A}$：我们可以证明 $\indid{A}$ 蕴含 \cref{lem:transport,thm:contr-paths}，而这两个原则直接蕴含 $\indidb{A}$。
+我们将细节留给读者作为 \cref{ex:pm-to-ml}。
+
+我们可以使用恒等类型的前述任一表述来建立等式是等价关系，每个函数保持等式且每个族尊重等式。我们将细节留到下一章，在那里这将在同伦类型论的背景下推导和解释。
+
+\begin{rmk}\label{rmk:propeq-vs-jdeq}
+  我们强调尽管有一些不熟悉的特征，命题等式\emph{是}同伦类型论中的数学等式。
+  这个区别不属于判断等式，后者是类型论规则的元理论特征。
+  例如，\cref{sec:inductive-types} 中证明的自然数加法的结合性是\emph{命题}等式，而不是判断等式。
+  交换律也是如此（\cref{ex:add-nat-commutative}）。
+  甚至非常简单的交换性 $n+1=1+n$ 对一般的 $n$ 也不是判断等式（虽然对任何特定的 $n$ 它是判断等式，例如 $3+1\jdeq 1+3$，因为两者通过定义 $+$ 的计算规则都判断上等于 $4$）。
+  我们只能通过使用恒等类型证明这些事实，因为我们只能将 \nat{} 的归纳原则应用于类型作为输出（而不是判断）。
+\end{rmk}
+
+\subsection{不相等}
+\label{sec:disequality}
+
+最后，让我们也说说\define{不相等}，
+\indexdef{disequality}%
+它是等式的否定：%
+\footnote{我们用不等式指 $<$ 和 $\leq$。另外，注意这是\emph{命题}恒等类型的否定。
+当然，否定判断等式 $\jdeq$ 是没有意义的，因为判断不受逻辑运算的约束。}
+%
+\begin{equation*}
+  (x \neq_A y) \ \defeq\ \lnot (\id[A]{x}{y}).
+\end{equation*}
+如果 $x\neq y$，我们说 $x$ 和 $y$ \define{不相等}
+\indexdef{unequal}%
+或\define{不等}。
+%
+就像否定一样，不相等在这里扮演的角色不如在经典\index{mathematics!classical}数学中重要。例如，我们不能通过证明两个东西不是不相等来证明它们相等：那将是经典双重否定律的应用，见 \cref{sec:intuitionism}。
+
+有时用正面方式表述不相等是有用的。例如，
+在 \cref{RD-inverse-apart-0} 中我们将证明实数 $x$ 有逆当且仅当它到 $0$ 的距离是正的，这是比 $x \neq 0$ 更强的要求。
+
+\index{type!identity|)}%
+

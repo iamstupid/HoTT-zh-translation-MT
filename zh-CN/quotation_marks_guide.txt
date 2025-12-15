@@ -1,0 +1,42 @@
+Quotation Mark Conversion Guide for Chinese Translation
+========================================================
+
+STRAIGHT QUOTES (ASCII - to be converted):
+------------------------------------------
+Double quote: " (U+0022) - the standard keyboard double quote
+
+LATEX QUOTATION MARKS (Target):
+-------------------------------
+Opening double quote: `` (two backticks) - renders as curly left quote
+Closing double quote: '' (two single quotes/apostrophes) - renders as curly right quote
+
+CONVERSION RULES:
+-----------------
+1. Straight " at start of quoted text  ->  ``
+2. Straight " at end of quoted text    ->  ''
+
+Example transformations in LaTeX source:
+  "Hello"     ->  ``Hello''
+  "type"      ->  ``type''
+
+DETECTION HEURISTICS:
+---------------------
+Opening quote (use ``): After whitespace, punctuation, or at start of line
+  - After: space, newline, (, [, {, etc.
+
+Closing quote (use ''): After letters, numbers, Chinese characters
+  - Before: space, punctuation, or end of text
+
+CAUTION IN LATEX:
+-----------------
+- Don't convert quotes inside \verb or verbatim environments
+- Don't convert quotes inside math mode ($...$)
+- Don't convert quotes that are part of LaTeX commands
+
+NOTE:
+-----
+LaTeX will automatically render:
+  `` as the curly opening quote (the one that looks like 66)
+  '' as the curly closing quote (the one that looks like 99)
+
+This is the standard LaTeX convention for typographically correct quotation marks.

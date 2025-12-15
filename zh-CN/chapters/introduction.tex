@@ -1,0 +1,488 @@
+﻿% 导论内容 (章节标题在 main-zh.tex 中定义)
+
+\term{同伦类型论}{Homotopy type theory}是数学的一个新分支，它以令人惊讶的方式结合了若干不同领域的诸多方面。它基于最近发现的\term{同伦论}{homotopy theory}与\term{类型论}{type theory}之间的联系。
+同伦论是代数拓扑和同调代数的延伸，与高阶范畴论有着联系；而类型论则是数理逻辑和理论计算机科学的一个分支。
+尽管这两者之间的联系目前正是密集研究的焦点，但越来越清楚的是，它们只是一个主题的开始，要完全理解这个主题还需要更多的时间和艰苦的工作。
+它涉及的主题看似遥远，如球面的同伦群、类型检查的算法，以及弱 $\infty$-群胚的定义。
+
+同伦类型论也为数学的根基带来了新的思想。
+\index{foundations, univalent}%
+一方面，有 Voevodsky 精妙而优美的\term{泛等公理}{univalence axiom}。
+\index{univalence axiom}%
+泛等公理特别蕴含了同构的结构可以被等同，这是数学家们在工作日里一直愉快使用的原则，尽管它与传统基础的官方教条不相容。
+另一方面，我们有\term{高阶归纳类型}{higher inductive types}，它们为同伦论的一些基本空间和构造提供了直接的逻辑描述：球面、柱面、截断、局部化等等。
+这两个思想在经典的集合论基础中都无法直接捕捉，但当它们在同伦类型论中结合时，它们允许一种全新的同伦类型的逻辑。
+\index{foundations}%
+
+这暗示了一种数学基础的新概念，它具有内在的同伦内容，是数学对象的一种不变概念——并且有方便的机器实现，可以作为工作数学家的实用辅助。
+这就是\term{泛等基础}{Univalent Foundations}纲领。
+本书旨在作为泛等基础基本原理的第一个系统性阐述，以及这种新推理风格的一系列例子——但不要求读者知道或学习任何形式逻辑，或使用任何计算机证明助手。
+
+% This enlarges the page by one line in letter format. Use sparringly.
+\OPTwidow
+
+我们强调，同伦类型论是一个年轻的领域，泛等基础还在积极发展中。
+本书应被视为该领域某一部分在写作时的快照，而非一个完成大厦的精致阐述。
+正如我们稍后将简要讨论的，同伦类型论还有许多方面尚未完全理解——有些甚至在这里没有涉及。
+最终的理论几乎肯定不会与本书中描述的理论完全一样，但它肯定\emph{至少}会同样强大和有力；因此我们相信，泛等基础最终将成为集合论作为大多数数学家进行非形式化数学的隐含基础的可行替代方案。
+
+\subsection*{类型论}
+
+类型论最初由 Bertrand Russell \cite{Russell:1908}\index{Russell, Bertrand} 发明，作为阻止当时正在研究的数学逻辑基础中悖论的手段。
+它在接下来的几十年中由许多人进一步发展，特别是 Church~\cite{Church:1940tu,Church:1941tc}，他将其与他的 \textit{$\lambda$-演算}结合起来。
+尽管它通常不被视为经典数学的基础（集合论更为常见），但类型论仍有许多应用，特别是在计算机科学和程序设计语言理论中~\cite{Pierce-TAPL}。
+\index{programming}%
+\index{type theory}%
+\index{lambda-calculus@$\lambda$-calculus}%
+Per Martin-L\"of \cite{Martin-Lof-1972,Martin-Lof-1973,Martin-Lof-1979,martin-lof:bibliopolis} 等人发展了 Church 类型系统的预断修改，现在通常称为依赖的、构造的、直觉主义的，或简称为 \emph{Martin-L\"of 类型论}。这是我们在此考虑的系统的基础；它最初旨在作为构造数学形式化的严格框架。在下文中，我们通常会用类型论来特指这个系统及类似系统，尽管类型论作为一个学科要广泛得多（关于类型论的历史，见 \cite{somma,kamar}）。
+
+在类型论中，与集合论不同，对象使用\term{类型}{type}的原始概念进行分类，类似于程序设计语言中使用的数据类型。这些精心构造的类型可用于表达被分类对象的详细规格说明，从而产生关于这些对象的推理原则。举一个非常简单的例子，乘积类型 $A\times B$ 的对象已知具有形式 $\pairr{a,b}$，因此人们自动知道如何构造它们以及如何分解它们。类似地，函数类型 $A\to B$ 的对象可以从由类型 $A$ 的对象参数化的类型 $B$ 的对象中获得，并且可以在类型 $A$ 的参数处求值。所有对象的这种严格可预测的行为（与集合论更自由的形成原则相反，允许非齐次集合）是类型论被广泛用于验证计算机程序正确性的一个方面。与类型构造相关的清晰推理原则也构成了现代\term{计算机证明助手}{computer proof assistants}的基础，
+\index{proof!assistant}%
+\indexsee{computer proof assistant}{proof assistant}
+\index{mathematics!formalized}%
+用于形式化数学和验证形式化证明的正确性。我们将在下文中回到类型论的这一方面。
+
+然而，从数学的角度理解类型论的一个问题一直是\term{类型}{type}的基本概念与\term{集合}{set}的概念不同，其方式一直难以精确表述。我们相信，将类型视为空间而非奇怪的集合（可能不使用经典逻辑构造），从同伦论的角度来看，是一个重大进步。特别是，它解决了理解类型的元素的相等性概念如何不同于集合的元素的相等性概念的问题。
+
+在同伦论中，人们关注空间
+\index{topological!space}%
+及它们之间的连续映射，
+\index{function!continuous!in classical homotopy theory}%
+直到同伦为止。一对连续映射 $f : X \to Y$ 和 $g : X\to Y$ 之间的\term{同伦}{homotopy}
+\index{homotopy!topological}%
+是满足 $H(x, 0) = f (x)$ 和 $H(x, 1) = g(x)$ 的连续映射 $H : X \times [0, 1] \to Y$。同伦 $H$ 可以被认为是 $f$ 到 $g$ 的连续变形。如果存在来回的连续映射，其复合同伦于相应的恒等映射，即它们在同伦意义下同构，则称空间 $X$ 和 $Y$ 是\term{同伦等价的}{homotopy equivalent}，
+\index{homotopy!equivalence!topological}%
+记作 $\eqv X Y$。同伦等价的空间具有相同的代数不变量（例如，同调或基本群），并且被称为具有相同的\term{同伦型}{homotopy type}。
+
+\subsection*{同伦类型论}
+
+同伦类型论 (HoTT) 从同伦的角度解释类型论。
+在同伦类型论中，我们将类型视为空间（如同伦论中所研究的）或高阶群胚，并将逻辑构造（如乘积 $A\times B$）视为这些空间上的同伦不变构造。
+通过这种方式，我们能够直接操作空间，而无需首先发展点集拓扑（或其任何组合替代，如单纯集理论）。
+为简要解释这一观点，首先考虑类型论的基本概念，即
+\term{项}{term} $a$ 是\term{类型}{type} $A$，记作：
+\[ a:A. \]
+这个表达式传统上被认为类似于：
+\begin{center}
+$a$ 是集合 $A$ 的元素。
+\end{center}
+然而，在同伦类型论中，我们将其视为：
+\begin{center}
+$a$ 是空间 $A$ 的点。
+\end{center}
+\index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+类似地，类型论中的每个函数 $f : A\to B$ 都被视为从空间 $A$ 到空间 $B$ 的连续映射。
+
+我们应该强调，这些空间是纯粹从同伦角度而非拓扑角度处理的。
+例如，没有类型的开子集或类型元素序列的收敛的概念。
+我们只有同伦概念，如点之间的路径和路径之间的同伦，这在同伦论的其他模型（如单纯集）中也有意义。
+因此，更准确地说，我们将类型视为 \emph{$\infty$-群胚}\index{.infinity-groupoid@$\infty$-groupoid}；这是同伦论的不变对象的名称，可以由拓扑空间、
+\index{topological!space}%
+单纯集或同伦论的任何其他模型来呈现。
+然而，有时使用空间和路径等拓扑词汇是方便的，只要我们记住其他拓扑概念不适用即可。
+
+（使用短语\term{同伦型}{homotopy type}
+\index{homotopy!type}%
+来称呼这些对象也很诱人，暗示（作为类型论中的）类型从同伦角度看和从同伦论的角度看的空间的双重解释。
+后者与同伦型的经典含义作为空间在同伦等价下的\emph{等价类}略有不同，尽管它确实保留了诸如这两个空间具有相同的同伦型等短语的含义。）
+
+将类型解释为结构化对象而非集合的想法有着悠久的历史，并且已知可以澄清类型论的各种神秘方面。
+例如，将类型解释为层有助于解释类型论逻辑的直觉主义性质，而将它们解释为偏等价关系或域有助于解释其计算方面。
+它还意味着我们可以使用类型论推理来研究结构化对象，从而产生了丰富的范畴逻辑领域。
+同伦解释符合这一模式：它澄清了类型论中\term{同一性}{identity}（或相等性）的本质，并允许我们在同伦论的研究中使用类型论推理。
+
+同伦解释的关键新思想是，同一类型 $A$ 的两个对象 $a, b: A$ 的逻辑同一性概念 $a = b$ 可以理解为空间 $A$ 中从点 $a$ 到点 $b$ 的路径 $p : a \leadsto b$ 的存在。
+这也意味着，如果两个函数 $f, g: A\to B$ 是同伦的，则它们可以被等同，因为同伦只是 $B$ 中路径 $p_x: f(x) \leadsto g(x)$ 的（连续）族，每个 $x:A$ 对应一条路径。
+在类型论中，对于每个类型 $A$，存在一个（以前有些神秘的）类型 $\idtypevar{A}$，表示 $A$ 的两个对象的同一性；在同伦类型论中，这恰好是从单位区间到 $A$ 的所有连续映射 $I\to A$ 的\term{路径空间}{path space} $A^I$。
+\index{unit!interval}%
+\index{interval!topological unit}%
+\index{path!topological}%
+\index{topological!path}%
+通过这种方式，项 $p : \idtype[A]{a}{b}$ 表示 $A$ 中的路径 $p : a \leadsto b$。
+
+同伦类型论的思想大约在 2006 年由 Awodey 和 Warren~\cite{AW} 以及 Voevodsky~\cite{VV} 的独立工作中产生，但它受到 Hofmann 和 Streicher 早期的群胚解释~\cite{hs:gpd-typethy}的启发。
+事实上，高维范畴论（特别是弱 $\infty$-群胚理论）现在已知与同伦论密切相关，这是 Grothendieck 提出的，现在正被两类数学家密集研究。
+Awodey--Warren 和 Voevodsky 的原始语义模型使用了同伦论中的著名概念和技术，这些概念和技术现在也用于高阶范畴论，如 Quillen 模型范畴和 Kan\index{Kan complex} 单纯集\index{simplicial!sets}。
+\index{Quillen model category}%
+\index{model category}%
+
+特别是，Voevodsky 构造了类型论在 Kan 单纯集中的解释，并认识到这种解释满足了他称为\term{泛等性}{univalence}的另一个关键性质。
+这在类型论中以前从未被考虑过（尽管 Church 的命题外延性原则被证明是它的一个非常特殊的情况，并且 Hofmann 和 Streicher 在宇宙外延性的名称下考虑过另一个特殊情况）。
+以新公理的形式将泛等性添加到类型论中具有深远的影响，其中许多是自然的、简化的和令人信服的。
+泛等公理还进一步加强了类型论的同伦观点，因为它在单纯模型和其他相关模型中成立，而在将类型视为集合的观点下失败。
+
+\subsection*{泛等基础}
+
+非常简要地说，泛等公理的基本思想可以解释如下。
+在类型论中，可以有一个类型，其元素本身是类型；这样的类型称为\term{宇宙}{universe}，通常记为 $\UU$。
+作为 $\UU$ 的项的那些类型通常称为\term{小}{small}类型。
+\index{type!small}%
+\index{small!type}%
+像任何类型一样，$\UU$ 有一个同一性类型 $\idtypevar{\UU}$，它表达小类型之间的同一性关系 $A = B$。
+将类型视为空间，$\UU$ 是一个空间，其点是空间；要理解其同一性类型，我们必须问，$\UU$ 中空间之间的路径 $p : A \leadsto B$ 是什么？
+泛等公理说，这样的路径对应于同伦等价 $\eqv A B$，（粗略地）如上所述。
+更精确地说，给定任何（小）类型 $A$ 和 $B$，除了 $A$ 与 $B$ 的同一性的原始类型 $\idtype[\UU]AB$ 之外，还有从 $A$ 到 $B$ 的等价的定义类型 $\texteqv AB$。
+由于任何对象上的恒等映射是等价，因此存在规范映射，
+\[\idtype[\UU]AB\to\texteqv AB.\]
+泛等公理断言这个映射本身是等价。
+冒着过度简化的风险，我们可以简洁地陈述如下：
+
+\begin{description}\index{univalence axiom}%
+\item[泛等公理：]  $\eqvspaced{(A = B)}{(\eqv A B)}$。
+\end{description}
+%
+换句话说，同一性等价于等价。\index{identity}%
+特别是，人们可以说等价的类型是同一的。
+然而，这个短语有些误导，因为它可能听起来像一种骨架性条件，它将等价的概念\emph{坍缩}为与同一性重合，而实际上泛等性是关于\emph{扩展}同一性的概念，以便与（不变的）等价概念重合。
+
+从同伦的角度来看，泛等性意味着具有相同同伦型的空间通过宇宙 $\UU$ 中的路径连接，符合（小）空间的分类空间的直觉。
+然而，从逻辑的角度来看，这是一个全新的思想：它说同构的东西可以被等同！数学家当然习惯于在实践中等同同构的结构，但他们通常通过记号滥用\index{abuse!of notation}或其他一些非正式手段来这样做，知道所涉及的对象并不真正同一。但在这个新的基础方案中，这样的结构可以被正式等同，在逻辑意义上，涉及一个的每个性质或构造也适用于另一个。事实上，等同现在是明确的，性质和构造可以系统地沿着它传输。此外，进行这种等同的不同方式本身形成了一个结构，人们可以（并且应该！）考虑到这一点。
+
+因此总的来说，对于宇宙 $\UU$ 的点 $A$ 和 $B$（即小类型），泛等公理等同了以下三个概念：
+\begin{itemize}
+\item （逻辑）$A$ 和 $B$ 的同一性 $p:A=B$
+\item （拓扑）$\UU$ 中从 $A$ 到 $B$ 的路径 $p:A \leadsto B$
+\item （同伦）$A$ 和 $B$ 之间的等价 $p:\eqv A B$。
+\end{itemize}
+
+\subsection*{高阶归纳类型}\index{type!higher inductive}%
+
+类型论的经典优势之一是其用于处理归纳定义结构的简单而有效的技术。
+最简单的非平凡归纳定义结构是自然数，它由零和后继函数归纳生成。
+从这个陈述可以算法地\index{algorithm}提取数学归纳原理，它刻画了自然数。
+更一般的归纳定义包括各种列表和良基树，每一个都由相应的归纳原理刻画。
+这包括某些程序设计语言中使用的大多数数据结构；因此类型论在关于后者的形式推理中的有用性。
+如果以非常一般的意义来理解，归纳定义还包括诸如不交并 $A+B$ 之类的例子，它可以被视为由两个注入 $A\to A+B$ 和 $B\to A+B$ 归纳地生成。
+在这种情况下，归纳原理是按情况分析证明，它刻画了不交并。
+
+在同伦论中，考虑归纳定义的空间也很自然，它们不仅由\emph{点}的集合生成，还由\emph{路径}和更高路径的集合生成。
+经典地，这样的空间称为 \emph{CW 复形}。
+\index{CW complex}%
+例如，圆 $S^1$ 由单个点和从该点到自身的单个路径生成。
+类似地，2-球面 $S^2$ 由单个点 $b$ 和从 $b$ 处的常路径到自身的单个二维路径生成，而环面 $T^2$ 由单个点、从该点到自身的两条路径 $p$ 和 $q$，以及从 $p\ct q$ 到 $q\ct p$ 的二维路径生成。
+
+通过使用同伦类型论中路径与同一性的等同，这种归纳定义的空间可以在类型论中通过归纳原理刻画，完全类似于自然数和不交并等经典例子。
+由此产生的\term{高阶归纳类型}{higher inductive types}
+\index{type!higher inductive}%
+提供了直接逻辑的方式来推理熟悉的空间，如球面，这（与泛等性结合）可以用于以纯形式的方式执行同伦论中的熟悉论证，如计算球面的同伦群。
+由此产生的证明是经典同伦论思想与经典类型论思想的结合，为两个学科都提供了新的见解。
+
+此外，这只是冰山一角：同伦论中的许多抽象构造，如同伦余极限、悬挂、Postnikov 塔、局部化、完备化和谱化，也可以表示为高阶归纳类型。
+其中许多在经典上使用 Quillen 的小对象论证构造，它可以被视为无限 CW 复形呈现\index{presentation!of a space as a CW complex}空间的有限算法描述方式，就像零和后继是自然数无限集的有限算法\index{algorithm}描述一样。
+通过小对象论证产生的空间是出了名的复杂和难以理解；类型论方法可能简单得多，通过直接访问适当的归纳原理绕过任何显式构造的需要。
+因此，泛等性和高阶归纳类型的结合暗示了同伦论实践中的某种革命的可能性。
+
+
+\subsection*{泛等基础中的集合}
+
+\index{set|(}%
+
+我们声称泛等基础最终可以作为所有数学的基础，但到目前为止我们只讨论了同伦论。当然，有许多使用类型论而不使用新的同伦类型论特性来形式化数学的具体例子，
+\index{mathematics!formalized}%
+\index{theorem!Feit--Thompson}%
+\index{theorem!odd-order}%
+\index{Feit--Thompson theorem}%
+\index{odd-order theorem}%
+例如最近在 \Coq~\cite{gonthier} 中形式化的 Feit--Thompson 奇阶定理。
+
+但传统观点是，数学建立在集合论之上，从某种意义上说，所有数学对象和构造都可以编码到 Zermelo--Fraenkel 集合论 (ZF) 这样的理论中。
+\index{set theory!Zermelo--Fraenkel}%
+\indexsee{Zermelo-Fraenkel set theory}{set theory}%
+\indexsee{ZF}{set theory}%
+\indexsee{ZFC}{set theory}%
+然而，现在已经确立的是，对于集合论本身之外的大多数数学，ZF 中集合的复杂层次成员结构实际上是不必要的：一个更结构化的理论，如 Lawvere\index{Lawvere} 的集合范畴的初等理论~\cite{lawvere:etcs-long}，就足够了。
+\index{Elementary Theory of the Category of Sets}%
+
+在泛等基础中，基本对象是同伦类型而不是集合，但我们可以\emph{定义}一类表现得像集合的类型。
+从同伦角度来看，这些可以被认为是每个连通分量都是可缩的空间，即那些同伦等价于离散空间的空间。
+\index{discrete!space}%
+这样的集合的范畴满足 Lawvere\index{Lawvere} 的公理（或相关公理，取决于理论的细节）是一个定理。
+因此，可以在类似 ETCS 的理论中表示的任何数学（经验表明，这基本上是所有数学）同样可以在泛等基础中表示。
+
+这支持了泛等基础至少与现有数学基础一样好的主张。
+在泛等基础中工作的数学家可以以熟悉的方式从集合构建结构，更一般的同伦类型在基础背景中等待，直到需要它们。
+因此，本书中的大多数应用都被选择为泛等基础有\emph{新}贡献的领域，使其与现有基础系统区分开来。
+
+不出所料，同伦论和范畴论是其中两个，但也许不太明显的是，泛等基础即使在集合论和实分析等学科中也有新的和有趣的东西可以提供。
+例如，泛等公理允许我们等同同构的结构，而高阶归纳类型允许通过它们的泛性质直接描述对象。
+因此，我们通常可以避免诉诸任意选择的代表或超限迭代构造。
+事实上，甚至 ZF 集合论中的研究对象也可以在泛等基础的集合内部通过这样的归纳泛性质来刻画。
+
+\index{set|)}%
+
+
+\subsection*{非形式类型论}
+
+\index{mathematics!formalized|(defstyle}%
+\index{informal type theory|(defstyle}%
+\index{type theory!informal|(defstyle}%
+\index{type theory!formal|(}%
+经典数学家在面对学习类型论时经常遇到的一个困难是，它通常以完全或部分形式化的演绎系统呈现。
+这种风格对于证明论研究非常有用，但对于应用、非形式推理并不特别方便。
+它甚至对大多数工作数学家来说都不熟悉，即使是那些可能对数学基础感兴趣的人。
+本工作的一个目标是在泛等基础中发展一种非形式的数学风格，它既严格又精确，但也更接近日常数学的语言和表达风格。
+
+在当今数学中，人们通常以一种原则上可以在初等集合论系统（如 ZFC）中形式化的方式构造和推理数学对象——至少给定足够的独创性和耐心。
+在大多数情况下，人们甚至不需要意识到这种可能性，因为它在很大程度上与证明完全严格的条件一致（从所有数学家通过教育和经验直观理解的意义上来说）。
+但是，人们确实需要学会对非形式集合论的几个方面保持谨慎：使用太大或太模糊而无法成为集合的集合；选择公理及其等价物；甚至（对于本科生）反证法；等等。
+采用新的基础系统（如同伦类型论）作为非形式推理的\emph{隐含形式基础}将需要调整一些人的直觉和实践。
+本文旨在作为这种新数学的一个例子，它仍然是非形式的，但现在原则上可以在同伦类型论而不是 ZFC 中形式化，同样需要足够的独创性和耐心。
+
+值得强调的是，在这个新系统中，这种形式化可以有真正的实际好处。
+类型论的形式系统适合计算机系统，并已在现有的证明助手中实现。
+\index{proof!assistant}%
+证明助手是一种计算机程序，它引导用户构造完全形式的证明，只允许有效的推理步骤。
+它还提供一定程度的自动化，可以搜索库以查找现有定理，甚至可以从由此产生的（构造性）证明中提取数值算法\index{algorithm} \index{extraction of algorithms}。
+
+我们相信，泛等基础纲领的这一方面使其与其他基础方法区分开来，可能为工作数学家提供新的实用性。
+事实上，基于较旧类型论的证明助手已经被用于形式化重要的数学证明，如四色定理\index{theorem!four-color} \index{four-color theorem}和 Feit--Thompson 定理。
+泛等基础的计算机实现目前正在进行中（就像理论本身一样）。
+\index{proof!assistant}%
+然而，即使是其当前可用的实现（这些主要是对现有证明助手（如 \Coq 和 \Agda）的小修改）也已经证明了它们的价值，不仅在已知证明的形式化方面，而且在发现新证明方面。
+事实上，本书中描述的许多证明实际上\emph{首先}是以证明助手中的完全形式化形式完成的，现在才第一次被非形式化——这是形式数学和非形式数学之间通常关系的逆转。
+
+可以想象，在不太遥远的将来，数学家将能够通过在泛等基础系统内工作（在证明助手中形式化）来验证自己论文的正确性，并且这样做将变得像在 \TeX 中排版自己的论文一样自然。
+%(Whether this proves to be the publishers' dream or their nightmare remains to be seen.)
+原则上，这对于任何其他基础系统都可以同样成立，但我们相信使用泛等基础更实际可行，正如本工作及其形式对应物所见证的那样。
+
+\index{type theory!formal|)}%
+\index{informal type theory|)}%
+\index{type theory!informal|)}%
+\index{mathematics!formalized|)}%
+
+\subsection*{构造性}
+
+\index{mathematics!constructive|(}%
+
+经典\index{mathematics!classical}基础和类型论之间最显著的区别之一是\term{证明相关性}{proof relevance}的思想，根据这种思想，数学陈述甚至它们的证明都成为第一类数学对象。
+在类型论中，我们用类型表示数学陈述，这些类型可以同时被视为数学构造和数学断言，这种概念也称为\term{命题即类型}{propositions as types}。
+\index{proposition!as types}%
+因此，我们可以将项 $a : A$ 同时视为类型 $A$ 的元素（或在同伦类型论中，空间 $A$ 的点），同时也是命题 $A$ 的证明。
+举个例子，假设我们有集合 $A$ 和 $B$（离散空间），
+\index{discrete!space}%
+考虑陈述$A$ 同构于 $B$。
+在类型论中，这可以表示为：
+\begin{narrowmultline*}
+  \mathsf{Iso}(A,B) \defeq \narrowbreak
+  \sm{f : A\to B}{g : B\to A}\Big(\big(\tprd{x:A} g(f(x)) = x\big) \times \big(\tprd{y:B}\, f(g(y)) = y\big)\Big).
+\end{narrowmultline*}
+%
+在这里将类型构造子 $\Sigma, \Pi, \times$ 分别读作存在、对所有和与，得到$A$ 和 $B$ 是同构的的通常表述；另一方面，将它们读作和与积，得到 $A$ 和 $B$ 之间的\emph{所有同构的类型}！要证明 $A$ 和 $B$ 是同构的，就要构造一个证明 $p : \mathsf{Iso}(A,B)$，因此这与构造 $A$ 和 $B$ 之间的同构是一样的，即展示一对函数 $f, g$ 以及它们的复合是相应恒等映射的\emph{证明}。后面的证明依次只是适当类型的同伦。通过这种方式，\emph{证明一个命题与构造某个特定类型的元素是一样的}。
+特别地，证明形式为$A$ 且 $B$的陈述就是证明 $A$ 和证明 $B$，即给出类型 $A\times B$ 的元素。
+证明 $A$ 蕴含 $B$ 就是找到 $A\to B$ 的元素，即从 $A$ 到 $B$ 的函数（确定从 $A$ 的证明到 $B$ 的证明的映射）。
+
+命题即类型逻辑是灵活的，支持许多变体，例如仅使用类型的子类来表示命题。
+在同伦类型论中，有从这样一个事实产生的自然子类，即所有类型的系统，就像经典同伦论中的空间一样，根据它们的高阶同伦结构存在或坍缩的维度进行分层。
+特别地，Voevodsky 发现了\term{同伦 $n$-类型}{homotopy $n$-types}的纯类型论定义，对应于在维度 $n$ 以上没有非平凡同伦信息的空间。
+（$0$-类型是前面提到的满足 Lawvere 公理\index{Lawvere}的集合。）
+此外，使用高阶归纳类型，我们可以将类型普遍地截断为 $n$-类型；在经典同伦论中，这将是它的第 $n$ 个 Postnikov\index{Postnikov tower} 截面。\index{n-type@$n$-type}
+对于逻辑特别重要的是同伦 $(-1)$-类型的情况，我们称之为\term{纯命题}{mere propositions}。
+经典地，每个 $(-1)$-类型要么是空的要么是可缩的；我们将这些可能性分别解释为真值假和真。
+
+使用所有类型作为命题会产生非常构造性的逻辑概念；更多关于此的信息，见~\cite{kolmogorov,TroelstraI,TroelstraII}。
+例如，某物存在的每个证明都携带足够的信息来实际找到这样的对象；并且$A$ 或 $B$成立的每个证明要么是 $A$ 成立的证明，要么是 $B$ 成立的证明。
+因此，从每个证明我们都可以自动提取算法；\index{algorithm} \index{extraction of algorithms}这在计算机编程的应用中可能非常有用。
+
+然而，另一方面，这种逻辑确实与数学中对存在性证明的传统理解有所不同。
+特别是，它不能忠实地表示某些重要的经典推理原则，如选择公理和排中律。
+对于这些，我们需要使用$(-1)$-截断逻辑，其中只有同伦 $(-1)$-类型表示命题。
+
+\index{axiom!of choice}%
+更具体地说，一方面考虑\term{选择公理}{axiom of choice}：如果对于每个 $x: A$ 存在 $y:B$ 使得 $R(x,y)$，则存在函数 $f : A\to B$ 使得对所有 $x:A$ 我们有 $R(x, f(x))$。
+纯命题即类型概念的存在足够强大，使得这个陈述是可证明的——然而它没有通常选择公理的所有结果。
+但是，在 $(-1)$-截断逻辑中，这个陈述不是自动真的，而是一个强假设，具有与经典\index{mathematics!classical}集合论中的对应物相同类型的结果。
+
+\index{excluded middle}%
+\index{univalence axiom}%
+另一方面，考虑\term{排中律}{law of excluded middle}：对所有 $A$，要么 $A$ 要么非 $A$。
+在纯命题即类型逻辑中解释这个会产生一个与泛等公理不一致的陈述。
+因为既然证明$A$意味着展示它的一个元素，这个假设将给出从每个非空类型中统一选择一个元素的方法——一种 Hilbert 选择算子。
+泛等性意味着由这样的选择算子选择的 $A$ 的元素必须在 $A$ 的所有自等价下不变，因为这些被等同为自同一性，并且每个操作都必须尊重同一性；但显然某些类型有没有不动点的自同构，例如我们可以交换两元素类型的元素。
+\index{automorphism!fixed-point-free}%
+然而，$(-1)$-截断的排中律虽然也不是自动真的，但可以与大多数经典数学中的相同结果一致地假设。
+
+换句话说，虽然纯命题即类型逻辑在上述强算法意义上是构造性的，但默认的 $(-1)$-截断逻辑在不同的意义上是构造性的（即 Heyting 以直觉主义名义形式化的逻辑的意义）；对于后者，我们可以自由地添加选择公理和排中律，以获得可以称为经典的逻辑。
+因此，同伦类型论与构造性和经典逻辑概念兼容，以及更多其他概念。
+\index{logic!constructive vs classical}%
+事实上，同伦视角揭示了经典逻辑和构造逻辑可以共存，作为不同系统的谱的端点，在两者之间有无限多的可能性（同伦 $n$-类型，其中 $-1 < n < \infty$）。
+我们可以说\LEM{n}和\choice{n}，其中 $\choice{\infty}$ 是可证明的，\LEM{\infty} 与泛等性不一致，而 $\choice{-1}$ 和 $\LEM{-1}$ 是经典数学家熟悉的版本（因此在大多数情况下，当没有给出下标时，假设下标为 $(-1)$ 是适当的）。事实上，甚至可以有有用的系统，其中只有\emph{某些}类型满足这些进一步的经典原则，而类型一般仍然是构造的。\index{excluded middle}\index{axiom!of choice}%%
+
+值得强调的是，泛等基础不\emph{要求}使用构造或直觉主义逻辑。\index{logic!intuitionistic}\index{logic!constructive}%
+依赖于排中律和选择公理的大多数经典数学都可以在泛等基础中执行，只需假设这两个原则成立（以其适当的 $(-1)$-截断形式）。
+然而，类型论确实鼓励在不必要时避免这些原则，原因有几个。
+
+首先，每个数学家都知道，使用更少假设证明的定理更强大，因为它适用于更多例子。
+\choice{} 和 \LEM{} 的情况也不例外：
+类型论允许许多有趣的非标准模型，例如在层拓扑\index{topos}中，其中经典性原则如 \choice{} 和 \LEM{} 往往失败。
+同伦类型论在高阶拓扑中允许类似的模型，如~\cite{ToenVezzosi02,Rezk05,lurie:higher-topoi}中研究的那样。
+因此，如果我们避免使用这些原则，我们证明的定理将在所有这样的模型内部有效。
+
+其次，类型论的另一个附加优点是其可计算特性。
+除了作为数学的基础，类型论还是计算的形式理论，可以被视为强大的程序设计语言。
+\index{programming}%
+从这个角度来看，系统的规则不能像集合论公理那样任意选择：它们之间必须有和谐，允许所有证明作为程序执行。
+我们还没有完全理解同伦类型论引入的新原则，如泛等性和高阶归纳类型，从这个角度来看，但基本轮廓正在浮现；例如，见~\cite{lh:canonicity}。
+然而，长期以来已知的是，诸如 \choice{} 和 \LEM{} 之类的原则从根本上与可计算性对立，因为它们直言不讳地断言某些东西存在，而没有给出任何计算它们的方法。
+因此，避免它们对于维持类型论作为计算理论的特性是必要的。
+
+幸运的是，构造性推理并不像看起来那么困难。
+在某些情况下，只需重新表述一些定义，定理就可以变得构造性，其证明也更优雅。
+此外，在泛等基础中，这似乎更经常发生。
+例如：
+\begin{enumerate}
+\item 在集合论基础中，同伦论和范畴论的各个点需要选择公理来执行超限构造。
+  但使用高阶归纳类型，我们可以直接和构造性地编码这些构造。
+  特别是，\cref{cha:homotopy}中的综合同伦论都不需要 \LEM{} 或 \choice{}。
+\item 在集合论基础中，陈述每个完全忠实且本质满射的函子是范畴的等价等价于选择公理。
+  但使用泛等公理，它只是\emph{真的}；见 \cref{cha:category-theory}。
+\item 在集合论中，需要各种迂回来获得规范地表示集合和良序集的同构类的基数和序数概念——可能涉及选择公理或基础公理。
+  但使用泛等性和高阶归纳类型，我们可以通过截断宇宙直接获得这样的代表；见 \cref{cha:set-math}。
+\item 在集合论基础中，将实数定义为 Cauchy 序列的等价类需要排中律或（可数）选择公理才能表现良好。
+  但使用高阶归纳类型，我们可以给出这个定义的一个版本，它表现良好并避免任何选择原则；见 \cref{cha:real-numbers}。
+\end{enumerate}
+当然，这些简化也可以被视为证据，表明新方法最终不会真正被证明是构造性的。然而，我们再次强调，读者不必关心或担心构造性才能阅读本书。重点是，在上述所有例子中，我们给出的理论版本都有独立的优势，无论 \LEM{} 和 \choice{} 是否被假定可用。如果达到，构造性将是一个额外的奖励。\index{constructivity}%
+
+鉴于这种关于添加新原则（如泛等性、高阶归纳类型、\choice{} 和 \LEM{}）的讨论，人们可能想知道由此产生的系统是否保持一致。
+（类型论相对于集合论的原始优点之一是它可以通过证明论手段被视为一致的）。
+与任何基础系统一样，一致性\index{consistency}是一个相对问题：相对于什么一致？
+简短的答案是，本书中考虑的所有构造和公理在 Kan\index{Kan complex} 复形范畴中都有模型，这归功于 Voevodsky~\cite{klv:ssetmodel}（对于高阶归纳类型见~\cite{ls:hits}）。
+因此，已知它们相对于 ZFC（以及我们需要多少不可达基数
+\index{inaccessible cardinal}\index{consistency}%
+嵌套泛等宇宙）是一致的。
+给出这种一致性的更传统的类型论说明是正在进行的工作（见，例如，~\cite{lh:canonicity,coquand2012constructive}）。
+
+我们在\cref{tab:pov}中总结了类型论操作的不同观点。
+
+\begin{table}[htb]
+  \centering
+  \OPTsmalltable
+ \begin{tabular}{lllll}
+    \toprule
+       类型 && 逻辑 & 集合 & 同伦\\ \addlinespace[2pt]
+    \midrule
+       $A$ && 命题 & 集合 & 空间\\ \addlinespace[2pt]
+       $a:A$ && 证明 & 元素 & 点 \\ \addlinespace[2pt]
+       $B(x)$ && 谓词 & 集合族 & 纤维化 \\ \addlinespace[2pt]
+       $b(x) : B(x)$ && 条件证明 & 元素族 & 截面\\ \addlinespace[2pt]
+       $\emptyt, \unit$ && $\bot, \top$ & $\emptyset, \{ \emptyset \}$ & $\emptyset, *$\\ \addlinespace[2pt]
+       $A + B$ && $A\vee B$ & 不交并 & 余积\\ \addlinespace[2pt]
+       $A\times B$ && $A\wedge B$ & 序对集合 & 乘积空间\\ \addlinespace[2pt]
+       $A\to B$ && $A\Rightarrow B$ & 函数集合 & 函数空间\\ \addlinespace[2pt]
+       $\sm{x:A}B(x)$ &&  $\exists_{x:A}B(x)$ & 不交和 & 全空间\\ \addlinespace[2pt]
+       $\prd{x:A}B(x)$ &&  $\forall_{x:A}B(x)$ & 乘积 & 截面空间\\ \addlinespace[2pt]
+       $\mathsf{Id}_{A}$ && 相等 $=$ & $\setof{\pairr{x,x} | x\in A}$ & 路径空间 $A^I$ \\ \addlinespace[2pt]
+    \bottomrule
+  \end{tabular}
+  \caption{比较类型论操作的不同观点}\label{tab:pov}
+\end{table}
+
+\index{mathematics!constructive|)}%
+
+\subsection*{开放问题}
+
+\index{open!problem|(}%
+
+对于那些有兴趣为这个新数学分支做出贡献的人来说，了解有许多有趣的开放问题可能会令人鼓舞。
+
+\index{univalence axiom!constructivity of}%
+也许其中最紧迫的是 Voevodsky 在 \cite{Universe-poly} 中提出的泛等公理的构造性。
+类型论的基本系统遵循 Gentzen 自然演绎的结构。逻辑联结词由其引入规则定义，并具有由计算规则证明合理的消除规则。遵循这种模式，并使用 Tait 的可计算性方法（最初设计用于分析 G\"odel 的辩证解释），人们可以证明类型论的\emph{规范化}性质。这反过来意味着重要性质，如类型检查的可判定性（一个关键性质，因为类型检查对应于证明检查，人们可以争辩说我们应该能够在看到证明时识别证明），以及所谓的正则性\index{canonicity}性质，即自然数类型的任何封闭项都归约为数字。当人们用公理（如函数外延性公理或泛等公理）扩展类型论时，这最后一个性质和引入/消除规则的统一结构就丢失了。Voevodsky 已经制定了一个与这个关于用泛等公理扩展的类型论的正则性问题相关的精确数学猜想：给定自然数类型的封闭项，是否总是可以找到一个数字和这个项等于这个数字的证明，其中这个相等的证明本身可以使用泛等公理？更一般地说，一个重要问题是是否可能提供泛等公理的构造性证明。
+如果添加其他同伦启发的构造（如高阶归纳类型），情况又如何？
+这些问题目前仍然开放，尽管目前正在开发试图找到答案的方法。
+
+另一个基本问题是处理本质上是集合（即离散空间）的类型（如自然数）的困难，
+\index{discrete!space}%
+只包含平凡路径。
+目前，同伦类型论实际上只能刻画空间直到同伦等价，这意味着这些离散空间可能只是\emph{同伦等价于}离散空间。
+类型论地说，这意味着有许多路径等于自反性，但不\emph{判断性地}等于它（关于判断性地的含义，见 \cref{sec:types-vs-sets}）。
+虽然这种同伦不变性有优势，但这些无意义的同一性项确实给论证和构造带来了不必要的复杂性，因此拥有系统的方法来消除或坍缩它们会很方便。
+% In some cases, the proliferation of such superfluous identity terms makes it very difficult or impossible to formulate what should be a straightforward concept, such as the definition of a (semi-)simplicial type.
+
+一个更专业但同样重要的问题是同伦类型论与目前在高阶范畴论和同伦论交汇处发生的关于\term{高阶拓扑}{higher toposes}%
+\index{.infinity1-topos@$(\infty,1)$-topos}
+的研究之间的关系。
+在熟悉这两个主题的人中，越来越相信它们密切相关。
+例如，泛等宇宙的概念应该与对象分类器的概念一致，而高阶归纳类型应该是局部可呈现性的初等反映。
+更一般地，同伦类型论应该是 $(\infty,1)$-拓扑的内语言，正如直觉主义高阶逻辑是普通 1-拓扑的内语言一样。
+尽管有这种普遍共识，但细节仍有待解决——特别是，相干性和严格性问题仍有待解决——这样做无疑会导致对这两个概念的进一步洞察。
+
+\index{mathematics!formalized}%
+但到目前为止，要做的最大工作领域是在这个新系统中持续形式化日常数学。
+最近在形式化基础同伦论和范畴论的一些事实方面的成功令人鼓舞；其中一些在 \cref{cha:homotopy,cha:category-theory} 中描述。
+显然，然而，还有很多工作要做。
+
+\index{open!problem|)}%
+
+同伦类型论社区在 \url{http://homotopytypetheory.org} 维护网站和群博客，以及讨论邮件列表。
+新人总是受欢迎的！
+
+
+\subsection*{如何阅读本书}
+
+本书分为两个部分。
+\cref{part:foundations}，基础，发展同伦类型论的基本概念。
+这是在其上构建特定主题发展的数学基础，并且是理解泛等基础方法所必需的。对于程序员来说，这是库代码。
+由于泛等基础是一种新的和不同的数学，其基本概念需要一些时间来适应；因此 \cref{part:foundations} 相当广泛。
+
+\cref{part:mathematics}，数学，由四章组成，这些章节建立在 \cref{part:foundations} 的基本概念之上，以展示我们可以用泛等基础在四个不同的数学领域做的一些新事情：同伦论（\cref{cha:homotopy}）、范畴论（\cref{cha:category-theory}）、集合论（\cref{cha:set-math}）和实分析（\cref{cha:real-numbers}）。
+\cref{part:mathematics} 中的章节或多或少是相互独立的，尽管偶尔一个会使用另一个中证明的引理。
+
+想要认真理解泛等基础并能够在其中工作的读者最终将不得不阅读并理解 \cref{part:foundations} 的大部分内容。
+然而，只想了解泛等基础及其能做什么的读者在到达 \cref{part:mathematics} 中的主体之前必须阅读超过 200 页，这是可以理解的退缩。
+幸运的是，并非 \cref{part:foundations} 的所有内容都是阅读 \cref{part:mathematics} 中章节所必需的。
+\cref{part:mathematics} 中的每一章都以其主题、泛等基础对它的贡献以及来自 \cref{part:foundations} 的必要背景的简要概述开始，因此勇敢的读者可以立即转到他们喜欢的主题的相应章节。
+对于那些想要比这更深入地理解 \cref{part:mathematics} 中的一个或多个章节，但还没有准备好阅读所有 \cref{part:foundations} 的人，我们在这里提供 \cref{part:foundations} 的简要总结，并备注哪些部分对于 \cref{part:mathematics} 中的哪些章节是必要的。
+
+\cref{cha:typetheory} 是关于类型论的基本概念，在任何同伦解释之前。
+熟悉 Martin-L\"of 类型论的读者可以快速浏览它以了解我们使用的理论的细节。
+然而，没有类型论经验的读者需要阅读 \cref{cha:typetheory}，因为类型论与集合论等其他基础之间有许多微妙的差异。
+
+\cref{cha:basics} 介绍了类型论的同伦观点，以及支持这一观点的基本概念，并描述了 \cref{cha:typetheory} 中类型论的每个组件的同伦行为。
+它还介绍了\emph{泛等公理}（\cref{sec:compute-universe}）——同伦类型论的两个基本创新之一。
+因此，它非常基础，我们鼓励每个人阅读它，特别是 \crefrange{sec:equality}{sec:basics-equivalences}。
+
+\cref{cha:logic} 描述了我们如何在同伦类型论中表示逻辑，以及它与经典逻辑以及构造和直觉主义逻辑的联系。
+这里我们定义了排中律、选择公理和命题大小调整公理（尽管在大多数情况下，我们不需要在本书的其余部分假设这些），以及对于表示传统逻辑至关重要的\emph{命题截断}。
+本章是 \cref{cha:set-math,cha:real-numbers} 的重要背景，对于 \cref{cha:category-theory} 不太重要，对于 \cref{cha:homotopy} 不太必要。
+
+\cref{cha:equivalences,cha:induction} 详细研究两个特殊主题：等价（及相关概念）和广义归纳定义。
+虽然这些本身是重要的主题，并提供了对同伦类型论的更深入理解，但在大多数情况下，它们对于 \cref{part:mathematics} 不是必需的。
+只有 \cref{cha:equivalences} 中的几个引理在这里和那里使用，而 \cref{sec:bool-nat,sec:strictly-positive,sec:generalizations} 中的一般讨论有助于提供 \cref{cha:hits} 所需的直觉。
+\cref{sec:generalizations} 中讨论的广义归纳定义也在 \cref{cha:set-math,cha:real-numbers} 的几个地方使用。
+
+\cref{cha:hits} 介绍了同伦类型论的第二个基本创新——\emph{高阶归纳类型}——并给出了许多例子。
+高阶归纳类型是 \cref{cha:homotopy} 中研究的主要对象，一些特定的高阶归纳类型在 \cref{cha:set-math,cha:real-numbers} 中发挥着重要作用。
+它们对于 \cref{cha:category-theory} 不太必要，尽管在 \cref{sec:rezk} 中使用了一个例子。
+
+最后，\cref{cha:hlevels} 讨论同伦 $n$-类型和相关概念，如 $n$-连通类型。
+这些概念对于 \cref{cha:homotopy} 很重要，但在 \cref{part:mathematics} 的其余部分不太重要，尽管某些引理的 $n=-1$ 情况在 \cref{sec:piw-pretopos} 中使用。
+
+这完成了 \cref{part:foundations}。
+如上所述，\cref{part:mathematics} 由四个基本无关的章节组成，每个章节描述泛等基础对特定主题的贡献。
+
+在 \cref{part:mathematics} 的章节中，\cref{cha:homotopy}（同伦论）也许是最激进的。
+泛等基础有一种非常不同的综合同伦论方法，其中同伦型是基本对象（即类型），而不是使用拓扑空间或其他一些集合论模型来构造。
+这使得经典代数拓扑定理的新证明风格成为可能，我们提供了一些样本，从 $\pi_1(\Sn^1)=\Z$ 到 Freudenthal 悬挂定理。
+
+在 \cref{cha:category-theory}（范畴论）中，我们发展了一些基本的（1-）范畴论，坚持泛等公理的原则，即\emph{相等即同构}。
+这产生了令人愉快的效果，确保所有定义和构造在范畴等价下自动不变：事实上，等价的范畴是相等的，就像等价的类型是相等的一样。
+（它还与高阶范畴论和高阶拓扑理论有联系。）
+
+\cref{cha:set-math}（集合论）研究泛等基础中的集合。
+集合范畴具有其通常的性质，因此为不需要同伦或高范畴结构的任何数学提供基础。
+我们还观察到，泛等性使基数和序数更加愉快，高阶归纳类型产生满足 Zermelo--Fraenkel 集合论通常公理的累积层次。
+
+在 \cref{cha:real-numbers}（实数）中，我们总结了 Dedekind 实数的构造，然后观察到高阶归纳类型允许 Cauchy 实数的定义，避免了构造数学中的一些相关问题。
+然后我们勾画了 Conway 超实数的类似方法。
+
+本书每一章都以注释部分结尾，其中收集了历史评论、文献参考和结果归属（尽可能）。
+我们还在每章结尾包含了习题，以帮助读者熟悉在泛等基础中进行数学。
+
+最后，回想一下，本书是由大量人员作为大规模协作努力编写的。
+我们已尽最大努力在术语和符号方面实现一致性，并将数学置于逻辑流动的线性序列中，但很可能仍存在一些不完美之处。
+我们请求读者原谅任何此类不妥之处，并欢迎对下一版的改进建议。
+
+
+% Local Variables:
+% TeX-master: hott-online
+% End:

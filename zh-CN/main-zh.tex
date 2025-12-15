@@ -1,0 +1,212 @@
+﻿% 同伦类型论：数学的泛等基础
+% Homotopy Type Theory: Univalent Foundations of Mathematics
+% 中文版 / Chinese Edition
+
+% 本文件是中文版的主文件
+% 基于原版 main.tex 修改
+
+% 文档类 (ctexbook 已包含中文支持)
+\documentclass[11pt]{ctexbook}
+
+\PassOptionsToPackage{table}{xcolor}
+
+\usepackage{etex}
+
+% 页面设置
+\usepackage[papersize={7in,10in},
+            twoside,
+            includehead,
+            top=1in,
+            bottom=1in,
+            inner=0.75in,
+            outer=1in,
+            bindingoffset=0.35in]{geometry}
+
+% 超链接
+\usepackage[backref=page,
+            colorlinks,
+            citecolor=blue,
+            linkcolor=blue,
+            urlcolor=blue,
+            unicode,
+            pdfauthor={Univalent Foundations Program},
+            pdftitle={同伦类型论：数学的泛等基础},
+            pdfsubject={数学},
+            pdfkeywords={类型论, 同伦论, 泛等公理}]{hyperref}
+
+% 其他宏包
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{stmaryrd}
+\usepackage{wasysym}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing,arrows}
+\usepackage{braket}
+\usepackage[all,2cell,cmtip]{xy}
+\UseAllTwocells
+
+% 与原版 main.tex 一致的包
+\usepackage{pifont}           % 表格符号
+\usepackage{multicol}         % 多栏布局
+\usepackage{fancyhdr}         % 页眉页脚
+\usepackage{nextpage}         % 跳转到奇数页
+\usepackage{xstring}          % 字符串处理
+\usepackage{comment}          % 注释环境
+\usepackage{etoolbox}         % TOC 处理
+\usepackage{mathpartir}       % 形式化附录
+\usepackage[numbered]{bookmark}  % PDF 书签
+
+% 索引
+\usepackage{makeidx}
+\makeindex
+
+% aliascnt 和 cleveref 必须在 macros 之前加载
+\usepackage{aliascnt}
+\usepackage[capitalize]{cleveref}
+
+% 加载原版宏 (包含定理环境定义)
+\input{../macros}
+
+% 加载中文版宏 (不要重复加载 ctex)
+\input{macros-zh}
+
+\begin{document}
+
+% 标题
+\title{同伦类型论\\{\large 数学的泛等基础}}
+\author{Univalent Foundations Program\\[1em]中文翻译组}
+\date{}
+
+\frontmatter
+
+\maketitle
+
+% 版权页
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+\textbf{同伦类型论：数学的泛等基础}\\[1em]
+Homotopy Type Theory: Univalent Foundations of Mathematics\\[2em]
+原作者：The Univalent Foundations Program\\[1em]
+中文翻译组\\[3em]
+本翻译基于原书，遵循\\
+Creative Commons Attribution-ShareAlike 3.0 Unported License\\
+\url{http://creativecommons.org/licenses/by-sa/3.0/}
+\end{center}
+\vspace*{\fill}
+\newpage
+
+% 前言
+\chapter*{译者序}
+\addcontentsline{toc}{chapter}{译者序}
+
+本书是《Homotopy Type Theory: Univalent Foundations of Mathematics》的中文译本。
+
+同伦类型论（Homotopy Type Theory，简称 HoTT）是21世纪数学基础研究的一个重要突破。它将同伦论的思想引入类型论，建立了一种全新的数学基础框架。核心的泛等公理（Univalence Axiom）断言：等价即相等，这一优雅的原理使得数学中大量显然的等同得以形式化。
+
+本书是2012-2013年普林斯顿高等研究院数学泛等基础特别年活动的成果，由该领域的先驱学者们集体撰写。
+
+翻译本书的目的是让更多中文读者能够接触和学习这一前沿领域。我们力求忠实于原文，同时使译文通顺易读。对于专业术语，我们参考了已有的中文文献，并在首次出现时标注英文原词。
+
+由于译者水平有限，疏漏之处在所难免，恳请读者批评指正。
+
+\vspace{2em}
+\hfill 中文翻译组
+
+% 目录
+\tableofcontents
+
+\mainmatter
+
+% ============================================
+% 导论
+% ============================================
+\chapter*{导论}
+\markboth{\textsc{导论}}{}
+\addcontentsline{toc}{chapter}{导论}
+\input{chapters/introduction}
+
+% ============================================
+% 第一部分：基础
+% ============================================
+\part{基础}
+\label{part:foundations}
+
+\chapter{类型论}
+\label{cha:typetheory}
+\input{chapters/preliminaries}
+
+\chapter{同伦类型论}
+\label{cha:basics}
+\input{chapters/basics}
+
+\chapter{集合与逻辑}
+\label{cha:logic}
+\input{chapters/logic}
+
+\chapter{等价}
+\label{cha:equivalences}
+\input{chapters/equivalences}
+
+\chapter{归纳}
+\label{cha:induction}
+\input{chapters/induction}
+
+\chapter{高阶归纳类型}
+\label{cha:hits}
+\input{chapters/hits}
+
+\chapter{同伦n-类型}
+\label{cha:hlevels}
+\input{chapters/hlevels}
+
+% ============================================
+% 第二部分：数学
+% ============================================
+\part{数学}
+\label{part:mathematics}
+
+\chapter{同伦论}
+\label{cha:homotopy}
+\input{chapters/homotopy}
+
+\chapter{范畴论}
+\label{cha:category-theory}
+\input{chapters/categories}
+
+\chapter{集合论}
+\label{cha:set-math}
+\input{chapters/setmath}
+
+\chapter{实数}
+\label{cha:real-numbers}
+\input{chapters/reals}
+
+% ============================================
+% 附录
+% ============================================
+\appendix
+\part*{附录}
+
+\chapter{形式类型论}
+\label{cha:rules}
+\input{backmatter/formal}
+
+% 参考文献
+\bibliographystyle{halpha}
+\bibliography{../references}
+
+% 符号索引
+\input{backmatter/symbols}
+
+% 索引
+\printindex
+
+\end{document}

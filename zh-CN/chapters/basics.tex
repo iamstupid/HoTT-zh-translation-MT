@@ -1,0 +1,2170 @@
+% 第2章 同伦类型论 / Chapter 2: Homotopy Type Theory
+% 翻译状态：进行中
+% 译者：Claude
+% 审校：
+
+% ============================================
+% 章节导论
+% ============================================
+
+同伦类型论中核心的新思想是类型可以被视为同伦论中的空间，或范畴论中的高阶群胚。
+
+\index{classical!homotopy theory|(}
+\index{higher category theory|(}
+我们首先简要总结同伦论与高维范畴论之间的联系。
+在经典同伦论中，空间 $X$ 是一个配备了拓扑的点集，
+\indexsee{space!topological}{topological space}
+\index{topological!space}
+而点 $x$ 与 $y$ 之间的路径由连续映射 $p : [0,1] \to X$ 表示，其中 $p(0) = x$ 且 $p(1) = y$。
+\index{path!topological}
+\index{topological!path}
+这个函数可以被视为在每个``时刻''给出 $X$ 中的一个点。对于许多目的而言，路径的严格相等（即逐点相等的函数）是一个过于精细的概念。例如，可以定义路径复合的运算（如果 $p$ 是从 $x$ 到 $y$ 的路径，$q$ 是从 $y$ 到 $z$ 的路径，那么复合 $p \ct q$ 是从 $x$ 到 $z$ 的路径）和逆运算（$\opp p$ 是从 $y$ 到 $x$ 的路径）。然而，这些运算之间存在对于严格相等不成立的自然等式：例如，路径 $p \ct \opp p$（当时间从 $0$ 到 $1$ 时，沿着同一条路线从 $x$ 走到 $y$，然后再走回来）并不严格等于恒等路径（始终停留在 $x$ 不动）。
+
+补救方法是考虑一个称为\emph{同伦}的更粗糙的路径相等概念。
+\index{homotopy!topological}
+一对连续映射 $f : X_1 \to X_2$ 和 $g : X_1\to X_2$ 之间的同伦是一个连续映射 $H : X_1 \times [0, 1] \to X_2$，满足 $H(x, 0) = f(x)$ 和 $H(x, 1) = g(x)$。在从 $x$ 到 $y$ 的路径 $p$ 和 $q$ 的特定情况下，同伦是一个连续映射 $H : [0,1] \times [0,1] \rightarrow X$，使得对所有 $s\in [0,1]$ 有 $H(s,0) = p(s)$ 且 $H(s,1) = q(s)$。在这种情况下，我们还要求对所有 $t\in [0,1]$ 有 $H(0,t) = x$ 且 $H(1,t)=y$，从而对每个 $t$，函数 $H(\blank,t)$ 仍然是从 $x$ 到 $y$ 的路径；这种同伦被称为\emph{保端点的}或\emph{相对于端点的}。在简单情况下，我们可以把正方形 $[0,1]\times [0,1]$ 在 $H$ 下的像想象成``填充了'' $p$ 和 $q$ 之间的空间，尽管对于一般的 $X$ 这并没有实际意义；最好把 $H$ 想象成 $p$ 到 $q$ 的一个不移动端点的连续形变。由于 $[0,1]\times [0,1]$ 是二维的，我们也称 $H$ 为二维的\emph{路径之间的路径}。\index{path!2-}
+
+例如，因为 $p \ct \opp p$ 沿着同一条路线走出去又走回来，你知道可以把 $p \ct \opp p$ 连续地收缩到恒等路径——它不会，比如说，被空间中的一个洞缠住。同伦是一个等价关系，而复合、逆等运算都保持它。此外，在某点 $x_0$ 处的环路\index{loop}的同伦等价类（其中两个环路 $p$ 和 $q$ 在它们之间存在一个\emph{基点}同伦时被等同，这是一个上述同伦 $H$，还需满足对所有 $t$ 有 $H(0,t) = H(1,t) = x_0$）构成一个称为\emph{基本群}\index{fundamental!group}的群。这个群是空间的一个\emph{代数不变量}，可以用来研究两个空间是否\emph{同伦等价}（存在来回的连续映射，其复合同伦于恒等），因为等价的空间有同构的基本群。
+
+因为同伦本身是一种二维路径，所以存在三维的\emph{同伦之间的同伦}\index{path!3-}的自然概念，然后是\emph{同伦之间的同伦之间的同伦}，依此类推。这个由点、路径、同伦、同伦之间的同伦、……组成的无限塔，配备了诸如基本群之类的代数运算，是一个称为（弱）\emph{$\infty$-群胚}的代数结构的实例。$\infty$-群胚\index{.infinity-groupoid@$\infty$-groupoid}由一个对象的集合，然后是对象之间的\emph{态射}\indexdef{morphism!in an .infinity-groupoid@in an $\infty$-groupoid}的集合，然后是态射之间的态射的集合，依此类推组成，并配备了一些复杂的代数结构；第 $k$ 层的态射称为 \define{$k$-态射}\indexdef{k-morphism@$k$-morphism}。每个层次的态射都有恒等、复合和逆运算，它们是弱的，意思是它们只在下一层态射的意义上满足群胚定律（复合的结合律、恒等是复合的单位元、逆元可消），而这种弱性产生了进一步的结构。例如，因为态射复合的结合律 $p \ct (q \ct r) = (p \ct q) \ct r$ 本身是一个高维态射，所以需要一个额外的运算来关联各种结合律的证明：将 $p \ct (q \ct (r \ct s))$ 重新结合成 $((p \ct q) \ct r) \ct s$ 的各种方式产生了Mac Lane五边形\index{pentagon, Mac Lane}。弱性还在不同层次之间产生非平凡的相互作用。
+
+每个拓扑空间 $X$ 都有一个\emph{基本 $\infty$-群胚}
+\index{.infinity-groupoid@$\infty$-groupoid!fundamental}
+\index{fundamental!.infinity-groupoid@$\infty$-groupoid}
+，其 $k$-态射是 $X$ 中的 $k$-维路径。$\infty$-群胚的弱性直接对应于路径只在同伦意义上构成群这一事实，$(k+1)$-路径充当 $k$-路径之间的同伦。此外，把空间看作 $\infty$-群胚保留了空间足够多的方面来进行同伦论研究：基本 $\infty$-群胚构造与 $\infty$-群胚的几何实现\index{geometric realization}互为伴随\index{adjoint!functor}，而且这个伴随保持同伦论（这被称为\emph{同伦假设/定理}，
+\index{hypothesis!homotopy}%
+\index{homotopy!hypothesis}%
+它是假设还是定理取决于你如何定义 $\infty$-群胚）。例如，你可以容易地定义 $\infty$-群胚的基本群，如果你计算一个空间的基本 $\infty$-群胚的基本群，它将与该空间基本群的经典定义一致。由于这种对应，同伦论和高维范畴论紧密相关。
+
+\index{classical!homotopy theory|)}%
+\index{higher category theory|)}%
+
+\mentalpause
+
+现在，在同伦类型论中，每个类型都可以看作具有 $\infty$-群胚的结构。回忆对于任何类型 $A$ 和任意 $x,y:A$，我们有恒等类型 $\id[A]{x}{y}$，也记作 $\idtype[A]{x}{y}$ 或简记为 $x=y$。从逻辑上讲，我们可以把 $x=y$ 的元素视为 $x$ 和 $y$ 相等的证据，或者说是 $x$ 与 $y$ 的等同。此外，类型论（不同于，比如说，一阶逻辑）允许我们把 $\id[A]{x}{y}$ 的这些元素也作为个体来考虑，它们可以成为进一步命题的主词。因此，我们可以\emph{迭代}恒等类型：我们可以构造等同之间的等同的类型 $\id[{(\id[A]{x}{y})}]{p}{q}$，以及 $\id[{(\id[{(\id[A]{x}{y})}]{p}{q})}]{r}{s}$，依此类推。这个恒等类型塔的结构精确对应于空间中连续路径和（更高阶）同伦之间的结构，或者 $\infty$-群胚。\index{.infinity-groupoid@$\infty$-groupoid}
+
+因此，我们将经常把元素 $p : \id[A]{x}{y}$ 称为从 $x$ 到 $y$ 的\define{路径}
+\index{path}
+；我们称 $x$ 为它的\define{起点}
+\indexdef{start point of a path}
+\indexdef{path!start point of}
+，$y$ 为它的\define{终点}。
+\indexdef{end point of a path}
+\indexdef{path!end point of}
+两条起点和终点相同的路径 $p,q : \id[A]{x}{y}$ 被称为\define{平行的}，
+\indexdef{parallel paths}
+\indexdef{path!parallel}
+在这种情况下，元素 $r : \id[{(\id[A]{x}{y})}]{p}{q}$ 可以被视为一个同伦，或者态射之间的态射；我们经常称它为 \define{2-路径}
+\indexdef{path!2-}\indexsee{2-path}{path, 2-}%
+或\define{二维路径}。
+\index{dimension!of paths}%
+\indexsee{2-dimensional path}{path, 2-}\indexsee{path!2-dimensional}{path, 2-}%
+类似地，$\id[{(\id[{(\id[A]{x}{y})}]{p}{q})}]{r}{s}$ 是两条平行的二维路径之间的\define{三维路径}
+\indexdef{path!3-}\indexsee{3-path}{path, 3-}\indexsee{3-dimensional path}{path, 3-}\indexsee{path!3-dimensional}{path, 3-}%
+的类型，依此类推。如果类型 $A$ 是``集合状的''，如 \nat，这些迭代的恒等类型将是无趣的（见\cref{sec:basics-sets}），但在一般情况下，它们可以模拟非平凡的同伦类型。
+
+同伦类型论与经典同伦论的一个重要区别是，同伦类型论提供了空间的\emph{综合}
+\index{synthetic mathematics}%
+\index{geometry, synthetic}%
+\index{Euclid of Alexandria}%
+描述，在以下意义上。综合几何是欧几里得\cite{Euclid}风格的几何：从一些基本概念（点和线）、构造（连接任意两点的线）和公理（所有直角相等）出发，逻辑地推导出结论。这与解析
+\index{analytic mathematics}%
+几何形成对比，在解析几何中，点和线等概念用 $\R^n$ 中的笛卡尔坐标具体表示——线是点的集合——而基本构造和公理从这种表示推导出来。虽然经典同伦论是解析的（空间和路径由点构成），同伦类型论是综合的：点、路径和路径之间的路径是基本的、不可分割的、原始的概念。
+
+此外，同伦类型论令人惊奇的事情之一是，所有的基本构造和公理——所有的高阶群胚结构——都自动地从恒等类型的归纳原理产生。
+回忆\cref{sec:identity-types}，这说的是如果
+\begin{itemize}
+\item 对每个 $x,y:A$ 和每个 $p:\id[A]xy$ 我们有一个类型 $D(x,y,p)$，且
+\item 对每个 $a:A$ 我们有一个元素 $d(a):D(a,a,\refl a)$，
+\end{itemize}
+那么
+\begin{itemize}
+\item 存在一个元素 $\indid{A}(D,d,x,y,p):D(x,y,p)$，对\emph{每}两个元素 $x,y:A$ 和 $p:\id[A]xy$ 成立，使得 $\indid{A}(D,d,a,a,\refl a) \jdeq d(a)$。
+\end{itemize}
+换句话说，给定依赖函数
+\begin{align*}
+D & :\prd{x,y:A} (\id{x}{y}) \to \type\\
+d & :\prd{a:A} D(a,a,\refl{a})
+\end{align*}
+存在一个依赖函数
+\[\indid{A}(D,d):\prd{x,y:A}{p:\id{x}{y}} D(x,y,p)\]
+使得
+\begin{equation}\label{eq:Jconv}
+\indid{A}(D,d,a,a,\refl{a})\jdeq d(a)
+\end{equation}
+对每个 $a:A$ 成立。
+通常，每次我们应用这个归纳规则时，我们要么不关心正在定义的具体函数，要么立即给它一个不同的名字。
+
+非形式地，恒等类型的归纳原理说的是，如果我们想要构造一个依赖于恒等类型的居留元 $p:\id[A]xy$ 的对象（或证明一个陈述），那么只需在 $x$ 和 $y$（判断上）相同且 $p$（判断上）是自反性元素 $\refl{x}:x=x$ 的特殊情况下进行构造（或证明）即可。
+在非形式书写时，我们可以用诸如``由归纳，只需假设……''这样的短语来表达这一点。
+这种到``自反性情形''的归约类似于自然数上普通归纳证明中到``基础情形''和``归纳步骤''的归约，也类似于对不交并或析取进行情形分析证明中的``左情形''和``右情形''。\index{induction principle!for identity type}%
+
+``转换规则''~\eqref{eq:Jconv}在自然数归纳证明的语境中不太熟悉，但在相关的递归定义概念中有一个类似的观念。
+如果一个序列\index{sequence} $(a_n)_{n\in \mathbb{N}}$ 通过给出 $a_0$ 并用 $a_n$ 来指定 $a_{n+1}$ 来定义，那么事实上所得序列的第 $0$ 项\emph{就是}给定的那个，而给定的关于 $a_{n+1}$ 与 $a_n$ 的递推关系对所得序列成立。
+（这可能看起来太明显以至于不值得说，但如果我们把递归定义视为计算序列值的算法\index{algorithm}，那么这正是执行该算法的过程。）
+规则~\eqref{eq:Jconv}是类似的：它说的是如果我们通过指定当 $p$ 是 $\refl{x}:x=x$ 时值应该是什么来为所有 $p:x=y$ 定义一个对象 $f(p)$，那么我们指定的值事实上就是 $f(\refl{x})$ 的值。
+
+这个归纳原理赋予每个类型 $\infty$-群胚\index{.infinity-groupoid@$\infty$-groupoid}的结构，赋予两个类型之间的每个函数两个这样的群胚之间的 $\infty$-函子\index{.infinity-functor@$\infty$-functor}的结构。这从数学的角度来看很有趣，因为它给出了一种处理 $\infty$-群胚的新方法。从类型论的角度来看也很有趣，因为它揭示了与每个类型和函数相关联的新运算。在本章的剩余部分，我们开始探索这种结构。
+
+\section{类型是高阶群胚}
+\label{sec:equality}
+
+\index{type!identity|(}%
+\index{path|(}%
+\index{.infinity-groupoid@$\infty$-groupoid!structure of a type|(}%
+我们现在从归纳原理推导出高阶群胚结构的开端。
+我们从相等的对称性开始，用拓扑语言来说就是``路径可以被逆转''。
+
+\begin{lem}\label{lem:opp}
+  对于每个类型 $A$ 和每个 $x,y:A$，存在一个函数
+  \begin{equation*}
+    (x= y)\to(y= x)
+  \end{equation*}
+  记作 $p\mapsto \opp{p}$，使得对每个 $x:A$ 有 $\opp{\refl{x}}\jdeq\refl{x}$。
+  我们称 $\opp{p}$ 为 $p$ 的\define{逆}。
+  \indexdef{path!inverse}%
+  \indexdef{inverse!of path}%
+  \index{equality!symmetry of}%
+  \index{symmetry!of equality}%
+\end{lem}
+
+既然这是我们第一次把某些东西表述为``引理''或``定理''，让我们停下来考虑一下这意味着什么。
+回忆命题（可被证明的陈述）与类型等同，而引理和定理（已被证明的陈述）与\emph{有居留元的}类型等同。
+因此，引理或定理的陈述应该被翻译成一个类型，如\cref{sec:pat}中那样，而它的证明被翻译成该类型的一个居留元。
+根据全称量词``对于每个''的解释，对应于\cref{lem:opp}的类型是
+\[ \prd{A:\UU}{x,y:A} (x= y)\to(y= x). \]
+\cref{lem:opp}的证明将包括构造这个类型的一个元素，即为某个 $f$ 导出判断 $f:\prd{A:\UU}{x,y:A} (x= y)\to(y= x)$。
+然后我们为这个元素 $f$ 引入记号 $\opp{(\blank)}$，其中参数 $A$、$x$ 和 $y$ 被省略并从上下文推断。
+（如\cref{sec:types-vs-sets}中所述，次要陈述``对每个 $x:A$ 有 $\opp{\refl{x}}\jdeq\refl{x}$''应被视为一个单独的判断。）
+
+\begin{proof}[第一个证明]
+  假设给定 $A:\UU$，并
+  令 $D:\prd{x,y:A}(x= y) \to \type$ 为由 $D(x,y,p)\defeq (y= x)$ 定义的类型族。
+  换句话说，$D$ 是一个函数，它把任意 $x,y:A$ 和 $p:x=y$ 映射到一个类型，即类型 $y=x$。
+  那么我们有一个元素
+  \begin{equation*}
+    d\defeq \lam{x} \refl{x}:\prd{x:A} D(x,x,\refl{x}).
+  \end{equation*}
+  因此，恒等类型的归纳原理给出一个元素
+  \narrowequation{ \indid{A}(D,d,x,y,p): (y= x)}
+  对每个 $p:(x= y)$。
+  我们现在可以把所需的函数 $\opp{(\blank)}$ 定义为 $\lam{p} \indid{A}(D,d,x,y,p)$，即我们设 $\opp{p} \defeq \indid{A}(D,d,x,y,p)$。
+  转换规则~\eqref{eq:Jconv}给出 $\opp{\refl{x}}\jdeq \refl{x}$，如所要求的。
+\end{proof}
+
+我们以一种非常形式的风格写出了这个证明，当恒等类型的归纳规则还不熟悉时这可能会有帮助。
+要更加形式化，我们可以说\cref{lem:opp}及其证明一起包含判断
+\begin{narrowmultline*}
+  \lam{A}{x}{y}{p} \indid{A}((\lam{x}{y}{p} (y=x)), (\lam{x} \refl{x}), x, y, p)
+  \narrowbreak : \prd{A:\UU}{x,y:A} (x= y)\to(y= x)
+\end{narrowmultline*}
+（连同一个额外的等式判断）。
+然而，我们最终更喜欢使用更自然的语言，如下面的等价证明。
+
+\begin{proof}[第二个证明]
+  我们想要对每个 $x,y:A$ 和 $p:x=y$ 构造一个元素 $\opp{p}:y=x$。
+  由归纳，只需在 $y$ 是 $x$ 且 $p$ 是 $\refl{x}$ 的情形进行。
+  但在这种情形下，$p$ 的类型 $x=y$ 和我们试图构造 $\opp{p}$ 的类型 $y=x$ 都只是 $x=x$。
+  因此，在``自反性情形''中，我们可以简单地把 $\opp{\refl{x}}$ 定义为 $\refl{x}$。
+  一般情形然后由归纳原理得出，而转换规则 $\opp{\refl{x}}\jdeq\refl{x}$ 正是我们在自反性情形给出的证明。
+\end{proof}
+
+我们将用两种风格写出接下来的几个证明，以帮助读者习惯后一种。
+接下来我们证明相等的传递性，或者说等价地``连接路径''。
+
+\begin{lem}\label{lem:concat}
+  对于每个类型 $A$ 和每个 $x,y,z:A$，存在一个函数
+  \begin{equation*}
+  (x= y) \to   (y= z)\to (x=  z),
+  \end{equation*}
+  记作 $p \mapsto q \mapsto p\ct q$，使得对任意 $x:A$ 有 $\refl{x}\ct \refl{x}\jdeq \refl{x}$。
+  我们称 $p\ct q$ 为 $p$ 和 $q$ 的\define{连接}或\define{复合}。
+  \indexdef{path!concatenation}%
+  \indexdef{path!composite}%
+  \indexdef{concatenation of paths}%
+  \indexdef{composition!of paths}%
+  \index{equality!transitivity of}%
+  \index{transitivity!of equality}%
+\end{lem}
+
+注意我们选择用与函数复合相反的顺序来记路径连接：从 $p:x=y$ 和 $q:y=z$ 我们得到 $p\ct q : x=z$，而从 $f:A\to B$ 和 $g:B\to C$ 我们得到 $g\circ f : A\to C$（见\cref{ex:composition}）。
+
+\begin{proof}[第一个证明]
+  所需的函数有类型 $\prd{x,y,z:A} (x= y) \to   (y= z)\to (x=  z)$。
+  我们将改为定义一个具有等价类型 $\prd{x,y:A} (x= y) \to \prd{z:A} (y= z)\to (x=  z)$ 的函数，这允许我们两次应用路径归纳。
+  令 $D:\prd{x,y:A} (x=y) \to \type$ 为类型族
+  \begin{equation*}
+    D(x,y,p)\defeq \prd{z:A}{q:y=z} (x=z).
+  \end{equation*}
+  注意 $D(x,x,\refl x) \jdeq \prd{z:A}{q:x=z} (x=z)$。
+  因此，为了把恒等类型的归纳原理应用到这个 $D$，我们需要一个类型为
+  \begin{equation}\label{eq:concatD}
+    \prd{x:A} D(x,x,\refl{x})
+  \end{equation}
+  的函数，
+  也就是说，类型为
+  \[ \prd{x,z:A}{q:x=z} (x=z). \]
+  现在令 $E:\prd{x,z:A}{q:x=z}\type$ 为类型族 $E(x,z,q)\defeq (x=z)$。
+  注意 $E(x,x,\refl x) \jdeq (x=x)$。
+  因此，我们有函数
+  \begin{equation*}
+    e(x) \defeq \refl{x} : E(x,x,\refl{x}).
+  \end{equation*}
+  通过将恒等类型的归纳原理应用于 $E$，我们得到一个函数
+  \begin{equation*}
+    d : \prd{x,z:A}{q:x=z} E(x,z,q).
+  \end{equation*}
+  但 $E(x,z,q)\jdeq (x=z)$，所以 $d$ 的类型是~\eqref{eq:concatD}。
+  因此，我们可以使用这个函数 $d$ 并把恒等类型的归纳原理应用于 $D$，以获得我们所需的类型为
+  \begin{equation*}
+    \prd{x,y:A} (x= y) \to \prd{z:A} (y= z)\to (x=  z)
+  \end{equation*}
+  的函数，从而得到 $\prd{x,y,z:A} (y=z) \to (x=y) \to (x=z)$。
+  两个归纳原理的转换规则给出对任意 $x:A$ 有 $\refl{x}\ct \refl{x}\jdeq \refl{x}$。
+\end{proof}
+
+\begin{proof}[第二个证明]
+  我们想要对每个 $x,y,z:A$ 和每个 $p:x=y$ 和 $q:y=z$ 构造一个 $x=z$ 的元素。
+  对 $p$ 进行归纳，只需假设 $y$ 是 $x$ 且 $p$ 是 $\refl{x}$。
+  在这种情形下，$q$ 的类型 $y=z$ 是 $x=z$。
+  现在对 $q$ 进行归纳，只需也假设 $z$ 是 $x$ 且 $q$ 是 $\refl{x}$。
+  但在这种情形下，$x=z$ 是 $x=x$，而我们有 $\refl{x}:(x=x)$。
+\end{proof}
+
+读者可能觉得我们给出了这个引理的一个过于迂回的证明。
+事实上，我们可以在对 $p$ 进行归纳后就停下来，因为那时我们想要产生的是一个相等 $x=z$，而我们已经有了这样一个相等，即 $q$。
+为什么我们还要继续对 $q$ 进行另一次归纳？
+
+答案是，如导论中所述，我们在做\emph{证明相关}的数学。
+\index{mathematics!proof-relevant}%
+当我们证明一个引理时，我们在定义某个类型的一个居留元，而在证明过程中我们定义的\emph{具体}元素可能很重要，不仅仅是该元素所居留的类型（即引理的\emph{陈述}）。
+\cref{lem:concat}有三个明显的证明：我们可以对 $p$ 进行归纳，对 $q$ 进行归纳，或对它们两个都进行归纳。
+如果我们用三种不同的方式证明它，我们将有同一类型的三个不同元素。
+不难证明这三个元素相等（见\cref{ex:basics:concat}），但由于它们不是\emph{判断上}相等的，仍然可能有理由偏好其中一个。
+
+在\cref{lem:concat}的情形中，差异取决于计算规则。
+如果我们用对 $p$ 的单次归纳来证明引理，那么我们最终会得到形式为 $\refl{y} \ct q \jdeq q$ 的计算规则。
+如果我们用对 $q$ 的单次归纳来证明它，我们将得到 $p\ct\refl{y}\jdeq p$，而用双重归纳来证明它（如我们所做的）只给出 $\refl{x}\ct\refl{x} \jdeq \refl{x}$。
+
+\index{mathematics!formalized}%
+在做形式化数学时，不对称的计算规则有时会很方便，因为它们允许计算机自动简化更多的东西。
+然而，在非形式数学中，甚至可以说在形式化的情况下，有一个行为不对称的连接运算并且必须记住哪一边是``特殊的''可能会令人困惑。
+对称地处理两边使证明更健壮；这就是为什么我们给出了这样的证明。
+（然而，这无可否认是一个风格选择。）
+
+下表总结了我们迄今所做的事情的``相等''、``同伦''和``高阶群胚''观点。
+\begin{center}
+  \medskip
+  \begin{tabular}{ccc}
+    \toprule
+    相等 & 同伦 & $\infty$-群胚\\
+    \midrule
+    自反性\index{equality!reflexivity of} & 常路径 & 恒等态射\\
+    对称性\index{equality!symmetry of} & 路径的逆 & 逆态射\\
+    传递性\index{equality!transitivity of} & 路径的连接 & 态射的复合\\
+    \bottomrule
+  \end{tabular}
+  \medskip
+\end{center}
+
+在实践中，传递性经常通过一系列中间步骤来证明相等。
+我们将使用常见的记号，如 $a=b=c=d$。
+如果中间表达式很长，或者我们想要指定每个相等的见证，我们可以写
+\begin{align*}
+  a &= b & \text{（由 $p$）}\\ &= c &\text{（由 $q$）} \\ &= d &\text{（由 $r$）}。
+\end{align*}
+在任一情况下，该记号表示构造元素 $(p\ct q)\ct r: (a=d)$。
+（我们为具体性选择左结合，尽管鉴于下面\cref{thm:omg}\ref{item:omg4}这几乎没有什么区别。）
+如果碰巧，比如说，$b$ 和 $c$ 判断上相等，那么我们可以写
+\begin{align*}
+  a &= b & \text{（由 $p$）}\\ &\jdeq c \\ &= d &\text{（由 $r$）}
+\end{align*}
+来表示构造 $p\ct r : (a=d)$。
+我们也遵循常见的数学实践，不要求这种记号中的理由（``由 $p$'' 和 ``由 $r$''）提供所需的确切见证；相反，我们允许它们只是提及构造该见证的最重要（或最不明显）的成分。
+例如，如果``引理 A''陈述对所有 $x$ 和 $y$ 我们有 $f(x)=g(y)$，那么我们可以写``由引理 A''作为步骤 $f(a) = g(b)$ 的理由，相信读者会推断我们以 $x\defeq a$ 和 $y\defeq b$ 应用引理 A。
+如果我们相信读者能够猜出理由，我们也可以完全省略它。
+
+现在，由于证明相关性，我们不能在证明了相等的``对称性''和``传递性''之后就停下来：我们需要知道这些相等上的\emph{运算}是良好的。
+（这个问题在集合论中是看不见的，在那里对称性和传递性只是相等的\emph{性质}，而不是路径上的结构。）
+从同伦论的观点来看，连接和取逆只是高阶群胚结构的``第一层''——我们还需要这些运算上的相容性\index{coherence}定律，以及更高维度的类似运算。
+例如，我们需要知道连接是\emph{结合的}，以及取逆关于连接提供\emph{逆元}。
+
+\begin{lem}\label{thm:omg}%[类型的 $\omega$-群胚结构]
+  \index{associativity!of path concatenation}%
+  \index{unit!law for path concatenation}%
+  假设 $A:\type$，$x,y,z,w:A$，$p:x= y$，$q:y = z$，$r:z=w$。
+  我们有以下：
+  \begin{enumerate}
+  \item $p= p\ct \refl{y}$ 且 $p = \refl{x} \ct p$。\label{item:omg1}
+  \item $\opp{p}\ct p=  \refl{y}$ 且 $p\ct \opp{p}= \refl{x}$。\label{item:omg2}
+  \item $\opp{(\opp{p})}= p$。\label{item:omg3}
+  \item $p\ct (q\ct r)=  (p\ct q)\ct r$。\label{item:omg4}
+  \end{enumerate}
+\end{lem}
+
+特别注意，\ref{item:omg1}--\ref{item:omg4}本身是命题相等，居留在恒等类型\emph{的}恒等类型中，如对 $p,q:x=y$ 有 $p=_{x=y}q$。
+拓扑地，它们是\emph{路径的路径}，即同伦。
+在拓扑学中有一个熟悉的事实，当我们把路径 $p$ 与逆路径 $\opp p$ 连接时，我们并不真正得到一个常路径（对应于类型论中的相等 $\refl{}$）——相反，我们有一个从 $p\ct\opp p$ 到常路径的同伦，或更高路径。
+
+\begin{proof}[\cref{thm:omg}的证明]
+  所有证明都使用相等的归纳原理。
+  \begin{enumerate}
+  \item \emph{第一个证明：}令 $D:\prd{x,y:A} (x=y) \to \type$ 为由
+    \begin{equation*}
+      D(x,y,p)\defeq (p= p\ct \refl{y})
+    \end{equation*}
+    给出的类型族。
+    那么 $D(x,x,\refl{x})$ 是 $\refl{x}=\refl{x}\ct\refl{x}$。
+    由于 $\refl{x}\ct\refl{x}\jdeq\refl{x}$，可得 $D(x,x,\refl{x})\jdeq (\refl{x}=\refl{x})$。
+    因此，有一个函数
+    \begin{equation*}
+      d\defeq\lam{x} \refl{\refl{x}}:\prd{x:A} D(x,x,\refl{x}).
+    \end{equation*}
+    现在恒等类型的归纳原理给出一个元素 $\indid{A}(D,d,x,y,p):(p= p\ct\refl{y})$，对每个 $p:x= y$。
+    另一个相等类似地证明。
+
+    \mentalpause
+
+    \noindent
+    \emph{第二个证明：}对 $p$ 进行归纳，只需假设 $y$ 是 $x$ 且 $p$ 是 $\refl x$。
+    但在这种情形下，我们有 $\refl{x}\ct\refl{x}\jdeq\refl{x}$。
+  \item \emph{第一个证明：}令 $D:\prd{x,y:A} (x=y) \to \type$ 为由
+    \begin{equation*}
+      D(x,y,p)\defeq (\opp{p}\ct p=  \refl{y})
+    \end{equation*}
+    给出的类型族。
+    那么 $D(x,x,\refl{x})$ 是 $\opp{\refl{x}}\ct\refl{x}=\refl{x}$。
+    由于 $\opp{\refl{x}}\jdeq\refl{x}$ 且 $\refl{x}\ct\refl{x}\jdeq\refl{x}$，我们得到 $D(x,x,\refl{x})\jdeq (\refl{x}=\refl{x})$。
+    因此我们找到函数
+    \begin{equation*}
+      d\defeq\lam{x} \refl{\refl{x}}:\prd{x:A} D(x,x,\refl{x}).
+    \end{equation*}
+    现在路径归纳给出一个元素 $\indid{A}(D,d,x,y,p):\opp{p}\ct p=\refl{y}$，对 $A$ 中每个 $p:x= y$。
+    另一个相等类似。
+
+    \mentalpause
+
+    \noindent \emph{第二个证明：}由归纳，只需假设 $p$ 是 $\refl x$。
+    但在这种情形下，我们有 $\opp{p} \ct p \jdeq \opp{\refl x} \ct \refl x \jdeq \refl x$。
+
+  \item \emph{第一个证明：}令 $D:\prd{x,y:A} (x=y) \to \type$ 为由
+    \begin{equation*}
+      D(x,y,p)\defeq (\opp{(\opp{p})}= p)
+    \end{equation*}
+    给出的类型族。
+    那么 $D(x,x,\refl{x})$ 是类型 $(\opp{(\opp{\refl x})}=\refl{x})$。
+    但由于对每个 $x:A$ 有 $\opp{\refl{x}}\jdeq \refl{x}$，我们有 $\opp{(\opp{\refl{x}})}\jdeq \opp{\refl{x}} \jdeq\refl{x}$，因此 $D(x,x,\refl{x})\jdeq(\refl{x}=\refl{x})$。
+    因此我们找到函数
+    \begin{equation*}
+      d\defeq\lam{x} \refl{\refl{x}}:\prd{x:A} D(x,x,\refl{x}).
+    \end{equation*}
+    现在路径归纳给出一个元素 $\indid{A}(D,d,x,y,p):\opp{(\opp{p})}= p$，对每个 $p:x= y$。
+
+    \mentalpause
+
+    \noindent \emph{第二个证明：}由归纳，只需假设 $p$ 是 $\refl x$。
+    但在这种情形下，我们有 $\opp{(\opp{p})}\jdeq \opp{(\opp{\refl x})} \jdeq \refl x$。
+
+  \item \emph{第一个证明：}令 $D_1:\prd{x,y:A} (x=y) \to \type$ 为由
+    \begin{equation*}
+      D_1(x,y,p)\defeq\prd{z,w:A}{q:y= z}{r:z= w} \big(p\ct (q\ct r)=  (p\ct q)\ct r\big)
+    \end{equation*}
+    给出的类型族。
+    那么 $D_1(x,x,\refl{x})$ 是
+    \begin{equation*}
+      \prd{z,w:A}{q:x= z}{r:z= w} \big(\refl{x}\ct(q\ct r)= (\refl{x}\ct q)\ct r\big).
+    \end{equation*}
+    为了构造这个类型的元素，令 $D_2:\prd{x,z:A} (x=z) \to \type$ 为类型族
+    \begin{equation*}
+      D_2 (x,z,q) \defeq \prd{w:A}{r:z=w} \big(\refl{x}\ct(q\ct r)= (\refl{x}\ct q)\ct r\big).
+    \end{equation*}
+    那么 $D_2(x,x,\refl{x})$ 是
+    \begin{equation*}
+      \prd{w:A}{r:x=w} \big(\refl{x}\ct(\refl{x}\ct r)= (\refl{x}\ct \refl{x})\ct r\big).
+    \end{equation*}
+    为了构造\emph{这个}类型的元素，令 $D_3:\prd{x,w:A} (x=w) \to \type$ 为类型族
+    \begin{equation*}
+      D_3(x,w,r) \defeq \big(\refl{x}\ct(\refl{x}\ct r)= (\refl{x}\ct \refl{x})\ct r\big).
+    \end{equation*}
+    那么 $D_3(x,x,\refl{x})$ 是
+    \begin{equation*}
+      \big(\refl{x}\ct(\refl{x}\ct \refl{x})= (\refl{x}\ct \refl{x})\ct \refl{x}\big)
+    \end{equation*}
+    它判断上等于类型 $(\refl{x} = \refl{x})$，因此由 $\refl{\refl{x}}$ 居留。
+    因此，三次应用路径归纳规则，我们得到总体所需类型的一个元素。
+
+    \mentalpause
+
+    \noindent \emph{第二个证明：}由归纳，只需假设 $p$、$q$ 和 $r$ 都是 $\refl x$。
+    但在这种情形下，我们有
+    \begin{align*}
+      p\ct (q\ct r)
+      &\jdeq \refl{x}\ct(\refl{x}\ct \refl{x})\\
+      &\jdeq \refl{x}\\
+      &\jdeq (\refl{x}\ct \refl x)\ct \refl x\\
+      &\jdeq (p\ct q)\ct r.
+    \end{align*}
+    因此，我们有 $\refl{\refl{x}}$ 居留这个类型。 \qedhere
+  \end{enumerate}
+\end{proof}
+
+\begin{rmk}
+  有其他方法来定义这些更高路径。
+  例如，在\cref{thm:omg}\ref{item:omg4}中我们可以只对一条或两条路径进行归纳而不是全部三条。
+  每种可能性将产生一个\emph{判断上}不同的证明，但它们都将彼此相等。
+  任何两个特定证明之间的这种相等又可以用归纳来证明，将所有相关路径归约到自反性，然后观察两个证明都把自己归约到自反性。
+\end{rmk}
+
+鉴于\cref{thm:omg}\ref{item:omg4}，我们将经常把 $p\ct q\ct r$ 写成 $(p\ct q)\ct r$，类似地把 $p\ct q\ct r \ct s$ 写成 $((p\ct q)\ct r)\ct s$，依此类推。
+我们为确定性选择左结合，但这没有实际区别。
+我们一般相信读者会在必要时插入\cref{thm:omg}\ref{item:omg4}的实例来重新结合这样的表达式。
+
+我们实际上还没有真正完成高阶群胚结构：路径~\ref{item:omg1}--\ref{item:omg4}也必须满足它们自己的更高相容性\index{coherence}定律，这些定律本身是更高路径，
+\index{associativity!of path concatenation!coherence of}%
+\index{globular operad}%
+\index{operad}%
+\index{groupoid!higher}%
+依此类推``一直到无穷大''（这可以用例如球状操纵子的概念来精确化）。
+然而，对于大多数目的来说，没有必要使整个无限维结构显式化。
+同伦类型论的好处之一是，所有这些结构都可以仅从恒等类型的归纳性质\emph{证明}出来，因此我们可以根据需要使其中的多或少显式化。
+
+特别地，在本书中我们不需要任何涉及精确化诸如``所有更高层次的相容结构''这样概念的复杂组合学。
+除了普通路径，我们将使用路径的路径（即类型 $p =_{x=_A y} q$ 的元素，对 $p,q:x=y$），如前所述我们称之为\emph{2-路径}\index{path!2-}或\emph{二维路径}，也许偶尔使用路径的路径的路径（即类型 $r = _{p =_{x=_A y} q} s$ 的元素），我们称之为\emph{3-路径}\index{path!3-}或\emph{三维路径}。
+可以定义\emph{$n$-维路径}
+\indexdef{path!n-@$n$-}%
+\indexsee{n-path@$n$-path}{path, $n$-}%
+\indexsee{n-dimensional path@$n$-dimensional path}{path, $n$-}%
+\indexsee{path!n-dimensional@$n$-dimensional}{path, $n$-}%
+的一般概念（见\cref{ex:npaths}），但我们不需要它。
+
+然而，我们将使用一个特别重要和简单的高阶路径的情形，就是起点和终点相同的情况。
+在集合论中，命题 $a=a$ 是完全无趣的，但在同伦论中，从一个点到自身的路径称为\emph{环路}\index{loop}，携带着许多有趣的高阶结构。
+因此，给定一个带有点 $a:A$ 的类型 $A$，我们定义它的\define{环路空间}
+\index{loop space}%
+$\Omega(A,a)$ 为类型 $\id[A]{a}{a}$。
+如果点 $a$ 从上下文中可以理解，我们有时可以简单地写 $\Omega A$。
+
+由于 $\Omega A$ 的任意两个元素都是起点和终点相同的路径，它们可以被连接；
+因此我们有一个运算 $\Omega A\times \Omega A\to \Omega A$。
+更一般地，$A$ 的高阶群胚结构赋予 $\Omega A$ 类似的``高阶群''结构。
+
+考虑 $A$ 的环路空间\index{loop space!iterated}\index{iterated loop space}\emph{的}环路空间也很有用，它是在 $a$ 处恒等环路上的二维环路的空间。
+这被写作 $\Omega^2(A,a)$，在类型论中由类型 $\id[({\id[A]{a}{a}})]{\refl{a}}{\refl{a}}$ 表示。
+虽然 $\Omega^2(A,a)$ 作为环路空间仍然是一个``高阶群''，但它现在还有一些额外的结构，来自于其元素是一维环路之间的二维环路这一事实。
+
+\begin{thm}[Eckmann--Hilton]\label{thm:EckmannHilton}
+  第二环路空间上的复合运算
+  %
+  \begin{equation*}
+    \Omega^2(A)\times \Omega^2(A)\to \Omega^2(A)
+  \end{equation*}
+  是交换的：对任意 $\alpha, \beta:\Omega^2(A)$ 有 $\alpha\ct\beta = \beta\ct\alpha$。
+  \index{Eckmann--Hilton argument}%
+\end{thm}
+
+\begin{proof}
+首先，观察 $1$-环路的复合 $\Omega A\times \Omega A\to \Omega A$ 诱导一个运算
+\[
+\star : \Omega^2(A)\times \Omega^2(A)\to \Omega^2(A)
+\]
+如下：考虑元素 $a, b, c : A$ 和 1- 与 2-路径，
+%
+\begin{align*}
+  p &: a = b,       &       r &: b = c \\
+  q &: a = b,       &       s &: b = c \\
+  \alpha &: p = q,  &   \beta &: r = s
+\end{align*}
+%
+如下图所示（路径画成箭头）。
+\[
+ \xymatrix@+5em{
+   {a} \rtwocell<10>^p_q{\alpha}
+   &
+   {b} \rtwocell<10>^r_s{\beta}
+   &
+   {c}
+ }
+\]
+分别复合上面和下面的 1-路径，我们得到两条路径 $p\ct r,\ q\ct s : a = c$，然后它们之间有一个``水平复合''
+%
+\begin{equation*}
+  \alpha\hct\beta : p\ct r = q\ct s
+\end{equation*}
+%
+定义如下。
+首先，我们通过对 $r$ 进行路径归纳来定义 $\alpha \rightwhisker r : p\ct r = q\ct r$，使得
+\[ \alpha \rightwhisker \refl{b} \jdeq \opp{\mathsf{ru}_p} \ct \alpha \ct \mathsf{ru}_q \]
+其中 $\mathsf{ru}_p : p = p \ct \refl{b}$ 是\cref{thm:omg}\ref{item:omg1}中的右单位律。
+我们也可以类似地通过对 $\alpha$ 进行归纳，或对所有可见路径进行归纳来定义 $\rightwhisker$，导致不同的判断相等，但对于当前目的，通过对 $r$ 进行归纳的定义会使事情更简单。
+类似地，我们通过对 $q$ 进行归纳来定义 $q\leftwhisker \beta : q\ct r = q\ct s$，使得
+\[ \refl{b} \leftwhisker \beta \jdeq \opp{\mathsf{lu}_r} \ct \beta \ct \mathsf{lu}_s \]
+其中 $\mathsf{lu}_r$ 表示左单位律。
+运算 $\leftwhisker$ 和 $\rightwhisker$ 称为\define{须化}\indexdef{whiskering}。
+接下来，由于 $\alpha \rightwhisker r$ 和 $q\leftwhisker \beta$ 是可复合的 2-路径，我们可以定义\define{水平复合}
+\indexdef{horizontal composition!of paths}%
+\indexdef{composition!of paths!horizontal}%
+为：
+\[
+\alpha\hct\beta\ \defeq\ (\alpha\rightwhisker r) \ct (q\leftwhisker \beta).
+\]
+现在假设 $a \jdeq  b \jdeq  c$，使得所有 1-路径 $p$、$q$、$r$ 和 $s$ 都是 $\Omega(A,a)$ 的元素，并进一步假设 $p\jdeq q \jdeq r \jdeq s\jdeq \refl{a}$，使得 $\alpha:\refl{a} = \refl{a}$ 和 $\beta:\refl{a} = \refl{a}$ 以两种顺序都可复合。
+在那种情况下，我们有
+\begin{align*}
+  \alpha\hct\beta
+  &\jdeq (\alpha\rightwhisker\refl{a}) \ct (\refl{a}\leftwhisker \beta)\\
+  &= \opp{\mathsf{ru}_{\refl{a}}} \ct \alpha \ct \mathsf{ru}_{\refl{a}} \ct \opp{\mathsf{lu}_{\refl a}} \ct \beta \ct \mathsf{lu}_{\refl{a}}\\
+  &\jdeq \opp{\refl{\refl{a}}} \ct \alpha \ct \refl{\refl{a}} \ct \opp{\refl{\refl a}} \ct \beta \ct \refl{\refl{a}}\\
+  &= \alpha \ct \beta.
+\end{align*}
+（回忆 $\mathsf{ru}_{\refl{a}} \jdeq \mathsf{lu}_{\refl{a}} \jdeq \refl{\refl{a}}$，由路径归纳的计算规则。）
+另一方面，我们可以类似地定义另一个水平复合
+\[
+\alpha\hct'\beta\ \defeq\ (p\leftwhisker \beta)\ct (\alpha\rightwhisker s)
+\]
+而我们类似地学到
+\[
+\alpha\hct'\beta = \beta\ct\alpha.
+\]
+\index{interchange law}%
+但一般来说，定义水平复合的两种方式一致，$\alpha\hct\beta = \alpha\hct'\beta$，正如我们通过对 $\alpha$ 和 $\beta$ 进行归纳然后对剩余的两条 1-路径进行归纳所能看到的那样，把一切都归约到自反性。
+因此我们有
+\[\alpha \ct \beta = \alpha\hct\beta = \alpha\hct'\beta = \beta\ct\alpha.
+\qedhere
+\]
+\end{proof}
+
+上述事实被称为\emph{Eckmann--Hilton 论证}，来自经典同伦论，实际上它在下面\cref{cha:homotopy}中被用来证明一个类型的高阶同伦群总是阿贝尔\index{group!abelian}群。
+证明中定义的须化和水平复合运算也是类型的 $\infty$-群胚结构的一般部分。
+它们满足自己的定律（到更高同伦为止），如
+\[ \alpha \rightwhisker (p\ct q) = (\alpha \rightwhisker p) \rightwhisker q \]
+等等。
+从现在开始，我们相信读者会在需要时应用路径归纳来定义这类进一步的运算并验证它们的性质。
+
+正如这个例子所暗示的，高阶路径类型的代数比每个层次上的类群胚结构要复杂得多；这些层次相互作用产生了许多进一步的运算和定律，就像同伦论中对迭代环路空间的研究一样。
+事实上，如在经典同伦论中，我们可以做以下一般定义：
+
+\begin{defn} \label{def:pointedtype}
+  一个\define{有点类型}
+  \indexsee{pointed!type}{type, pointed}%
+  \indexdef{type!pointed}%
+  $(A,a)$ 是一个类型 $A:\type$ 连同一个点 $a:A$，称为它的\define{基点}。
+  \indexdef{basepoint}%
+  我们写 $\pointed{\type} \defeq \sm{A:\type} A$ 表示宇宙 $\type$ 中有点类型的类型。
+\end{defn}
+
+\begin{defn} \label{def:loopspace}
+  给定一个有点类型 $(A,a)$，我们定义 $(A,a)$ 的\define{环路空间}
+  \indexdef{loop space}%
+  为以下有点类型：
+  \[\Omega(A,a)\defeq ((\id[A]aa),\refl a).\]
+  它的元素将被称为 $a$ 处的\define{环路}\indexdef{loop}。
+  对于 $n:\N$，有点类型 $(A,a)$ 的\define{$n$-重迭代环路空间} $\Omega^{n}(A,a)$
+  \indexdef{loop space!iterated}%
+  \indexsee{loop space!n-fold@$n$-fold}{loop space, iterated}%
+  递归地定义为：
+  \begin{align*}
+    \Omega^0(A,a)&\defeq(A,a)\\
+    \Omega^{n+1}(A,a)&\defeq\Omega^n(\Omega(A,a)).
+  \end{align*}
+  它的元素将被称为 $a$ 处的\define{$n$-环路}
+  \indexdef{loop!n-@$n$-}%
+  \indexsee{n-loop@$n$-loop}{loop, $n$-}%
+  或\define{$n$-维环路}。
+  \indexsee{loop!n-dimensional@$n$-dimensional}{loop, $n$-}%
+  \indexsee{n-dimensional loop@$n$-dimensional loop}{loop, $n$-}%
+\end{defn}
+
+我们将在\cref{cha:hlevels,cha:hits,cha:homotopy}中回到迭代环路空间。
+\index{.infinity-groupoid@$\infty$-groupoid!structure of a type|)}%
+\index{type!identity|)}
+\index{path|)}%
+
+\section{函数是函子}
+\label{sec:functors}
+
+\index{function|(}%
+\index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+现在我们希望建立函数 $f:A\to B$ 在路径上函子性地行为。
+在传统类型论中，这等价于陈述函数尊重相等。
+\index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+拓扑地，这对应于说每个函数都是``连续的''，即保持路径。
+
+\begin{lem}\label{lem:map}
+  假设 $f:A\to B$ 是一个函数。
+  那么对任意 $x,y:A$ 有一个运算
+  \begin{equation*}
+    \apfunc f : (\id[A] x y) \to (\id[B] {f(x)} {f(y)}).
+  \end{equation*}
+  此外，对每个 $x:A$ 我们有 $\apfunc{f}(\refl{x})\jdeq \refl{f(x)}$。
+  \indexdef{application!of function to a path}%
+  \indexdef{path!application of a function to}%
+  \indexdef{function!application to a path of}%
+  \indexdef{action!of a function on a path}%
+\end{lem}
+
+记号 $\apfunc f$ 可以读作 $f$ 对路径的\underline{应用}（\underline{ap}plication），或者 $f$ 在\underline{路径}上的\underline{作用}（\underline{a}ction on \underline{p}aths）。
+
+\begin{proof}[第一个证明]
+  令 $D:\prd{x,y:A} (x=y) \to \type$ 为由
+  \[D(x,y,p)\defeq (f(x)= f(y))\]
+  定义的类型族。
+  那么我们有
+  \begin{equation*}
+    d\defeq\lam{x} \refl{f(x)}:\prd{x:A} D(x,x,\refl{x}).
+  \end{equation*}
+  通过路径归纳，我们得到 $\apfunc f : \prd{x,y:A} (x=y) \to (f(x)=f(y))$。
+  计算规则蕴含对每个 $x:A$ 有 $\apfunc f({\refl{x}})\jdeq\refl{f(x)}$。
+\end{proof}
+
+\begin{proof}[第二个证明]
+  要为所有 $p:x=y$ 定义 $\apfunc{f}(p)$，由归纳只需假设 $p$ 是 $\refl{x}$。
+  在这种情形下，我们可以定义 $\apfunc f(p) \defeq \refl{f(x)}:f(x)= f(x)$。
+\end{proof}
+
+我们经常把 $\apfunc f (p)$ 简单地写成 $\ap f p$。
+严格来说这是有歧义的，但一般不会引起混淆。
+它与范畴论中使用同一符号表示函子对对象和态射的应用的常见约定相匹配。
+
+我们注意到 $\apfunc{}$ 以人们可能期望的所有方式函子性地行为。
+
+\begin{lem}\label{lem:ap-functor}
+  对于函数 $f:A\to B$ 和 $g:B\to C$ 以及路径 $p:\id[A]xy$ 和 $q:\id[A]yz$，我们有：
+  \begin{enumerate}
+  \item $\apfunc f(p\ct q) = \apfunc f(p) \ct \apfunc f(q)$。\label{item:apfunctor-ct}
+  \item $\apfunc f(\opp p) = \opp{\apfunc f (p)}$。\label{item:apfunctor-opp}
+  \item $\apfunc g (\apfunc f(p)) = \apfunc{g\circ f} (p)$。\label{item:apfunctor-compose}
+  \item $\apfunc {\idfunc[A]} (p) = p$。
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  留给读者。
+\end{proof}
+\index{function|)}%
+
+正如\cref{thm:omg}中的相等那样，\cref{lem:ap-functor}中的那些本身是路径，它们满足自己的相容性定律（可以用同样的方式证明），依此类推。
+
+
+\section{类型族是纤维化}
+\label{sec:fibrations}
+
+\index{type!family of|(}%
+\index{transport|(defstyle}%
+由于\emph{依赖类型}函数在类型论中是必不可少的，我们还需要\cref{lem:map}的一个版本来处理这些。
+然而，这不是那么简单地陈述，因为如果 $f:\prd{x:A} B(x)$ 且 $p:x=y$，那么 $f(x):B(x)$ 和 $f(y):B(y)$ 是不同类型的元素，所以\emph{先验地}我们甚至不能问它们是否相等。
+缺失的成分是 $p$ 本身给了我们一种关联类型 $B(x)$ 和 $B(y)$ 的方法。
+
+我们在\cref{sec:identity-types}中已经见过这个，在那里我们称之为``相同者的不可区分性''。
+\index{indiscernibility of identicals}%
+我们现在为它引入一个不同的名字和记号，从现在开始我们将使用它。
+
+\begin{lem}[传输]\label{lem:transport}
+  假设 $P$ 是 $A$ 上的类型族，$p:\id[A]xy$。
+  那么有一个函数 $\transf{p}:P(x)\to P(y)$。
+\end{lem}
+
+\begin{proof}[第一个证明]
+  令 $D:\prd{x,y:A} (\id{x}{y}) \to \type$ 为由
+  \[D(x,y,p)\defeq P(x)\to P(y)\]
+  定义的类型族。
+  那么我们有函数
+  \begin{equation*}
+    d\defeq\lam{x} \idfunc[P(x)]:\prd{x:A} D(x,x,\refl{x}),
+  \end{equation*}
+  从而归纳原理给我们 $\indid{A}(D,d,x,y,p):P(x)\to P(y)$，对 $p:x= y$，我们定义它为 $\transf p$。
+\end{proof}
+
+\begin{proof}[第二个证明]
+  由归纳，只需假设 $p$ 是 $\refl x$。
+  但在这种情形下，我们可以取 $\transf{(\refl x)}:P(x)\to P(x)$ 为恒等函数。
+\end{proof}
+
+有时候，需要记下传输运算发生的类型族 $P$。
+在这种情况下，我们可以写
+\[\transfib P p \blank : P(x) \to P(y).\]
+
+回忆 $A$ 上的类型族 $P$ 可以被看作 $A$ 的元素的性质，当 $P(x)$ 有居留元时在 $x$ 处成立。
+那么传输引理说 $P$ 尊重相等，在以下意义上：如果 $x$ 等于 $y$，那么 $P(x)$ 成立当且仅当 $P(y)$ 成立。
+事实上，我们稍后将看到如果 $x=y$ 那么实际上 $P(x)$ 和 $P(y)$ 是\emph{等价的}。
+
+拓扑地，传输引理可以被看作纤维化中的``路径提升''运算。
+\index{fibration}%
+\indexdef{total!space}%
+我们把类型族 $P:A\to \type$ 看作一个\emph{纤维化}，底空间是 $A$，$P(x)$ 是 $x$ 上方的纤维，$\sm{x:A}P(x)$ 是纤维化的\define{全空间}，带有第一投影 $\sm{x:A}(P(x))\to A$。
+纤维化的定义性质是，给定底空间 $A$ 中的路径 $p:x=y$ 和 $x$ 上方纤维中的点 $u:P(x)$，我们可以把路径 $p$ 提升为全空间中从 $u$ 开始的路径（而且这种提升可以连续地进行）。
+点 $\trans p u$ 可以被视为这条提升路径的另一个端点。
+我们也可以在类型论中定义路径本身：
+
+\begin{lem}[路径提升性质]\label{thm:path-lifting}
+  \indexdef{path!lifting}%
+  \indexdef{lifting!path}%
+  给定类型族 $P:A\to\type$ 以及 $u:P(x)$ 和路径 $p:x=y$，我们有
+  \[\mathsf{lift}(u,p):(x,u)=_{(\sm{x:A}P(x))}(y,\trans{p}{u}).\]
+\end{lem}
+
+\begin{proof}
+  由归纳，只需假设 $p$ 是 $\refl{x}$。在这种情形下，$\trans{p}{u}\jdeq u$ 且我们有 $\refl{(x,u)}:(x,u)=(x,u)$。
+\end{proof}
+
+注意提升路径 $\mathsf{lift}(u,p)$ 位于 $\Sigma$-类型 $\sm{x:A}P(x)$ 中；因此它的投影是 $A$ 中的路径，我们期望它是 $p$：
+
+\begin{lem}\label{thm:path-lifting-triangle}
+  对于 $u:P(x)$ 和 $p:x=y$，我们有
+  \[\proj1(\mathsf{lift}(u,p)) = p.\]
+\end{lem}
+
+\begin{proof}
+  由路径归纳留给读者。
+\end{proof}
+
+现在我们可以陈述依赖类型函数的``函子性''版本。
+
+\begin{lem}\label{lem:apd}
+  假设 $f:\prd{x:A}P(x)$，那么对任意路径 $p:x=y$ 我们有
+  \[\apdfunc{f}(p):p_*(f(x))=_{P(y)}f(y).\]
+  \indexdef{function!dependent, application to a path of}%
+  \indexdef{path!application of a dependent function to}%
+  \indexdef{application!of dependent function to a path}%
+  \indexdef{action!of a dependent function on a path}%
+\end{lem}
+
+\begin{proof}
+  由路径归纳。
+\end{proof}
+
+名字 $\apdfunc{}$ 代表依赖应用的``\underline{依赖}版本''（dependent \underline{ap}）。
+注意当 $P$ 是常类型族时，$p_*(f(x))$ 等于 $f(x)$，因此 $\apdfunc{f}(p):f(x)=f(y)$ 与 $\apfunc{f}(p)$ 类型相同。
+在这种情况下，它们实际上相等：
+
+\begin{lem}\label{thm:apd-const}
+  当 $P:A\to\type$ 是常类型族 $P(x)\defeq B$ 时，对 $f:A\to B$ 和 $p:x=y$ 我们有
+  \[\apdfunc{f}(p) = \transconst Bp{f(x)} \ct \apfunc{f}(p)\]
+  其中常类型族沿路径的传输是
+  \[\transconst Bpb : \transfib{(\lam{x}B)}{p}{b}=b.\]
+\end{lem}
+
+\begin{proof}
+  由路径归纳。
+\end{proof}
+\index{transport|)}%
+\index{type!family of|)}%
+
+
+\section{同伦与等价}
+\label{sec:basics-equivalences}
+
+\index{homotopy|(defstyle}%
+
+到目前为止，我们已经看到恒等类型 $\id[A]xy$ 如何可以被视为两个元素 $x$ 和 $y$ 之间的\emph{等同}、\emph{路径}或\emph{等价}的类型。
+现在我们研究\emph{函数}之间和\emph{类型}之间``等同''或``相同''的适当概念。
+在\cref{sec:compute-pi,sec:compute-universe}中，我们将看到同伦类型论允许我们把这些与恒等类型的实例等同起来，但在这样做之前我们需要独立地理解它们。
+
+传统上，我们把两个函数视为相同的，如果它们在所有输入上取相等的值。
+在命题即类型的解释下，这建议两个函数 $f$ 和 $g$（可能是依赖类型的）应该相同，如果类型 $\prd{x:A} (f(x)=g(x))$ 有居留元。
+在同伦解释下，这个依赖函数类型由\emph{连续}路径或\emph{函子性}等价组成，因此可以被视为\emph{同伦}或\emph{自然同构}的类型。\index{isomorphism!natural}
+我们将采用这方面的拓扑术语。
+
+\begin{defn} \label{defn:homotopy}
+  设 $f,g:\prd{x:A} P(x)$ 是类型族 $P:A\to\type$ 的两个截面。
+  从 $f$ 到 $g$ 的\define{同伦}是类型
+  \begin{equation*}
+    (f\htpy g) \defeq \prd{x:A} (f(x)=g(x))
+  \end{equation*}
+  的依赖函数。
+\end{defn}
+
+注意同伦与等同 $(f=g)$ 不一样。
+然而，在\cref{sec:compute-pi}中我们将引入一个公理使同伦和等同``等价''。
+
+以下证明留给读者。
+
+\begin{lem}\label{lem:homotopy-props}
+  同伦是每个依赖函数类型 $\prd{x:A} P(x)$ 上的等价关系。
+  即，我们有以下类型的元素
+  \begin{gather*}
+    \prd{f:\prd{x:A} P(x)} (f\htpy f)\\
+    \prd{f,g:\prd{x:A} P(x)} (f\htpy g) \to (g\htpy f)\\
+    \prd{f,g,h:\prd{x:A} P(x)} (f\htpy g) \to (g\htpy h) \to (f\htpy h).
+  \end{gather*}
+\end{lem}
+
+\index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+\index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+正如类型论中的函数自动是``函子''一样，同伦自动是
+\index{naturality of homotopies@``naturality'' of homotopies}%
+``自然变换''。
+我们只对非依赖函数 $f,g:A\to B$ 陈述并证明这一点；在\cref{ex:dep-htpy-natural}中我们请读者把它推广到依赖函数。
+
+回忆对于 $f:A\to B$ 和 $p:\id[A]xy$，我们可以写 $\ap f p$ 来表示 $\apfunc{f} (p)$。
+
+\begin{lem}\label{lem:htpy-natural}
+  假设 $H:f\htpy g$ 是函数 $f,g:A\to B$ 之间的同伦，设 $p:\id[A]xy$。那么我们有
+  \begin{equation*}
+    H(x)\ct\ap{g}{p}=\ap{f}{p}\ct H(y).
+  \end{equation*}
+  我们也可以把这画成一个交换图：\index{diagram}
+  \begin{align*}
+    \xymatrix{
+      f(x) \ar@{=}[r]^{\ap fp} \ar@{=}[d]_{H(x)} & f(y) \ar@{=}[d]^{H(y)} \\
+      g(x) \ar@{=}[r]_{\ap gp} & g(y)
+    }
+  \end{align*}
+\end{lem}
+\begin{proof}
+  由归纳，我们可以假设 $p$ 是 $\refl x$。
+  由于 $\apfunc{f}$ 和 $\apfunc g$ 在自反性上计算，在这种情况下我们必须证明的是
+  \[ H(x) \ct \refl{g(x)} = \refl{f(x)} \ct H(x). \]
+  但这是成立的，因为两边都等于 $H(x)$。
+\end{proof}
+
+\begin{cor}\label{cor:hom-fg}
+  设 $H : f \htpy \idfunc[A]$ 是一个同伦，其中 $f : A \to A$。那么对任意 $x : A$ 我们有 \[ H(f(x)) = \ap f{H(x)}. \]
+\end{cor}
+\noindent
+这里 $f(x)$ 表示 $f$ 对 $x$ 的普通应用，而 $\ap f{H(x)}$ 表示 $\apfunc{f}(H(x))$。
+\begin{proof}
+由 $H$ 的自然性，以下路径图交换：
+\begin{align*}
+\xymatrix@C=3pc{
+ffx \ar@{=}[r]^-{\ap f{Hx}} \ar@{=}[d]_{H(fx)} & fx \ar@{=}[d]^{Hx} \\
+fx \ar@{=}[r]_-{Hx} & x
+}
+\end{align*}
+即，$\ap f{H x} \ct H x = H(f x) \ct H x$。
+我们现在可以用 $\opp{(H x)}$ 进行须化来消去 $H x$，得到
+\[ \ap f{H x}
+= \ap f{H x} \ct H x \ct \opp{(H x)}
+= H(f x) \ct H x \ct \opp{(H x)}
+= H(f x)
+\]
+如所要求的（省略了一些结合律路径）。
+\end{proof}
+
+当然，像函数的函子性（\cref{lem:ap-functor}）一样，\cref{lem:htpy-natural}中的等式是满足其自身相容性定律的路径，依此类推。
+
+\index{homotopy|)}%
+
+\index{equivalence|(}%
+转向类型，从传统视角可以说函数 $f:A\to B$ 是一个\emph{同构}，如果存在函数 $g:B\to A$ 使得复合 $f\circ g$ 和 $g\circ f$ 都逐点等于恒等，即使得 $f \circ g \htpy \idfunc[B]$ 且 $g\circ f \htpy \idfunc[A]$。
+\indexsee{homotopy!equivalence}{equivalence}%
+从同伦视角来看这应该称为\emph{同伦等价}，从范畴视角来看应该称为\emph{（高阶）群胚的等价}。
+然而，当做证明相关的数学时，
+\index{mathematics!proof-relevant}%
+对应的类型
+\begin{equation}
+  \sm{g:B\to A} \big((f \circ g \htpy \idfunc[B]) \times (g\circ f \htpy \idfunc[A])\big)\label{eq:qinvtype}
+\end{equation}
+行为不好。
+例如，对于单个函数 $f:A\to B$，~\eqref{eq:qinvtype}可能有多个不相等的居留元。
+（这与高阶范畴论中的观察密切相关，即通常需要考虑\emph{伴随}等价\index{adjoint!equivalence}而不是普通等价。）
+由于这个原因，我们给~\eqref{eq:qinvtype}以下历史上准确但听起来略带贬义的名字。
+
+\begin{defn}\label{defn:quasi-inverse}
+  对于函数 $f:A\to B$，$f$ 的\define{拟逆}
+  \indexdef{quasi-inverse}%
+  \indexsee{function!quasi-inverse of}{quasi-inverse}%
+  是一个三元组 $(g,\alpha,\beta)$，由函数 $g:B\to A$ 和同伦 $\alpha:f\circ g\htpy \idfunc[B]$ 及 $\beta:g\circ f\htpy \idfunc[A]$ 组成。
+\end{defn}
+
+\symlabel{qinv}
+因此，~\eqref{eq:qinvtype}是 \emph{$f$ 的拟逆的类型}；我们可以把它记作 $\qinv(f)$。
+
+\begin{eg}\label{eg:idequiv}
+  \index{identity!function}%
+  \index{function!identity}%
+  恒等函数 $\idfunc[A]:A\to A$ 有一个拟逆，由 $\idfunc[A]$ 本身给出，连同由 $\alpha(y) \defeq \refl{y}$ 和 $\beta(x) \defeq \refl{x}$ 定义的同伦。
+\end{eg}
+
+\begin{eg}\label{eg:concatequiv}
+  对任意 $p:\id[A]xy$ 和 $z:A$，函数
+  \begin{align*}
+    (p\ct \blank)&:(\id[A]yz) \to (\id[A]xz) \qquad\text{和}\\
+    (\blank \ct p)&:(\id[A]zx) \to (\id[A]zy)
+  \end{align*}
+  有拟逆，分别由 $(\opp p \ct \blank)$ 和 $(\blank \ct \opp p)$ 给出；见\cref{ex:equiv-concat}。
+\end{eg}
+
+\begin{eg}\label{thm:transportequiv}
+  对任意 $p:\id[A]xy$ 和 $P:A\to\type$，函数
+  \[\transfib{P}{p}{\blank}:P(x) \to P(y)\]
+  有一个拟逆，由 $\transfib{P}{\opp p}{\blank}$ 给出；这由\cref{thm:transport-concat}得出。
+\end{eg}
+
+\symlabel{basics-isequiv}\symlabel{basics:iso}
+一般来说，我们只在类型 $A$ 和 $B$``行为像集合''（见\cref{sec:basics-sets}）的特殊情况下使用\emph{同构}
+\index{isomorphism!of sets}
+这个词（以及类似的词如\emph{双射}，和相关记号 $A\cong B$）。
+\index{bijection}
+在这种情况下，类型~\eqref{eq:qinvtype}是没有问题的。
+我们将为改进的概念 $\isequiv (f)$ 保留\emph{等价}这个词，它具有以下性质：%
+\begin{enumerate}
+\item 对每个 $f:A\to B$ 有一个函数 $\qinv(f) \to \isequiv (f)$。\label{item:be1}
+\item 类似地，对每个 $f$ 我们有 $\isequiv (f) \to \qinv(f)$；因此两者逻辑等价（见\cref{sec:pat}）。\label{item:be2}
+\item 对任意两个居留元 $e_1,e_2:\isequiv(f)$ 我们有 $e_1=e_2$。\label{item:be3}
+\end{enumerate}
+在\cref{cha:equivalences}中我们将看到有许多不同的 $\isequiv(f)$ 定义满足这三个性质，但它们都是等价的。
+现在，为了使读者相信这样的东西存在，我们只提及最容易的定义：
+\begin{equation}\label{eq:isequiv-invertible}
+  \isequiv(f) \;\defeq\;
+  \Parens{\sm{g:B\to A} (f\circ g \htpy \idfunc[B])}
+  \times
+  \Parens{\sm{h:B\to A} (h\circ f \htpy \idfunc[A])}.
+\end{equation}
+我们现在可以为这个定义证明~\ref{item:be1}和~\ref{item:be2}。
+函数 $\qinv(f) \to \isequiv (f)$ 容易定义，把 $(g,\alpha,\beta)$ 映到 $(g,\alpha,g,\beta)$。
+在另一方向，给定 $(g,\alpha,h,\beta)$，令 $\gamma$ 为复合同伦
+\[ g \overset{\beta}{\htpy} h\circ f\circ g \overset{\alpha}{\htpy} h, \]
+意思是 $\gamma(x) \defeq \opp{\beta(g(x))} \ct \ap{h}{\alpha(x)}$。
+现在定义 $\beta':g\circ f\htpy \idfunc[A]$ 为 $\beta'(x) \defeq \gamma(f(x)) \ct \beta(x)$。
+那么 $(g,\alpha,\beta'):\qinv(f)$。
+
+这个定义的性质~\ref{item:be3}证明起来也不太难，但它需要识别笛卡尔积和依赖对类型的恒等类型，我们将在\cref{sec:compute-cartprod,sec:compute-sigma}中讨论。
+因此，我们也推迟它；见\cref{sec:biinv}。
+此时，要带走的主要东西是有一个行为良好的类型，我们可以读作``$f$ 是一个等价''，而且我们可以通过展示它的拟逆来证明 $f$ 是等价。
+在实践中，这是证明函数是等价的最常见方式。
+
+按照证明相关的哲学，
+\index{mathematics!proof-relevant}%
+从 $A$ 到 $B$ 的\emph{等价}被定义为函数 $f:A\to B$ 连同 $\isequiv (f)$ 的一个居留元，即它是等价的证明。
+我们写 $(\eqv A B)$ 表示从 $A$ 到 $B$ 的等价的类型，即类型
+\begin{equation}\label{eq:eqv}
+  (\eqv A B) \defeq \sm{f:A\to B} \isequiv(f).
+\end{equation}
+上面的性质~\ref{item:be3}将确保如果两个等价作为函数相等（即底层的 $A\to B$ 的元素相等），那么它们作为等价也相等（见\cref{sec:compute-sigma}）。
+因此，我们经常滥用记号并模糊等价与其底层函数之间的区别。
+例如，如果我们有函数 $f:A\to B$ 并且知道 $e:\isequiv(f)$，我们可以写 $f:\eqv A B$，而不是 $\tup{f}{e}$。
+或者反过来，如果我们有等价 $g:\eqv A B$，给定 $a:A$ 时我们可以写 $g(a)$，而不是 $(\proj1 g)(a)$。
+
+我们以如下观察作结：
+
+\begin{lem}\label{thm:equiv-eqrel}
+  类型等价是 \type 上的等价关系。
+  更具体地：
+  \begin{enumerate}
+  \item 对任意 $A$，恒等函数 $\idfunc[A]$ 是等价；因此 $\eqv A A$。
+  \item 对任意 $f:\eqv A B$，我们有等价 $f^{-1} : \eqv B A$。
+  \item 对任意 $f:\eqv A B$ 和 $g:\eqv B C$，我们有 $g\circ f : \eqv A C$。
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  恒等函数显然是其自身的拟逆；因此它是等价。
+
+  如果 $f:A\to B$ 是等价，那么它有拟逆，比如说 $f^{-1}:B\to A$。
+  那么 $f$ 也是 $f^{-1}$ 的拟逆，所以 $f^{-1}$ 是等价 $B\to A$。
+
+  最后，给定 $f:\eqv A B$ 和 $g:\eqv B C$ 带拟逆 $f^{-1}$ 和 $g^{-1}$，那么对任意 $a:A$ 我们有 $f^{-1} g^{-1} g f a = f^{-1} f a = a$，对任意 $c:C$ 我们有 $g f f^{-1} g^{-1} c = g g^{-1} c = c$。
+  因此 $f^{-1} \circ g^{-1}$ 是 $g\circ f$ 的拟逆，所以后者是等价。
+\end{proof}
+
+\index{equivalence|)}%
+
+
+\section{类型构造子的高阶群胚结构}
+\label{sec:computational}
+
+在\cref{cha:typetheory}中，我们引入了许多构造新类型的方式：笛卡尔积、不交并、依赖积、依赖和等。
+在\cref{sec:equality,sec:functors,sec:fibrations}中，我们看到同伦类型论中\emph{所有}类型都像空间或高阶群胚那样行为。
+我们在本章剩余部分的目标是明确这种高阶结构在\cref{cha:typetheory}中定义的特定类型情况下如何表现。
+
+事实证明，对于许多类型 $A$，相等类型 $\id[A]xy$ 可以被刻画为，到等价为止，用构造 $A$ 的数据来表达。
+例如，如果 $A$ 是笛卡尔积 $B\times C$，且 $x\jdeq (b,c)$ 和 $y\jdeq(b',c')$，那么我们有等价
+\begin{equation}\label{eq:prodeqv}
+  \eqv{\big((b,c)=(b',c')\big)}{\big((b=b')\times (c=c')\big)}.
+\end{equation}
+用更传统的语言说，两个有序对相等当且仅当它们的分量相等（但等价~\eqref{eq:prodeqv}说的比这更多）。
+恒等类型的高阶结构也可以用这些等价来表达；例如，对之间的两个相等的连接对应于成对的连接。
+
+类似地，当类型族 $P:A\to\type$ 使用\cref{cha:typetheory}中的类型构造规则逐纤维构建时，运算 $\transfib{P}{p}{\blank}$ 可以被刻画为，到同伦为止，用进入 $P$ 的数据上的对应运算来表达。
+例如，如果 $P(x) \jdeq B(x)\times C(x)$，那么我们有
+\[\transfib{P}{p}{(b,c)} = \big(\transfib{B}{p}{b},\transfib{C}{p}{c}\big).\]
+
+最后，类型构造规则也是函子性的，如果函数 $f$ 从这种函子性构建，那么运算 $\apfunc f$ 和 $\apdfunc f$ 可以基于进入 $f$ 的数据上的对应运算来计算。
+例如，如果 $g:B\to B'$ 和 $h:C\to C'$ 且我们定义 $f:B\times C \to B'\times C'$ 为 $f(b,c)\defeq (g(b),h(c))$，那么模等价~\eqref{eq:prodeqv}，我们可以把 $\apfunc f$ 等同于``$(\apfunc g,\apfunc h)$''。
+
+接下来的几节（\crefrange{sec:compute-cartprod}{sec:compute-nat}）将致力于为所有基本类型构造规则陈述并证明这类定理，每个基本类型构造子一节。
+这里我们遇到了当前可用类型论中某种明显的不足；
+正如后面章节将变得清晰的，如果这些恒等类型、传输等的刻画是\emph{判断上的}\index{judgmental equality}等式，似乎会更方便和直观。
+然而，在\cref{cha:typetheory}中呈现的理论中，恒等类型通过它们的归纳原理为所有类型统一定义，所以我们不能``重新定义''它们在不同类型是不同的东西。
+因此，本章要讨论的特定类型的刻画大部分是我们必须发现和证明的\emph{定理}，如果可能的话。
+
+实际上，\cref{cha:typetheory}的类型论不足以证明两个类型构造子所需的定理：$\Pi$-类型和宇宙。
+由于这个原因，我们被迫在类型论中引入公理，以使那些``定理''成立。
+从类型论上讲，\emph{公理}（参见\cref{sec:axioms}）是一个``原子''元素，被声明居留某个指定的类型，而没有规定其行为的规则，除了与它所居留的类型相关的规则。
+\index{axiom!versus rules}%
+
+\index{function extensionality}%
+\indexsee{extensionality, of functions}{function extensionality}
+\index{univalence axiom}%
+$\Pi$-类型的公理（\cref{sec:compute-pi}）对类型论学家来说是熟悉的：它叫做\emph{函数外延性}，（大致）陈述如果两个函数在\cref{sec:basics-equivalences}意义下同伦，那么它们相等。
+然而，宇宙的公理（\cref{sec:compute-universe}）是同伦类型论的新贡献，归功于 Voevodsky：它叫做\emph{泛等公理}，（大致）陈述如果两个类型在\cref{sec:basics-equivalences}意义下等价，那么它们相等。
+我们已经在导论中评论过这个公理；它将在本书中扮演非常重要的角色。%
+\footnote{我们选择把这些原理作为公理引入，但可能有其他方式来表述它们成立的类型论。
+  见本章的注释。}
+
+重要的是要注意，不是\emph{所有}恒等类型都可以通过对类型构造的归纳来``确定''。
+反例包括大多数非平凡的高阶归纳类型（见\cref{cha:hits,cha:homotopy}）。
+例如，计算类型 $\Sn^n$（见\cref{sec:circle}）的恒等类型等价于计算球面的高阶同伦群，这是代数拓扑中深刻且重要的研究领域。
+
+
+\section{笛卡尔积类型}
+\label{sec:compute-cartprod}
+
+\index{type!product|(}%
+给定类型 $A$ 和 $B$，考虑笛卡尔积类型 $A \times B$。
+对于任意元素 $x,y:A\times B$ 和路径 $p:\id[A\times B]{x}{y}$，通过函子性我们可以提取路径 $\ap{\proj1}p:\id[A]{\proj1(x)}{\proj1(y)}$ 和 $\ap{\proj2}p:\id[B]{\proj2(x)}{\proj2(y)}$。
+因此，我们有函数
+\begin{equation}\label{eq:path-prod}
+  (\id[A\times B]{x}{y}) \to (\id[A]{\proj1(x)}{\proj1(y)}) \times (\id[B]{\proj2(x)}{\proj2(y)}).
+\end{equation}
+
+\begin{thm}\label{thm:path-prod}
+  对任意 $x$ 和 $y$，函数~\eqref{eq:path-prod}是等价。
+\end{thm}
+
+从逻辑上读，这说两个对相等当且仅当它们分量相等。从范畴论上读，这说积群胚中的态射是成对的态射。从同伦论上读，这说积空间中的路径是成对的路径。
+
+\begin{proof}
+  我们需要一个反方向的函数：
+  \begin{equation}
+    (\id[A]{\proj1(x)}{\proj1(y)}) \times (\id[B]{\proj2(x)}{\proj2(y)}) \to (\id[A\times B]{x}{y}). \label{eq:path-prod-inverse}
+  \end{equation}
+  通过笛卡尔积的归纳规则，我们可以假设 $x$ 和 $y$ 都是对，即对某些 $a,a':A$ 和 $b,b':B$ 有 $x\jdeq (a,b)$ 和 $y\jdeq (a',b')$。
+  在这种情况下，我们需要的是函数
+  \begin{equation*}
+    (\id[A]{a}{a'}) \times (\id[B]{b}{b'}) \to \big(\id[A\times B]{(a,b)}{(a',b')}\big).
+  \end{equation*}
+  现在通过对其定义域中的笛卡尔积进行归纳，我们可以假设给定 $p:a=a'$ 和 $q:b=b'$。
+  而通过两次路径归纳，我们可以假设 $a\jdeq a'$ 且 $b\jdeq b'$ 且 $p$ 和 $q$ 都是自反性。
+  但在这种情况下，我们有 $(a,b)\jdeq(a',b')$，所以我们可以取输出也是自反性。
+
+  剩下要证明~\eqref{eq:path-prod-inverse}是~\eqref{eq:path-prod}的拟逆。
+  这是一系列简单的归纳，但必须按正确的顺序进行。
+
+  在一个方向，让我们从 $r:\id[A\times B]{x}{y}$ 开始。
+  我们首先对 $r$ 进行路径归纳以假设 $x\jdeq y$ 且 $r$ 是自反性。
+  在这种情况下，由于 $\apfunc{\proj1}$ 和 $\apfunc{\proj2}$ 由路径归纳定义，~\eqref{eq:path-prod}把 $r\jdeq \refl{x}$ 映到对 $(\refl{\proj1x},\refl{\proj2x})$。
+  现在通过对 $x$ 的归纳，我们可以假设 $x\jdeq (a,b)$，使得这是 $(\refl a, \refl b)$。
+  因此，~\eqref{eq:path-prod-inverse}把它按定义映到 $\refl{(a,b)}$，它（在我们当前的假设下）是 $r$。
+
+  在另一方向，如果我们从 $s:(\id[A]{\proj1(x)}{\proj1(y)}) \times (\id[B]{\proj2(x)}{\proj2(y)})$ 开始，那么我们首先对 $x$ 和 $y$ 进行归纳以假设它们是对 $(a,b)$ 和 $(a',b')$，然后对 $s:(\id[A]{a}{a'}) \times (\id[B]{b}{b'})$ 进行归纳将其归约为对 $(p,q)$，其中 $p:a=a'$ 且 $q:b=b'$。
+  现在通过对 $p$ 和 $q$ 的归纳，我们可以假设它们是自反性 $\refl a$ 和 $\refl b$，在这种情况下~\eqref{eq:path-prod-inverse}给出 $\refl{(a,b)}$，然后~\eqref{eq:path-prod}把我们带回 $(\refl a,\refl b)\jdeq (p,q)\jdeq s$。
+\end{proof}
+
+特别地，我们已经证明~\eqref{eq:path-prod}有逆~\eqref{eq:path-prod-inverse}，我们可以把它记作
+\symlabel{defn:pairpath}
+\[
+\pairpath : (\id{\proj{1}(x)}{\proj{1}(y)}) \times (\id{\proj{2}(x)}{\proj{2}(y)}) \to (\id x y).
+\]
+注意这的一个特例给出了积的命题唯一性原理\index{uniqueness!principle, propositional!for product types}：$z = (\proj1(z),\proj2(z))$。
+
+把 \pairpath 视为 $\id x y$ 的\emph{构造子}或\emph{引入规则}会很有帮助，类似于 $A\times B$ 本身的``配对''构造子，它在给定 $a:A$ 和 $b:B$ 时引入对 $(a,b)$。
+从这个角度，~\eqref{eq:path-prod}的两个分量：
+\begin{align*}
+  \projpath{1} &: (\id{x}{y}) \to (\id{\proj{1}(x)}{\proj{1} (y)})\\
+  \projpath{2} &: (\id{x}{y}) \to (\id{\proj{2}(x)}{\proj{2} (y)})
+\end{align*}
+是\emph{消除子}或\emph{消除规则}，类似于积类型的投影 $\proj1$ 和 $\proj2$。
+
+类似地，见证~\eqref{eq:path-prod-inverse}是~\eqref{eq:path-prod}的拟逆的两个同伦分别由\emph{命题计算规则}组成：
+\index{computation rule!propositional!for identities between pairs}%
+\begin{align*}
+  {\projpath{1}{(\pairpath(p, q)})}
+  &= %_{(\id{\proj{1} x}{\proj{1} y})}
+  {p} \\
+  {\projpath{2}{(\pairpath(p,q)})}
+  &= %_{(\id{\proj{2} x}{\proj{2} y})}
+  {q}
+\end{align*}
+其中 $p:\id{\proj{1} x}{\proj{1} y}$ 且 $q:\id{\proj{2} x}{\proj{2} y}$，
+以及\emph{命题唯一性原理}：
+\index{uniqueness!principle, propositional!for identities between pairs}%
+\[
+\id{r}{\pairpath(\projpath{1} (r), \projpath{2} (r)) }
+\qquad\text{对于 } r : \id[A \times B] x y.
+\]
+
+我们还可以逐分量刻画 $A\times B$ 中路径的自反性、逆和复合：
+\begin{align*}
+  {\refl{(z : A \times B)}}
+  &= {\pairpath (\refl{\proj{1} z},\refl{\proj{2} z})} \\
+  {\opp{p}}
+  &= {\pairpath \big(\opp{\projpath{1} (p)},\, \opp{\projpath{2} (p)}\big)} \\
+  {{p \ct q}}
+  &= {\pairpath \big({\projpath{1} (p)} \ct {\projpath{1} (q)},\,{\projpath{2} (p)} \ct {\projpath{2} (q)}\big)}.
+\end{align*}
+或者换种写法：
+\begin{alignat*}{2}
+  \projpath{i}(\refl{(z : A \times B)}) &= \refl{\proj{i} z} &\qquad (i=1,2)\\
+  \pairpath(\opp p, \opp q) &= \opp{\pairpath(p,q)}\\
+  \pairpath(p\ct q, p'\ct q') &= \pairpath(p,p') \ct \pairpath(q,q').
+\end{alignat*}
+所有这些等式都可以通过对给定路径进行路径归纳然后返回自反性来推导。
+对于\cref{sec:equality}中考虑的其余高阶群胚结构也是如此，尽管插入足够多的相容性路径以得到能类型检查的等式开始变得乏味。
+例如，如果我们用 $\ctassoc(p,q,r)$ 表示\cref{thm:omg}\ref{item:omg4}中路径的逆，用 $\pairct(p,q,p',q')$ 表示上面显示的最后一个路径，那么对任意 $u,v,z,w:A\times B$ 和适当类型的 $p,q,r,p',q',r'$ 我们有
+\begin{equation*}
+  \begin{array}{l}
+    \pairct(p\ct q, r, p'\ct q', r') \\
+    \ct\;  (\pairct(p,q,p',q') \rightwhisker \pairpath(r,r')) \\
+    \ct\;  \ctassoc(\pairpath(p,p'),\pairpath(q,q'),\pairpath(r,r'))\\
+    =
+    \begin{array}[t]{l}
+      \apfunc{\pairpath}({\pairpath(\ctassoc(p,q,r),\ctassoc(p',q',r'))})\\
+      \ct\; \pairct(p, q\ct r, p', q'\ct r')\\
+      \ct\; (\pairpath(p,p') \leftwhisker \pairct(q,r,q',r')).
+    \end{array}
+  \end{array}
+\end{equation*}
+幸运的是，我们永远不需要使用任何这样的高维相容性。
+
+\index{transport!in product types}%
+现在我们考虑在类型族的逐点积中的传输。
+给定类型族 $A, B : Z \to \type$，我们滥用记号写 $A\times B:Z\to \type$ 表示由 $(A\times B)(z) \defeq A(z) \times B(z)$ 定义的类型族。
+现在给定 $p : \id[Z]{z}{w}$ 和 $x : A(z) \times B(z)$，我们可以沿着 $p$ 传输 $x$ 得到 $A(w)\times B(w)$ 的一个元素。
+
+\begin{thm}\label{thm:trans-prod}
+  在上述情况下，我们有
+  \[
+  \id[A(w) \times B(w)]
+  {\transfib{A\times B}px}
+  {(\transfib{A}{p}{\proj{1}x}, \transfib{B}{p}{\proj{2}x})}.
+  \]
+\end{thm}
+\begin{proof}
+  通过路径归纳，我们可以假设 $p$ 是自反性，在这种情况下我们有
+  \begin{align*}
+    \transfib{A\times B}px&\jdeq x\\
+    \transfib{A}{p}{\proj{1}x}&\jdeq \proj1x\\
+    \transfib{B}{p}{\proj{2}x}&\jdeq \proj2x.
+  \end{align*}
+  因此，剩下要证明 $x = (\proj1 x, \proj2x)$。
+  但这正是积类型的命题唯一性原理，如我们上面所述，它从\cref{thm:path-prod}推出。
+\end{proof}
+
+最后，我们考虑 $\apfunc{}$ 在笛卡尔积下的函子性。
+假设给定类型 $A,B,A',B'$ 和函数 $g:A\to A'$ 和 $h:B\to B'$；则我们可以定义函数 $f:A\times B\to A'\times B'$ 为 $f(x) \defeq (g(\proj1x),h(\proj2x))$。
+
+\begin{thm}\label{thm:ap-prod}
+  在上述情况下，给定 $x,y:A\times B$ 和 $p:\proj1x=\proj1y$ 和 $q:\proj2x=\proj2y$，我们有
+  \[ \id[(f(x)=f(y))]{\ap{f}{\pairpath(p,q)}} {\pairpath(\ap{g}{p},\ap{h}{q})}. \]
+\end{thm}
+\begin{proof}
+  首先注意上述等式是良类型的。
+  一方面，由于 $\pairpath(p,q):x=y$ 我们有 $\ap{f}{\pairpath(p,q)}:f(x)=f(y)$。
+  另一方面，由于 $\proj1(f(x))\jdeq g(\proj1x)$ 且 $\proj2(f(x))\jdeq h(\proj2x)$，我们也有 $\pairpath(\ap{g}{p},\ap{h}{q}):f(x)=f(y)$。
+
+  现在，通过归纳，我们可以假设 $x\jdeq(a,b)$ 且 $y\jdeq(a',b')$，在这种情况下我们有 $p:a=a'$ 和 $q:b=b'$。
+  因此，通过路径归纳，我们可以假设 $p$ 和 $q$ 是自反性，在这种情况下所需的等式判断上成立。
+\end{proof}
+
+\index{type!product|)}%
+
+
+\section{$\Sigma$-类型}
+\label{sec:compute-sigma}
+
+\index{type!dependent pair|(}%
+设 $A$ 是类型，$P:A\to\type$ 是类型族。
+回忆 $\Sigma$-类型，或依赖对类型，$\sm{x:A} P(x)$ 是笛卡尔积类型的推广。
+因此，我们期望它的高阶群胚结构也是上一节的推广。
+特别地，它的路径应该是路径对，但需要一些思考才能给出这些路径的正确类型。
+
+假设我们有 $\sm{x:A}P(x)$ 中的路径 $p:w=w'$。
+则我们得到 $\ap{\proj{1}}{p}:\proj{1}(w)=\proj{1}(w')$。
+然而，我们不能直接问 $\proj{2}(w)$ 是否与 $\proj{2}(w')$ 相同，因为它们不必在同一个类型中。
+但我们可以沿着路径 $\ap{\proj{1}}{p}$ 传输\index{transport} $\proj{2}(w)$，这确实给出与 $\proj{2}(w')$ 相同类型的元素。
+通过路径归纳，我们实际上得到路径 $\trans{\ap{\proj{1}}{p}}{\proj{2}(w)}=\proj{2}(w')$。
+
+回忆\cref{lem:mapdep}前面的讨论，
+\narrowequation{
+  \trans{\ap{\proj{1}}{p}}{\proj{2}(w)}=\proj{2}(w')
+}
+可以被视为从 $\proj2(w)$ 到 $\proj2(w')$ 的路径类型，这些路径``位于'' $A$ 中的路径 $\ap{\proj1}{p}$ 之上。
+\index{fibration}%
+\index{total!space}%
+因此，我们说的是全空间中的路径 $w=w'$ 决定（并由之决定）$A$ 中的路径 $p:\proj1(w)=\proj1(w')$ 以及从 $\proj2(w)$ 到 $\proj2(w')$ 的位于 $p$ 之上的路径，这看起来是合理的。
+
+\begin{rmk}\label{rmk:sigma-equality-extraction}
+  注意如果我们有 $x:A$ 和 $u,v:P(x)$ 使得 $(x,u)=(x,v)$，并不能推出 $u=v$ --- 参见\cref{ex:sigma-eq-components-neq}获取反例。
+  我们能得出的只是存在 $p:x=x$ 使得 $\trans p u = v$。
+  这是类型论新手常见的困惑来源，但从拓扑的观点看是有道理的：在纤维化的全空间中，恰好位于同一纤维中的两点之间存在路径 $(x,u)=(x,v)$，并不意味着存在完全\emph{在}那个纤维内部的路径 $u=v$。
+\end{rmk}
+
+下一个定理说明我们也可以反过来进行这个过程。
+因为它是\cref{thm:path-prod}的直接推广，我们将更简洁。
+
+\begin{thm}\label{thm:path-sigma}
+假设 $P:A\to\type$ 是类型 $A$ 上的类型族，设 $w,w':\sm{x:A}P(x)$。则有等价
+\begin{equation*}
+\eqvspaced{(w=w')}{\dsm{p:\proj{1}(w)=\proj{1}(w')} \trans{p}{\proj{2}(w)}=\proj{2}(w')}.
+\end{equation*}
+\end{thm}
+
+\begin{proof}
+我们定义函数
+\begin{equation*}
+f : \prd{w,w':\sm{x:A}P(x)} (w=w') \to \dsm{p:\proj{1}(w)=\proj{1}(w')} \trans{p}{\proj{2}(w)}=\proj{2}(w')
+\end{equation*}
+通过路径归纳，有
+\begin{equation*}
+f(w,w,\refl{w})\defeq(\refl{\proj{1}(w)},\refl{\proj{2}(w)}).
+\end{equation*}
+我们想证明 $f$ 是等价。
+
+在反方向，我们定义
+\begin{narrowmultline*}
+  g : \prd{w,w':\sm{x:A}P(x)}
+      \Parens{\sm{p:\proj{1}(w)=\proj{1}(w')}\trans{p}{\proj{2}(w)}=\proj{2}(w')}
+      \to
+      \narrowbreak
+      (w=w')
+\end{narrowmultline*}
+首先对 $w$ 和 $w'$ 进行归纳，将它们分别拆分为 $(w_1,w_2)$ 和 $(w_1',w_2')$，所以只需证明
+\begin{equation*}
+\Parens{\sm{p:w_1 = w_1'}\trans{p}{w_2}=w_2'} \to ((w_1,w_2)=(w_1',w_2')).
+\end{equation*}
+接下来，给定对 $\sm{p:w_1 = w_1'}\trans{p}{w_2}=w_2'$，我们可以用 $\Sigma$-归纳得到 $p : w_1 = w_1'$ 和 $q : \trans{p}{w_2}=w_2'$。
+对 $p$ 进行归纳，我们有 $q : \trans{(\refl{w_1})}{w_2}=w_2'$，只需证明 $(w_1,w_2)=(w_1,w_2')$。
+但 $\trans{(\refl{w_1})}{w_2} \jdeq w_2$，所以对 $q$ 进行归纳将目标归约为 $(w_1,w_2)=(w_1,w_2)$，我们可以用 $\refl{(w_1,w_2)}$ 证明。
+
+接下来我们证明 $f(g(r))=r$ 对所有 $w$、$w'$ 和 $r$ 成立，其中 $r$ 的类型是
+\[\dsm{p:\proj{1}(w)=\proj{1}(w')} (\trans{p}{\proj{2}(w)}=\proj{2}(w')).\]
+首先，我们通过对归纳拆分对 $w$、$w'$ 和 $r$，如同 $g$ 的定义中那样，然后用两次路径归纳将 $r$ 的两个分量都归约为 \refl{}。
+然后只需证明 $f (g(\refl{w_1},\refl{w_2})) = (\refl{w_1},\refl{w_2})$，这由定义为真。
+
+类似地，为了证明 $g(f(p))=p$ 对所有 $w$、$w'$ 和 $p : w = w'$ 成立，我们可以对 $p$ 进行路径归纳，然后对归纳拆分 $w$，此时只需证明 $g(f (\refl{(w_1,w_2)})) = \refl{(w_1,w_2)}$，这由定义为真。
+
+因此，$f$ 有拟逆，从而是等价。
+\end{proof}
+
+如同我们对笛卡尔积所做的，我们可以推导出一个命题唯一性原理作为特例。
+
+\begin{cor}\label{thm:eta-sigma}
+  \index{uniqueness!principle, propositional!for dependent pair types}%
+  对于 $z:\sm{x:A} P(x)$，我们有 $z = (\proj1(z),\proj2(z))$。
+\end{cor}
+\begin{proof}
+  我们有 $\refl{\proj1(z)} : \proj1(z) = \proj1(\proj1(z),\proj2(z))$，所以由\cref{thm:path-sigma}只需展示路径 $\trans{(\refl{\proj1(z)})}{\proj2(z)} = \proj2(\proj1(z),\proj2(z))$。
+  但两边判断上都等于 $\proj2(z)$。
+\end{proof}
+
+与二元笛卡尔积一样，我们可以把\cref{thm:path-sigma}的反方向视为引入形式 (\pairpath{}{})，正方向视为消除形式 (\projpath{1} 和 \projpath{2})，而等价给出它们的命题计算规则和唯一性原理。
+
+注意\cref{thm:path-lifting}中定义的 $p:x=y$ 在 $u:P(x)$ 处的提升路径 $\mathsf{lift}(u,p)$ 可以与引入形式的特例等同：
+\[\pairpath(p,\refl{\trans p u}):(x,u) = (y,\trans p u).\]
+\index{transport!in dependent pair types}%
+这出现在 $\Sigma$-类型上传输作用的陈述中，它也是二元笛卡尔积作用的推广：
+
+\begin{thm}\label{transport-Sigma}
+  假设我们有类型族
+  %
+  \begin{equation*}
+    P:A\to\type
+    \qquad\text{和}\qquad
+    Q:\Parens{\sm{x:A} P(x)}\to\type.
+  \end{equation*}
+  %
+  则我们可以构造 $A$ 上的类型族，定义为
+  \begin{equation*}
+    x \mapsto \sm{u:P(x)} Q(x,u).
+  \end{equation*}
+  对任意路径 $p:x=y$ 和任意 $(u,z):\sm{u:P(x)} Q(x,u)$ 我们有
+  \begin{equation*}
+    \trans{p}{u,z}=\big(\trans{p}{u},\,\trans{\pairpath(p,\refl{\trans pu})}{z}\big).
+  \end{equation*}
+\end{thm}
+
+\begin{proof}
+直接由路径归纳。
+\end{proof}
+
+我们把\cref{thm:ap-prod}的推广陈述和证明留给读者（参见\cref{ex:ap-sigma}），以及逐分量刻画 $\Sigma$-类型的自反性、逆和复合。
+
+\index{type!dependent pair|)}%
+
+
+\section{单位类型}
+\label{sec:compute-unit}
+
+\index{type!unit|(}%
+平凡情况有时也很重要，所以我们简要提一下单位类型~\unit 的情况。
+
+\begin{thm}\label{thm:path-unit}
+  对任意 $x,y:\unit$，我们有 $\eqv{(x=y)}{\unit}$。
+\end{thm}
+
+开始这个证明时可能很想对 $x$ 和 $y$ 进行 $\unit$-归纳，将问题归约为 $\eqv{(\ttt=\ttt)}{\unit}$。
+然而，此时我们会陷入困境，因为我们无法对 $p:\ttt=\ttt$ 进行路径归纳。
+因此，我们尽可能地处理一般的 $x$ 和 $y$，只在最后时刻才通过归纳将它们归约为 $\ttt$。
+
+\begin{proof}
+  函数 $(x=y)\to\unit$ 容易定义，把所有东西都映到 \ttt。
+  反过来，对任意 $x,y:\unit$ 我们可以通过归纳假设 $x\jdeq \ttt\jdeq y$。
+  在这种情况下我们有 $\refl{\ttt}:x=y$，产生常函数 $\unit\to(x=y)$。
+
+  为了证明这些是互逆的，首先考虑元素 $u:\unit$。
+  我们可以假设 $u\jdeq\ttt$，但这也是复合 $\unit \to (x=y)\to\unit$ 的结果。
+
+  另一方面，假设给定 $p:x=y$。
+  通过路径归纳，我们可以假设 $x\jdeq y$ 且 $p$ 是 $\refl x$。
+  然后我们可以假设 $x$ 是 \ttt，在这种情况下复合 $(x=y) \to \unit\to(x=y)$ 把 $p$ 映到 $\refl x$，即~$p$。
+\end{proof}
+
+特别地，$\unit$ 的任意两个元素相等。
+我们把用引入、消除、计算和唯一性规则表述这个等价留给读者。
+\index{transport!in unit type}%
+\unit 的传输引理就是常类型族的传输引理（\cref{thm:trans-trivial}）。
+
+\index{type!unit|)}%
+
+
+\section{$\Pi$-类型与函数外延性公理}
+\label{sec:compute-pi}
+
+\index{type!dependent function|(}%
+\index{type!function|(}%
+\index{homotopy|(}%
+给定类型 $A$ 和类型族 $B : A \to \type$，考虑依赖函数类型 $\prd{x:A}B(x)$。
+我们期望 $\prd{x:A} B(x)$ 中从 $f$ 到 $g$ 的路径类型 $f=g$ 等价于逐点路径的类型：\index{pointwise!equality of functions}
+\begin{equation}
+  \eqvspaced{(\id{f}{g})}{\Parens{\prd{x:A} (\id[B(x)]{f(x)}{g(x)})}}.\label{eq:path-forall}
+\end{equation}
+从传统角度，这说在每一点相等的两个函数作为函数相等。
+\index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+从拓扑角度，这说函数空间中的路径等同于连续同伦。
+\index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+从范畴论角度，这说函子范畴中的同构是同构的自然族。
+
+然而，与前面几节的情况不同，\cref{cha:typetheory}中呈现的基本类型论不足以证明~\eqref{eq:path-forall}。
+我们能说的只是存在某个函数
+\begin{equation}\label{eq:happly}
+  \happly : (\id{f}{g}) \to \prd{x:A} (\id[B(x)]{f(x)}{g(x)})
+\end{equation}
+它容易通过路径归纳定义。
+因此，目前我们假设：
+
+\begin{axiom}[函数外延性]\label{axiom:funext}
+  \indexsee{axiom!function extensionality}{function extensionality}%
+  \indexdef{function extensionality}%
+  对任意 $A$、$B$、$f$ 和 $g$，函数~\eqref{eq:happly}是等价。
+\end{axiom}
+
+我们将在后面的章节看到这个公理既从泛等性推出（参见\cref{sec:compute-universe,sec:univalence-implies-funext}），也从区间类型推出（参见\cref{sec:interval}和\cref{ex:funext-from-interval}）。
+
+特别地，\cref{axiom:funext}蕴含~\eqref{eq:happly}有拟逆
+\[
+\funext : \Parens{\prd{x:A} (\id{f(x)}{g(x)})} \to {(\id{f}{g})}.
+\]
+这个函数也被称为``函数外延性''。
+如同我们在\cref{sec:compute-cartprod}中对 $\pairpath$ 所做的，我们可以把 $\funext$ 视为 $\id f g$ 类型的\emph{引入规则}。
+从这个角度，$\happly$ 是\emph{消除规则}，而见证 $\funext$ 是 $\happly$ 的拟逆的同伦成为命题计算规则\index{computation rule!propositional!for identities between functions}
+\[
+\id{\happly({\funext{(h)}},x)}{h(x)} \qquad\text{对于 }h:\prd{x:A} (\id{f(x)}{g(x)})
+\]
+和命题唯一性原理\index{uniqueness!principle!for identities between functions}：
+\[
+\id{p}{\funext (x \mapsto \happly(p,{x}))} \qquad\text{对于 } p: \id f g.
+\]
+
+我们也可以计算 $\Pi$-类型中的恒等、逆和复合；它们简单地由逐点运算给出：\index{pointwise!operations on functions}
+\begin{align*}
+\refl{f} &= \funext(x \mapsto \refl{f(x)}) \\
+\opp{\alpha} &= \funext (x \mapsto \opp{\happly (\alpha,x)})  \\
+{\alpha} \ct \beta &= \funext (x \mapsto {\happly({\alpha},x) \ct \happly({\beta},x)}).
+\end{align*}
+第一个等式从 $\happly$ 的定义推出，而第二个和第三个是简单的路径归纳。
+
+因为非依赖函数类型 $A\to B$ 是依赖函数类型 $\prd{x:A} B(x)$（当 $B$ 不依赖于 $x$）的特例，我们上面说的一切在非依赖情况下也适用。
+\index{transport!in function types}%
+然而，传输规则在非依赖情况下稍微简单一些。
+给定类型 $X$，路径 $p:\id[X]{x_1}{x_2}$，类型族 $A,B:X\to \type$，和函数 $f : A(x_1) \to B(x_1)$，我们有
+\begin{align}\label{eq:transport-arrow}
+  \transfib{A\to B}{p}{f} &=
+  \Big(x \mapsto \transfib{B}{p}{f(\transfib{A}{\opp p}{x})}\Big)
+\end{align}
+其中 $A\to B$ 滥用地表示由以下定义的类型族 $X\to \type$：
+\[(A\to B)(x) \defeq (A(x)\to B(x)).\]
+换句话说，当我们沿着路径 $p:x_1=x_2$ 传输函数 $f:A(x_1)\to B(x_1)$ 时，我们得到函数 $A(x_2)\to B(x_2)$，它把参数沿 $p$ 反向传输（在类型族 $A$ 中），应用 $f$，然后把结果沿 $p$ 正向传输（在类型族 $B$ 中）。
+这可以通过路径归纳容易地证明。
+
+\index{transport!in dependent function types}%
+传输依赖函数类似，但更复杂。
+假设给定 $X$ 和 $p$ 如前，类型族 $A:X\to \type$ 和 $B:\prd{x:X} (A(x)\to\type)$，以及依赖函数 $f : \prd{a:A(x_1)} B(x_1,a)$。
+则对于 $a:A(x_2)$，我们有
+\begin{narrowmultline*}
+  \transfib{\Pi_A(B)}{p}{f}(a) = \narrowbreak
+  \Transfib{\widehat{B}}{\opp{(\pairpath(\opp{p},\refl{ \trans{\opp p}{a} }))}}{f(\transfib{A}{\opp p}{a})}
+\end{narrowmultline*}
+其中 $\Pi_A(B)$ 和 $\widehat{B}$ 分别表示类型族
+\begin{equation}\label{eq:transport-arrow-families}
+\begin{array}{rclcl}
+\Pi_A(B) &\defeq& \big(x\mapsto \prd{a:A(x)} B(x,a) \big) &:& X\to \type\\
+\widehat{B} &\defeq& \big(w \mapsto B(\proj1w,\proj2w) \big) &:& \big(\sm{x:X} A(x)\big) \to \type.
+\end{array}
+\end{equation}
+如果这些公式看起来有点吓人，不要担心细节。
+基本思想与非依赖函数类型相同：我们反向传输参数，应用函数，然后正向传输结果。
+
+现在回忆对于一般的类型族 $P:X\to\type$，在\cref{sec:functors}中我们定义了在 $p:\id[X]xy$ 之上从 $u:P(x)$ 到 $v:P(y)$ 的\emph{依赖路径}的类型为 $\id[P(y)]{\trans{p}{u}}{v}$。
+当 $P$ 是函数类型的族时，有一种等价的方式来表示它，这通常更方便。
+\index{path!dependent!in function types}
+
+\begin{lem}\label{thm:dpath-arrow}
+  给定类型族 $A,B:X\to\type$ 和 $p:\id[X]xy$，以及 $f:A(x)\to B(x)$ 和 $g:A(y)\to B(y)$，我们有等价
+  \[ \eqvspaced{ \big(\trans{p}{f} = {g}\big) } { \prd{a:A(x)}  (\trans{p}{f(a)} = g(\trans{p}{a})) }. \]
+  此外，如果 $q:\trans{p}{f} = {g}$ 在这个等价下对应于 $\widehat q$，则对于 $a:A(x)$，路径
+  \[ \happly(q,\trans p a) : (\trans p f)(\trans p a) = g(\trans p a)\]
+  等于连接路径 $i\ct j\ct k$，其中
+  \begin{itemize}
+  \item $i:(\trans p f)(\trans p a) = \trans p {f (\trans {\opp p}{\trans p a})}$ 来自~\eqref{eq:transport-arrow}，
+  \item $j:\trans p {f (\trans {\opp p}{\trans p a})} = \trans p {f(a)}$ 来自\cref{thm:transport-concat,thm:omg}，且
+  \item $k:\trans p {f(a)}= g(\trans p a)$ 是 $\widehat{q}(a)$。
+  \end{itemize}
+\end{lem}
+\begin{proof}
+  通过路径归纳，我们可以假设 $p$ 是自反性，在这种情况下所需的等价归约为函数外延性。
+  第二个陈述然后从函数外延性的计算规则推出。
+\end{proof}
+
+一般来说，我们经常想要考虑路径的连接，其中每条路径都来自某个先前证明的引理或假设的对象，用给连接中的每条路径命名的方式来描述这些可能相当乏味，如同我们在上面的第二个陈述中所做的那样。
+因此，我们采用以熟悉的数学风格写这种连接的约定，即``带有理由的等式链''，并允许我们省略读者容易填补的理由。
+例如，\cref{thm:dpath-arrow}中的路径 $i\ct j\ct k$ 会这样写：
+  \begin{align*}
+    (\trans p f)(\trans p a)
+    &= \trans p {f (\trans {\opp p}{\trans p a})}
+    \tag{由~\eqref{eq:transport-arrow}}\\
+    &= \trans p {f(a)}\\
+    &= g(\trans p a).
+    \tag{由 $\widehat{q}$}
+  \end{align*}
+在普通数学中，这样的等式链只是证明两个东西相等。
+我们通过用它来描述它们之间的一条\emph{特定}路径来增强这一点。
+
+像往常一样，有一个依赖函数版本的\cref{thm:dpath-arrow}，类似但更复杂。
+\index{path!dependent!in dependent function types}
+
+\begin{lem}\label{thm:dpath-forall}
+  给定类型族 $A:X\to\type$ 和 $B:\prd{x:X} A(x)\to\type$ 和 $p:\id[X]xy$，以及 $f:\prd{a:A(x)} B(x,a)$ 和 $g:\prd{a:A(y)} B(y,a)$，我们有等价
+  \[ \eqvspaced{ \big(\trans{p}{f} = {g}\big) } { \Parens{\prd{a:A(x)}  \transfib{\widehat{B}}{\pairpath(p,\refl{\trans pa})}{f(a)} = g(\trans{p}{a}) } } \]
+  其中 $\widehat{B}$ 如~\eqref{eq:transport-arrow-families}。
+\end{lem}
+
+我们把这个的证明和表述合适的计算规则留给读者。
+
+\index{homotopy|)}%
+\index{type!dependent function|)}%
+\index{type!function|)}%
+
+
+\section{宇宙与泛等公理}
+\label{sec:compute-universe}
+
+\index{type!universe|(}%
+\index{equivalence|(}%
+给定两个类型 $A$ 和 $B$，我们可以把它们视为某个宇宙类型 \type 的元素，从而形成恒等类型 $\id[\type]AB$。
+如导论中所述，\emph{泛等性}就是把 $\id[\type]AB$ 与从 $A$ 到 $B$ 的等价类型 $(\eqv AB)$（我们在\cref{sec:basics-equivalences}中描述过）等同起来。
+我们通过以下典范函数来实现这个等同。
+
+\begin{lem}\label{thm:idtoeqv}
+  对于类型 $A,B:\type$，存在某个函数，
+  \begin{equation}\label{eq:uidtoeqv}
+    \idtoeqv : (\id[\type]AB) \to (\eqv A B),
+  \end{equation}
+  定义见证明。
+\end{lem}
+\begin{proof}
+  我们可以通过对相等的归纳直接构造它，但以下描述更方便。
+  \index{identity!function}%
+  \index{function!identity}%
+  注意恒等函数 $\idfunc[\type]:\type\to\type$ 可以被视为由宇宙 \type 索引的类型族；它把每个类型 $X:\type$ 赋给类型 $X$ 本身。
+  （当被视为纤维化时，它的全空间是``有点类型''的类型 $\sm{A:\type}A$；另见\cref{sec:object-classification}。）
+  因此，给定路径 $p:A =_\type B$，我们有传输\index{transport}函数 $\transf{p}:A \to B$。
+  我们声称 $\transf{p}$ 是等价。
+  但通过归纳，只需假设 $p$ 是 $\refl A$，在这种情况下 $\transf{p} \jdeq \idfunc[A]$，由\cref{eg:idequiv}它是等价。
+  因此，我们可以定义 $\idtoeqv(p)$ 为 $\transf{p}$（连同上述它是等价的证明）。
+\end{proof}
+
+我们想说 \idtoeqv 是等价。
+然而，与函数类型的 $\happly$ 一样，\cref{cha:typetheory}中描述的类型论不足以保证这一点。
+因此，与函数外延性一样，我们把这个性质表述为公理：Voevodsky 的\emph{泛等公理}。
+
+\begin{axiom}[泛等性]\label{axiom:univalence}
+  \indexdef{univalence axiom}%
+  \indexsee{axiom!univalence}{univalence axiom}%
+  对任意 $A,B:\type$，函数~\eqref{eq:uidtoeqv}是等价。
+\end{axiom}
+
+因此特别地，我们有
+  \[
+\eqv{(\id[\type]{A}{B})}{(\eqv A B)}.
+\]
+
+从技术上讲，泛等公理是关于特定宇宙类型 $\UU$ 的陈述。
+如果宇宙 $\UU$ 满足这个公理，我们说它是\define{泛等的}。
+\indexdef{type!universe!univalent}%
+\indexdef{univalent universe}%
+除非另有说明（例如在\cref{sec:univalence-implies-funext}中），我们将假设\emph{所有}宇宙都是泛等的。
+
+\begin{rmk}
+  对于泛等公理，重要的是我们使用如\cref{sec:basics-equivalences}中描述的``好的'' $\isequiv$ 版本来定义 $\eqv AB$，而不是（比如说）定义为 $\sm{f:A\to B} \qinv(f)$。
+  参见\cref{ex:qinv-univalence}。
+\end{rmk}
+
+特别地，泛等性意味着\emph{等价的类型可以被等同}。
+如同我们在前面几节所做的，把这个等价分解为以下几部分是有用的：
+%
+\symlabel{ua}
+\begin{itemize}
+\item {(\id[\type]{A}{B})}的引入规则，记为 $\ua$，表示``泛等公理''：
+  \[
+  \ua : ({\eqv A B}) \to (\id[\type]{A}{B}).
+  \]
+\item 消除规则，即 $\idtoeqv$，
+  \[
+  \idtoeqv \jdeq \transfibf{X \mapsto X} : (\id[\type]{A}{B}) \to (\eqv A B).
+  \]
+\item 命题计算规则\index{computation rule!propositional!for univalence}，
+  \[
+  \transfib{X \mapsto X}{\ua(f)}{x} = f(x).
+  \]
+\item 命题唯一性原理：\index{uniqueness!principle, propositional!for univalence}
+  对任意 $p : \id A B$，
+  \[
+  \id{p}{\ua(\transfibf{X \mapsto X}(p))}.
+  \]
+\end{itemize}
+%
+我们也可以把宇宙中相等的自反性、连接和逆与等价上的对应运算等同起来：
+\begin{align*}
+  \refl{A} &= \ua(\idfunc[A]) \\
+  \ua(f) \ct \ua(g) &= \ua(g\circ f) \\
+  \opp{\ua(f)} &= \ua(f^{-1}).
+\end{align*}
+第一个等式成立是因为 $\idfunc[A] = \idtoeqv(\refl{A})$ 由 \idtoeqv 的定义，且 \ua 是 \idtoeqv 的逆。
+对于第二个，如果我们定义 $p \defeq \ua(f)$ 和 $q\defeq \ua(g)$，则我们有
+\[ \ua(g\circ f) = \ua(\idtoeqv(q) \circ \idtoeqv(p)) = \ua(\idtoeqv(p\ct q)) = p\ct q\]
+使用\cref{thm:transport-concat}和 $\idtoeqv$ 的定义。
+第三个类似。
+
+以下观察是\cref{thm:transport-compose}的特例，在应用泛等公理时经常有用。
+
+\begin{lem}\label{thm:transport-is-ap}
+  对任意类型族 $B:A\to\type$ 和 $x,y:A$，路径 $p:x=y$ 和 $u:B(x)$，我们有
+  \begin{align*}
+    \transfib{B}{p}{u} &= \transfib{X\mapsto X}{\apfunc{B}(p)}{u}\\
+    &= \idtoeqv(\apfunc{B}(p))(u).
+  \end{align*}
+\end{lem}
+
+\index{equivalence|)}%
+\index{type!universe|)}%
+
+
+\section{恒等类型}
+\label{sec:compute-paths}
+
+\index{type!identity|(}%
+正如类型 \id[A]{a}{a'} 被刻画到同构，对每个 $A$ 有单独的``定义''，路径之间的路径类型 \id[{\id[A]{a}{a'}}]{p}{q}（其中 $p,q : \id[A]{a}{a'}$）没有简单的刻画。
+然而，我们其他的一般类定理确实扩展到恒等类型，例如它们保持等价的事实。
+
+\begin{thm}\label{thm:paths-respects-equiv}
+  如果 $f : A \to B$ 是等价，则对所有 $a,a':A$，
+  \[\apfunc{f} : (\id[A]{a}{a'}) \to (\id[B]{f(a)}{f(a')})\]
+  也是等价。
+\end{thm}
+\begin{proof}
+  设 $\opp f$ 是 $f$ 的拟逆，带同伦
+  %
+  \begin{equation*}
+    \alpha:\prd{b:B} (f(\opp f(b))=b)
+    \qquad\text{和}\qquad
+    \beta:\prd{a:A} (\opp f(f(a)) = a).
+  \end{equation*}
+  %
+  $\apfunc{f}$ 的拟逆本质上是
+  \[\apfunc{\opp f} : (\id{f(a)}{f(a')}) \to (\id{\opp f(f(a))}{\opp f(f(a'))}).\]
+  然而，为了从 $\apfunc{\opp f}(q)$ 得到 $\id[A]{a}{a'}$ 的元素，我们必须在两侧连接路径 $\opp{\beta_a}$ 和 $\beta_{a'}$。
+  为了证明这给出 $\apfunc{f}$ 的拟逆，一方面我们必须证明对任意 $p:\id[A]{a}{a'}$ 有
+  \[ \opp{\beta_a} \ct \apfunc{\opp f}(\apfunc{f}(p)) \ct \beta_{a'} = p. \]
+  这从 $\apfunc{}$ 的函子性和同伦的自然性推出，\cref{lem:ap-functor,lem:htpy-natural}。
+  另一方面，我们必须证明对任意 $q:\id[B]{f(a)}{f(a')}$ 有
+  \[ \apfunc{f}\big( \opp{\beta_a} \ct \apfunc{\opp f}(q) \ct \beta_{a'} \big) = q. \]
+  这个证明稍微复杂一些，但每一步仍然是\cref{lem:ap-functor,lem:htpy-natural}的应用（或简单地消去逆路径）：
+  \begin{align*}
+    \apfunc{f}\big( \narrowamp\opp{\beta_a} \ct \apfunc{\opp f}(q) \ct \beta_{a'} \big) \narrowbreak
+    &= \opp{\alpha_{f(a)}} \ct {\alpha_{f(a)}} \ct
+    \apfunc{f}\big( \opp{\beta_a} \ct \apfunc{\opp f}(q) \ct \beta_{a'} \big)
+    \ct \opp{\alpha_{f(a')}} \ct {\alpha_{f(a')}}\\
+    &= \opp{\alpha_{f(a)}} \ct
+    \apfunc f \big(\apfunc{\opp f}\big(\apfunc{f}\big( \opp{\beta_a} \ct \apfunc{\opp f}(q) \ct \beta_{a'} \big)\big)\big)
+    \ct {\alpha_{f(a')}}\\
+    &= \opp{\alpha_{f(a)}} \ct
+    \apfunc f \big(\beta_a \ct \opp{\beta_a} \ct \apfunc{\opp f}(q) \ct \beta_{a'} \ct \opp{\beta_{a'}} \big)
+    \ct {\alpha_{f(a')}}\\
+    &= \opp{\alpha_{f(a)}} \ct
+    \apfunc f (\apfunc{\opp f}(q))
+    \ct {\alpha_{f(a')}}\\
+    &= q.\qedhere
+  \end{align*}
+\end{proof}
+
+因此，如果对某个类型 $A$ 我们有 $\id[A]{a}{a'}$ 的完全刻画，类型 $\id[{\id[A]{a}{a'}}]{p}{q}$ 也随之确定。
+例如：
+\begin{itemize}
+\item 路径 $p = q$，其中 $p,q : \id[A \times B]{w}{w'}$，等价于路径对
+  \[\id[{\id[A]{\proj{1} w}{\proj{1} w'}}]{\projpath{1}{p}}{\projpath{1}{q}}
+  \quad\text{和}\quad
+  \id[{\id[B]{\proj{2} w}{\proj{2} w'}}]{\projpath{2}{p}}{\projpath{2}{q}}.
+  \]
+\item 路径 $p = q$，其中 $p,q : \id[\prd{x:A} B(x)]{f}{g}$，等价于同伦
+  \[\prd{x:A} (\id[f(x)=g(x)] {\happly(p)(x)}{\happly(q)(x)}).\]
+\end{itemize}
+
+\index{transport!in identity types}%
+接下来我们考虑在路径族中的传输，即在 $C:A\to\type$ 中的传输，其中每个 $C(x)$ 是恒等类型。
+最简单的情况是 $C(x)$ 是 $A$ 本身中的路径类型，可能有一个端点固定。
+
+\begin{lem}\label{cor:transport-path-prepost}
+  对任意 $A$ 和 $a:A$，以及 $p:x_1=x_2$，我们有
+  %
+  \begin{align*}
+    \transfib{x \mapsto (\id{a}{x})} {p} {q} &= q \ct p
+    & &\text{对于 $q:a=x_1$，}\\
+    \transfib{x \mapsto (\id{x}{a})} {p} {q} &= \opp {p} \ct q
+    & &\text{对于 $q:x_1=a$，}\\
+    \transfib{x \mapsto (\id{x}{x})} {p} {q} &= \opp{p} \ct q \ct p
+    & &\text{对于 $q:x_1=x_1$。}
+  \end{align*}
+\end{lem}
+\begin{proof}
+  对 $p$ 进行路径归纳，然后用复合的单位元律。
+\end{proof}
+
+换句话说，用 ${x \mapsto \id{c}{x}}$ 传输是后复合，用 ${x \mapsto \id{x}{c}}$ 传输是逆变的前复合。
+这些可能作为范畴论中协变和逆变 hom-函子 $\hom(c, {\blank})$ 和 $\hom({\blank},c)$ 的函子作用而为人熟知。
+
+类似地，我们可以证明以下\cref{cor:transport-path-prepost}的更一般形式，它与\cref{thm:transport-compose}相关。
+
+\begin{thm}\label{thm:transport-path}
+  对于 $f,g:A\to B$，$p : \id[A]{a}{a'}$ 和 $q : \id[B]{f(a)}{g(a)}$，我们有
+  \begin{equation*}
+    \id[f(a') = g(a')]{\transfib{x \mapsto \id[B]{f(x)}{g(x)}}{p}{q}}
+    {\opp{(\apfunc{f}{p})} \ct q \ct \apfunc{g}{p}}.
+  \end{equation*}
+\end{thm}
+
+因为 $\apfunc{(x \mapsto x)}$ 是恒等函数且 $\apfunc{(x \mapsto c)}$（其中 $c$ 是常数）是 $p \mapsto\refl{c}$，\cref{cor:transport-path-prepost}是特例。
+一个更一般的版本是当 $B$ 可以是 $A$ 上索引的类型族时：
+
+\begin{thm}\label{thm:transport-path2}
+  设 $B : A \to \type$ 和 $f,g : \prd{x:A} B(x)$，$p : \id[A]{a}{a'}$ 和 $q : \id[B(a)]{f(a)}{g(a)}$。
+  则我们有
+  \begin{equation*}
+    \transfib{x \mapsto \id[B(x)]{f(x)}{g(x)}}{p}{q} =
+    \opp{(\apdfunc{f}(p))} \ct \apfunc{(\transfibf{B}{p})}(q) \ct \apdfunc{g}(p).
+  \end{equation*}
+\end{thm}
+
+最后，如\cref{sec:compute-pi}中那样，对于恒等类型的族，依赖路径有另一种等价刻画。
+\index{path!dependent!in identity types}
+
+\begin{thm}\label{thm:dpath-path}
+  对于 $p:\id[A]a{a'}$，$q:a=a$ 和 $r:a'=a'$，我们有
+  \[ \eqvspaced{ \big(\transfib{x\mapsto (x=x)}{p}{q} = r \big) }{ \big( q \ct p = p \ct r \big). } \]
+\end{thm}
+\begin{proof}
+  对 $p$ 进行路径归纳，然后用与单位等式 $q\ct 1 = q$ 和 $r = 1\ct r$ 复合是等价的事实。
+\end{proof}
+
+存在涉及函数应用的更一般等价，类似于\cref{thm:transport-path,thm:transport-path2}。
+
+\index{type!identity|)}%
+
+
+\section{余积}
+\label{sec:compute-coprod}
+
+\index{type!coproduct|(}%
+\index{encode-decode method|(}%
+到目前为止，我们考虑的大多数类型构造子是所谓的\emph{负的}。
+\index{type!negative}\index{negative!type}%
+\index{polarity}%
+直观地说，这意味着它们的元素由其在消除规则下的行为决定：（依赖）对由其投影决定，（依赖）函数由其值决定。
+负类型的恒等类型几乎总是可以直接刻画，连同所有高阶结构，如我们在\crefrange{sec:compute-cartprod}{sec:compute-pi}中所做的。
+宇宙不完全是负类型，但它的恒等类型表现类似：我们有直接的刻画（泛等性）和高阶结构的描述。
+恒等类型本身当然是特例。
+
+现在我们考虑第一个\emph{正}类型构造子的例子。
+\index{type!positive}\index{positive!type}%
+再次非形式地说，正类型是由某些构造子``呈现''的类型，呈现的泛性质\index{presentation!of a positive type by its constructors}由其消除规则表达。
+（从范畴论角度，正类型有``映出''的泛性质，而负类型有``映入''的泛性质。）
+因为用呈现计算一般是不可计算的问题，对于正类型我们不能总是期望恒等类型有直接的刻画。
+然而，在许多特定情况下，刻画或部分刻画确实存在，可以用我们用这个例子介绍的一般方法获得。
+
+（从技术上讲，我们选择的笛卡尔积和 $\Sigma$-类型的呈现也是正的。
+然而，因为这些类型也允许只稍有不同的负呈现，它们的恒等类型有直接的刻画，不需要这里要描述的方法。）
+
+考虑余积类型 $A+B$，它由单射 $\inl:A\to A+B$ 和 $\inr:B\to A+B$``呈现''。
+直观地，我们期望 $A+B$ 不交地包含 $A$ 和 $B$ 的精确副本，所以我们应该有
+\begin{align}
+  {(\inl(a_1)=\inl(a_2))}&\eqvsym {(a_1=a_2)} \label{eq:inlinj}\\
+  {(\inr(b_1)=\inr(b_2))}&\eqvsym {(b_1=b_2)}\\
+  {(\inl(a)= \inr(b))} &\eqvsym {\emptyt}. \label{eq:inlrdj}
+\end{align}
+我们如下证明这一点。
+固定元素 $a_0:A$；我们将刻画类型族
+\begin{equation}
+  (x\mapsto (\inl(a_0)=x)) : A+B \to \type.\label{eq:sumcodefam}
+\end{equation}
+类似的论证会刻画类似的族 $x\mapsto (x = \inr(b_0))$（对任意 $b_0:B$）。
+这些刻画一起蕴含~\eqref{eq:inlinj}--\eqref{eq:inlrdj}。
+
+为了刻画~\eqref{eq:sumcodefam}，我们将定义类型族 $\code:A+B\to\type$ 并证明 $\prd{x:A+B} (\eqv{(\inl(a_0)=x)}{\code(x)})$。
+因为我们想从这推出~\eqref{eq:inlinj}，我们应该有 $\code(\inl(a)) = (a_0=a)$，因为我们也想推出~\eqref{eq:inlrdj}，我们应该有 $\code (\inr(b)) = \emptyt$。
+关键洞察是我们可以用 $A+B$ 的递归原理来\emph{定义} $\code:A+B\to\type$ 由这两个方程：
+\begin{align*}
+  \code(\inl(a)) &\defeq (a_0=a),\\
+  \code(\inr(b)) &\defeq \emptyt.
+\end{align*}
+这是在同伦类型论中进行同伦论时经常使用的证明技术的一个非常简单的例子；参见例如\cref{sec:pi1-s1-intro,sec:general-encode-decode}。
+%
+现在我们可以证明：
+
+\begin{thm}\label{thm:path-coprod}
+  对所有 $x:A+B$ 我们有 $\eqv{(\inl(a_0)=x)}{\code(x)}$。
+\end{thm}
+\begin{proof}
+  以下证明的关键是我们对所有点 $x$ 一起证明，使我们能用余积的消除原理。
+  我们首先定义函数
+  \[ \encode : \prd{x:A+B}{p:\inl(a_0)=x} \code(x) \]
+  通过沿 $p$ 传输自反性：
+  \[ \encode(x,p) \defeq \transfib{\code}{p}{\refl{a_0}}. \]
+  注意 $\refl{a_0} : \code(\inl(a_0))$，因为 $\code(\inl(a_0))\jdeq (a_0=a_0)$ 由 \code 的定义。
+  接下来，我们定义函数
+  \[ \decode : \prd{x:A+B}{c:\code(x)} (\inl(a_0)=x). \]
+  为了定义 $\decode(x,c)$，我们可以首先用 $A+B$ 的消除原理根据 $x$ 是形如 $\inl(a)$ 还是形如 $\inr(b)$ 分情况。
+
+  在第一种情况，$x\jdeq \inl(a)$，则 $\code(x)\jdeq (a_0=a)$，所以 $c$ 是 $a_0$ 和 $a$ 之间的等同。
+  因此，$\apfunc{\inl}(c):(\inl(a_0)=\inl(a))$ 所以我们可以定义这为 $\decode(\inl(a),c)$。
+
+  在第二种情况，$x\jdeq \inr(b)$，则 $\code(x)\jdeq \emptyt$，所以 $c$ 居留空类型。
+  因此，$\emptyt$ 的消除规则产生 $\decode(\inr(b),c)$ 的值。
+
+  这完成了 \decode 的定义；现在我们证明 $\encode(x,{\blank})$ 和 $\decode(x,{\blank})$ 对所有 $x$ 是拟逆。
+  一方面，假设给定 $x:A+B$ 和 $p:\inl(a_0)=x$；我们想证明
+  \narrowequation{
+    \decode(x,\encode(x,p)) = p.
+  }
+  但现在通过（基于的）路径归纳，只需考虑 $x\jdeq\inl(a_0)$ 和 $p\jdeq \refl{\inl(a_0)}$：
+  \begin{align*}
+    \decode(x,\encode(x,p))
+    &\jdeq \decode(\inl(a_0),\encode(\inl(a_0),\refl{\inl(a_0)}))\\
+    &\jdeq \decode(\inl(a_0),\transfib{\code}{\refl{\inl(a_0)}}{\refl{a_0}})\\
+    &\jdeq \decode(\inl(a_0),\refl{a_0})\\
+    &\jdeq \apfunc{\inl}(\refl{a_0})\\
+    &\jdeq \refl{\inl(a_0)}\\
+    &\jdeq p.
+  \end{align*}
+  另一方面，设 $x:A+B$ 和 $c:\code(x)$；我们想证明 $\encode(x,\decode(x,c))=c$。
+  我们可以再次根据 $x$ 分情况。
+  如果 $x\jdeq\inl(a)$，则 $c:a_0=a$ 且 $\decode(x,c)\jdeq \apfunc{\inl}(c)$，所以
+  \begin{align}
+    \encode(x,\decode(x,c))
+    &\jdeq \transfib{\code}{\apfunc{\inl}(c)}{\refl{a_0}}
+    \notag\\
+    &= \transfib{a\mapsto (a_0=a)}{c}{\refl{a_0}}
+    \tag{由\cref{thm:transport-compose}}\\
+    &= \refl{a_0} \ct c
+    \tag{由\cref{cor:transport-path-prepost}}\\
+    &= c. \notag
+  \end{align}
+  最后，如果 $x\jdeq \inr(b)$，则 $c:\emptyt$，所以我们可以得出任何我们想要的结论。
+\end{proof}
+
+\noindent
+当然，如果我们固定 $b_0:B$ 而不是 $a_0:A$，有相应的定理。
+
+特别地，\cref{thm:path-coprod}蕴含对任意 $a : A$ 和 $b : B$ 有函数
+%
+\[ \encode(\inl(a), {\blank}) : (\inl(a_0)=\inl(a)) \to (a_0=a)\]
+%
+和
+%
+\[ \encode(\inr(b), {\blank}) : (\inl(a_0)=\inr(b)) \to \emptyt. \]
+%
+第二个说``$\inl(a_0)$ 不等于 $\inr(b)$''，即 \inl 和 \inr 的像是不交的。第一个的传统解读，其中恒等类型被视为命题，就是 $\inl$ 的单射性。\cref{thm:path-coprod}的完整同伦论陈述给出更多信息：类型 $\inl(a_0)=\inl(a)$ 和 $a_0=a$ 实际上是等价的，$\inr(b_0)=\inr(b)$ 和 $b_0=b$ 也是。
+
+\begin{rmk}\label{rmk:true-neq-false}
+特别地，因为二元类型 $\bool$ 等价于 $\unit+\unit$，我们有 $\bfalse\neq\btrue$。
+\end{rmk}
+
+这个证明说明了描述路径空间的一般方法，我们将经常使用。为了刻画路径空间，第一步是定义比较纤维化``$\code$''，它提供路径的更显式描述。有几种不同的方法证明这样的比较纤维化等价于路径（我们在\cref{sec:pi1-s1-intro}中对同一结果展示几种不同的证明）。我们这里使用的叫做\define{编码-解码方法}：
+\indexdef{encode-decode method}
+关键思想是对纤维化的所有实例一般地定义 $\decode$（即作为函数 $\prd{x:A+B} \code(x) \to (\inl(a_0)=x)$），这样路径归纳可以用来分析 $\decode(x,\encode(x,p))$。
+
+\index{transport!in coproduct types}%
+像往常一样，我们也可以刻画余积类型中传输的作用。
+给定类型~$X$，路径 $p:\id[X]{x_1}{x_2}$，和类型族 $A,B:X\to\type$，我们有
+\begin{align*}
+  \transfib{A+B}{p}{\inl(a)} &= \inl (\transfib{A}{p}{a}),\\
+  \transfib{A+B}{p}{\inr(b)} &= \inr (\transfib{B}{p}{b}),
+\end{align*}
+其中像往常一样，上标中的 $A+B$ 滥用地表示类型族 $x\mapsto A(x)+B(x)$。
+证明是简单的路径归纳。
+
+\index{encode-decode method|)}%
+\index{type!coproduct|)}%
+
+
+\section{自然数}
+\label{sec:compute-nat}
+
+\index{natural numbers|(}%
+\index{encode-decode method|(}%
+我们用编码-解码方法来刻画自然数的路径空间，它也是正类型。
+在这种情况下，我们不是固定一个端点，而是一次刻画双边路径空间。
+因此，恒等的编码是类型族
+\[\code:\N\to\N\to\type,\]
+通过对 \N 的双重递归如下定义：
+\begin{align*}
+  \code(0,0) &\defeq \unit\\
+  \code(\suc(m),0) &\defeq \emptyt\\
+  \code(0,\suc(n)) &\defeq \emptyt\\
+  \code(\suc(m),\suc(n)) &\defeq \code(m,n).
+\end{align*}
+我们也通过递归定义依赖函数 $r:\prd{n:\N} \code(n,n)$，有
+\begin{align*}
+  r(0) &\defeq \ttt\\
+  r(\suc(n)) &\defeq r(n).
+\end{align*}
+
+\begin{thm}\label{thm:path-nat}
+  对所有 $m,n:\N$ 我们有 $\eqv{(m=n)}{\code(m,n)}$。
+\end{thm}
+\begin{proof}
+  我们定义
+  \[ \encode : \prd{m,n:\N} (m=n) \to \code(m,n) \]
+  通过传输，$\encode(m,n,p) \defeq \transfib{\code(m,{\blank})}{p}{r(m)}$。
+  （我们也可以直接通过路径归纳定义 $\encode$，但用传输定义通常使后续计算更容易。）
+  而我们定义
+  \[ \decode : \prd{m,n:\N} \code(m,n) \to (m=n) \]
+  通过对 $m,n$ 的双重归纳。
+  当 $m$ 和 $n$ 都是 $0$ 时，我们需要函数 $\unit \to (0=0)$，我们定义它把所有东西映到 $\refl{0}$。
+  当 $m$ 是后继而 $n$ 是 $0$，或反过来，定义域 $\code(m,n)$ 是 \emptyt，所以 \emptyt 的消除子就够了。
+  当两者都是后继时，我们可以定义 $\decode(\suc(m),\suc(n))$ 为复合
+  %
+  \begin{narrowmultline*}
+    \code(\suc(m),\suc(n))\jdeq\code(m,n)
+    \xrightarrow{\decode(m,n)} \narrowbreak
+    (m=n)
+    \xrightarrow{\apfunc{\suc}}
+    (\suc(m)=\suc(n)).
+  \end{narrowmultline*}
+  %
+  接下来我们证明 $\encode(m,n)$ 和 $\decode(m,n)$ 对所有 $m,n$ 是拟逆。
+
+  一方面，如果我们从 $p:m=n$ 开始，则通过对 $p$ 的归纳只需证明
+  \[\decode(n,n,\encode(n,n,\refl{n}))=\refl{n}.\]
+  但 $\encode(n,n,\refl{n}) \jdeq r(n)$，所以只需证明 $\decode(n,n,r(n)) =\refl{n}$。
+  我们可以通过对 $n$ 的归纳证明这一点。
+  如果 $n\jdeq 0$，则 $\decode(0,0,r(0)) =\refl{0}$ 由 \decode 的定义。
+  在后继的情况，由归纳假设我们有 $\decode(n,n,r(n)) = \refl{n}$，所以只需观察 $\apfunc{\suc}(\refl{n}) \jdeq \refl{\suc(n)}$。
+
+  另一方面，如果我们从 $c:\code(m,n)$ 开始，则我们对 $m$ 和 $n$ 进行双重归纳。
+  如果两者都是 $0$，则 $\decode(0,0,c) \jdeq \refl{0}$，而 $\encode(0,0,\refl{0})\jdeq r(0) \jdeq \ttt$。
+  因此，只需回忆\cref{sec:compute-unit}中 $\unit$ 的每个居留元都等于 \ttt。
+  如果 $m$ 是 $0$ 但 $n$ 是后继，或反过来，则 $c:\emptyt$，所以我们完成了。
+  在两个后继的情况，我们有
+  \begin{multline*}
+    \encode(\suc(m),\suc(n),\decode(\suc(m),\suc(n),c))\\
+    \begin{aligned}
+    &= \encode(\suc(m),\suc(n),\apfunc{\suc}(\decode(m,n,c)))\\
+    &= \transfib{\code(\suc(m),{\blank})}{\apfunc{\suc}(\decode(m,n,c))}{r(\suc(m))}\\
+    &= \transfib{\code(\suc(m),\suc({\blank}))}{\decode(m,n,c)}{r(\suc(m))}\\
+    &= \transfib{\code(m,{\blank})}{\decode(m,n,c)}{r(m)}\\
+    &= \encode(m,n,\decode(m,n,c))\\
+    &= c
+  \end{aligned}
+  \end{multline*}
+  使用归纳假设。
+  （实际上这个证明比必要的更长；参见\cref{ex:n-set}。）
+\end{proof}
+
+特别地，我们有
+\begin{equation}\label{eq:zero-not-succ}
+  \encode(\suc(m),0) : (\suc(m)=0) \to \emptyt
+\end{equation}
+这表明``$0$ 不是任何自然数的后继''。
+我们还有复合
+\begin{narrowmultline}\label{eq:suc-injective}
+  (\suc(m)=\suc(n))
+  \xrightarrow{\encode} \narrowbreak
+  \code(\suc(m),\suc(n))
+  \jdeq \code(m,n) \xrightarrow{\decode} (m=n)
+\end{narrowmultline}
+这表明函数 $\suc$ 是单射的。
+\index{successor}%
+
+我们将在\cref{cha:induction,cha:hits}中研究更一般的正类型。
+在\cref{cha:homotopy}中，我们将看到这里用来刻画余积和 \nat 的恒等类型的同样技术也可以用来计算球面的高阶同伦群。
+
+\index{encode-decode method|)}%
+\index{natural numbers|)}%
+
+
+\section{例子：结构的相等}
+\label{sec:equality-of-structures}
+
+我们现在考虑一个例子来说明类型上的群胚结构与类型构造子之间的相互作用。在导论中我们提到泛等性的一个优点是两个同构的东西是可互换的，意思是涉及一个的每个性质或构造也适用于另一个。常见的``记号滥用''\index{abuse!of notation}变成形式上为真。泛等性本身说等价的类型相等，因此可互换，这包括例如等同同构集合的常见做法。此外，当我们把其他数学对象定义为配备了结构或性质的集合，甚至一般类型时，我们可以从泛等性推导出它们的正确相等概念。我们将在\cref{cha:category-theory}中用一个重要例子说明这一点，在那里我们以范畴的相等是等价、函子的相等是自然同构等方式定义范畴论的基本概念。特别参见\cref{sec:sip}。
+在本节中，我们描述一个来自代数的非常简单的例子。
+
+为简单起见，我们用\emph{半群}作为例子，其中半群是配备了结合的``乘法''运算的类型。同样的思想适用于其他代数结构，如幺半群、群和环。
+回忆\cref{sec:sigma-types,sec:pat}，一种数学结构的定义应该被解释为把这种结构的类型定义为某个迭代 $\Sigma$-类型。
+在半群的情况下这产生如下。
+
+\begin{defn}
+给定类型 $A$，载体\index{carrier}为 $A$ 的\define{半群结构}类型 \semigroupstr{A}
+\indexdef{semigroup!structure}%
+\index{structure!semigroup}%
+\index{associativity!of semigroup operation}%
+定义为
+\[
+\semigroupstr{A} \defeq \sm{m:A \to A \to A} \prd{x,y,z:A} m(x,m(y,z)) = m(m(x,y),z).
+\]
+%
+\define{半群}
+\indexdef{semigroup}%
+是一个类型连同这样的结构：
+%
+\[
+\semigroup \defeq \sm{A:\type} \semigroupstr A
+\]
+\end{defn}
+
+\noindent
+在接下来的两个小节中，我们描述泛等性使得处理这样的半群更容易的两种方式。
+
+\subsection{提升等价}
+
+\index{lifting!equivalences}%
+当不严格地工作时，人们可能会说集合 $A$ 和 $B$ 之间的双射``显然''诱导 $A$ 上的半群结构和 $B$ 上的半群结构之间的同构。用泛等性，这确实是显然的，因为给定类型 $A$ 和 $B$ 之间的等价，我们可以自动从 $A$ 上的半群结构推导出 $B$ 上的半群结构，而且证明这个推导是半群结构的等价。原因是 \semigroupstrsym\ 是类型的族，因此有由 $\mathsf{transport}$ 给出的类型之间路径上的作用：
+\[
+\transfibf{\semigroupstrsym}{(\ua(e))} : \semigroupstr{A} \to \semigroupstr{B}.
+\]
+此外，这个映射是等价，因为 $\transfibf{C}(\alpha)$ 总是等价，其逆是 $\transfibf{C}{(\opp \alpha)}$，参见\cref{thm:transport-concat,thm:omg}。
+
+虽然泛等公理\index{univalence axiom}确保这个映射存在，我们需要使用前面几节证明的关于 $\mathsf{transport}$ 的事实来计算它实际做什么。设 $(m,a)$ 是 $A$ 上的半群结构，我们研究由
+\[
+\transfib{\semigroupstrsym}{\ua(e)}{(m,a)}
+\]
+给出的 $B$ 上的诱导半群结构。
+首先，因为 \semigroupstr{X} 被定义为 $\Sigma$-类型，由\cref{transport-Sigma}，
+\[
+\transfib{\semigroupstrsym}{\ua(e)}{(m,a)} = (m',a')
+\]
+其中 $m'$ 是 $B$ 上的诱导乘法运算
+\begin{flalign*}
+& m' : B \to B \to B \\
+& m'(b_1,b_2) \defeq \transfib{X \mapsto (X \to X \to X)}{\ua(e)}{m}(b_1,b_2)
+\end{flalign*}
+而 $a'$ 是 $m'$ 结合的诱导证明。
+再由\cref{transport-Sigma}，我们有
+\begin{equation}\label{eq:transport-semigroup-step1}
+  \begin{aligned}
+{}&a' :     \mathsf{Assoc}(B,m')\\
+  &a' \defeq \transfib{(X,m) \mapsto \mathsf{Assoc}(X,m)}{(\pairpath(\ua(e),\refl{m'}))}{a},
+  \end{aligned}
+\end{equation}
+其中 $\mathsf{Assoc}(X,m)$ 是类型 $\prd{x,y,z:X} m(x,m(y,z)) = m(m(x,y),z)$。
+由函数外延性，只需研究 $m'$ 应用于参数 $b_1,b_2 : B$ 时的行为。通过两次应用~\eqref{eq:transport-arrow}，我们有 $m'(b_1,b_2)$ 等于
+%
+\begin{narrowmultline*}
+  \transfibf{X \mapsto X}\big(
+      \ua(e), \narrowbreak
+      m(\transfib{X \mapsto X}{\opp{\ua(e)}}{b_1},
+        \transfib{X \mapsto X}{\opp{\ua(e)}}{b_2}
+       )
+   \big).
+\end{narrowmultline*}
+%
+然后，因为 $\ua$ 是 $\transfibf{X\mapsto X}$ 的拟逆，这等于
+\[
+e(m(\opp{e}(b_1), \opp{e}(b_2))).
+\]
+因此，给定 $B$ 的两个元素，诱导乘法 $m'$ 用等价 $e$ 把它们送到 $A$，在 $A$ 中乘它们，然后用 $e$ 把结果带回 $B$，正如人们所期望的。
+
+此外，虽然我们不展示证明，可以计算出 $m'$ 结合的诱导证明（参见\eqref{eq:transport-semigroup-step1}）等于一个函数，把 $b_1,b_2,b_3 : B$ 送到由以下步骤给出的路径：
+\begin{equation}
+  \label{eq:transport-semigroup-assoc}
+  \begin{aligned}
+    m'(m'(b_1,b_2),b_3)
+    &= e(m(\opp{e}(m'(b_1,b_2)),\opp{e}(b_3))) \\
+    &= e(m(\opp{e}(e(m(\opp{e}(b_1),\opp{e}(b_2)))),\opp{e}(b_3))) \\
+    &= e(m(m(\opp{e}(b_1),\opp{e}(b_2)),\opp{e}(b_3))) \\
+    &= e(m(\opp{e}(b_1),m(\opp{e}(b_2),\opp{e}(b_3)))) \\
+    &= e(m(\opp{e}(b_1),\opp{e}(e(m(\opp{e}(b_2),\opp{e}(b_3)))))) \\
+    &= e(m(\opp{e}(b_1),\opp{e}(m'(b_2,b_3)))) \\
+    &= m'(b_1,m'(b_2,b_3)).
+\end{aligned}
+\end{equation}
+这些步骤使用 $m$ 结合的证明 $a$ 和~$e$ 的逆律。从代数角度看，研究一个运算结合的证明的恒等可能看起来奇怪，但如果我们把 $A$ 和 $B$ 想成一般空间，路径之间有非平凡的同伦，这就有意义了。在\cref{cha:logic}中，我们将引入\emph{集合}的概念，它是只有平凡同伦的类型，如果我们考虑集合上的半群结构，则任何两个这样的结合性证明自动相等。
+
+\subsection{半群的相等}
+\label{sec:equality-semigroups}
+
+使用前面几节讨论的路径空间方程，我们可以研究两个半群何时相等。给定半群 $(A,m,a)$ 和 $(B,m',a')$，由\cref{thm:path-sigma}，路径类型
+\narrowequation{
+  (A,m,a) =_\semigroup (B,m',a')
+}
+等于对的类型
+\begin{align*}
+p_1 &: A =_{\type} B \qquad\text{和}\\
+p_2 &: \transfib{\semigroupstrsym}{p_1}{(m,a)} = {(m',a')}.
+\end{align*}
+由泛等性，$p_1$ 是某个等价 $e$ 的 $\ua(e)$。由\cref{thm:path-sigma}、函数外延性和上面对类型族 $\semigroupstrsym$ 中传输的分析，$p_2$ 等价于一对证明，第一个证明
+\begin{equation} \label{eq:equality-semigroup-mult}
+\prd{y_1,y_2:B} e(m(\opp{e}(y_1), \opp{e}(y_2))) = m'(y_1,y_2)
+\end{equation}
+第二个证明 $a'$ 等于\eqref{eq:transport-semigroup-assoc}中从 $a$ 构造的诱导结合性证明。但通过逆的消去，\eqref{eq:equality-semigroup-mult}等价于
+\[
+\prd{x_1,x_2:A} e(m(x_1, x_2)) = m'(e(x_1),e(x_2)).
+\]
+这说 $e$ 与二元运算交换，意思是它把 $A$ 中的乘法（即 $m$）带到 $B$ 中的乘法（即 $m'$）。关于 $a$ 和 $a'$ 的方程也可以做类似的重新安排。因此，半群的相等恰好由载体类型上与半群结构交换的等价组成。
+
+对于一般类型，结合性的证明被认为是半群结构的一部分。然而，如果我们限制到集合类的类型（再次参见\cref{cha:logic}），关于 $a$ 和 $a'$ 的方程平凡为真。此外，在这种情况下，集合之间的等价恰好是双射。因此，我们得到了\emph{半群同构}\index{isomorphism!semigroup}的标准定义：载体集合上保持乘法运算的双射。也可以使用范畴论的同构定义，通过定义\emph{半群同态}\index{homomorphism!semigroup}为保持乘法的映射，并得出半群的相等与两个互逆同态相同的结论；但我们不在这里展示细节；参见\cref{sec:sip}。
+
+结论是，由于泛等性，半群精确地在它们作为代数结构同构时相等。正如我们将在\cref{sec:sip}中看到的，这个结论更一般地适用：在同伦类型论中，数学结构的所有构造自动尊重同构，无需任何繁琐的证明或记号滥用。
+
+
+\section{泛性质}
+\label{sec:universal-properties}
+
+\index{universal!property|(}%
+通过组合前面几节描述的路径计算规则，我们可以证明各种类型构造运算满足预期的泛性质，以同伦方式解释为等价。
+例如，给定类型 $X,A,B$，我们有函数
+\index{type!product}%
+\begin{equation}\label{eq:prod-ump-map}
+  (X\to A\times B) \to (X\to A)\times (X\to B)
+\end{equation}
+定义为 $f \mapsto (\proj1 \circ f, \proj2\circ f)$。
+
+\begin{thm}\label{thm:prod-ump}
+  \index{universal!property!of cartesian product}%
+  \eqref{eq:prod-ump-map}是等价。
+\end{thm}
+\begin{proof}
+  我们定义拟逆把 $(g,h)$ 映到 $\lam{x}(g(x),h(x))$。
+  （从技术上讲，我们使用了笛卡尔积 $(X\to A)\times (X\to B)$ 的归纳原理，归约到对的情况。
+  从现在起我们经常不显式提及就应用这个原理。）
+
+  现在给定 $f:X\to A\times B$，往返复合产生函数
+  \begin{equation}
+    \lam{x} (\proj1(f(x)),\proj2(f(x))).\label{eq:prod-ump-rt1}
+  \end{equation}
+  由\cref{thm:path-prod}，对任意 $x:X$ 我们有 $(\proj1(f(x)),\proj2(f(x))) = f(x)$。
+  因此，由函数外延性，函数~\eqref{eq:prod-ump-rt1}等于 $f$。
+
+  另一方面，给定 $(g,h)$，往返复合产生对 $(\lam{x} g(x),\lam{x} h(x))$。
+  由函数的唯一性原理，这（判断上）等于 $(g,h)$。
+\end{proof}
+
+实际上，我们也有这个泛性质的依赖类型版本。
+假设给定类型 $X$ 和类型族 $A,B:X\to \type$。
+则我们有函数
+\begin{equation}\label{eq:prod-umpd-map}
+  \Parens{\prd{x:X} (A(x)\times B(x))} \to \Parens{\prd{x:X} A(x)} \times \Parens{\prd{x:X} B(x)}
+\end{equation}
+如前定义为 $f \mapsto (\proj1 \circ f, \proj2\circ f)$。
+
+\begin{thm}\label{thm:prod-umpd}
+  \eqref{eq:prod-umpd-map}是等价。
+\end{thm}
+\begin{proof}
+  留给读者。
+\end{proof}
+
+正如 $\Sigma$-类型是笛卡尔积的推广，它们满足这个泛性质的推广版本。
+直接跳到依赖类型版本，假设我们有类型 $X$ 和类型族 $A:X\to \type$ 和 $P:\prd{x:X} A(x)\to\type$。
+则我们有函数
+\index{type!dependent pair}%
+\begin{equation}
+  \label{eq:sigma-ump-map}
+  \Parens{\prd{x:X}\dsm{a:A(x)} P(x,a)} \to
+  \Parens{\sm{g:\prd{x:X} A(x)} \prd{x:X} P(x,g(x))}.
+\end{equation}
+注意如果我们对某个 $B:X\to\type$ 有 $P(x,a) \defeq B(x)$，则~\eqref{eq:sigma-ump-map}归约为~\eqref{eq:prod-umpd-map}。
+
+\begin{thm}\label{thm:ttac}
+  \index{universal!property!of dependent pair type}%
+  \eqref{eq:sigma-ump-map}是等价。
+\end{thm}
+\begin{proof}
+  如前，我们定义拟逆把 $(g,h)$ 映到函数 $\lam{x} (g(x),h(x))$。
+  现在给定 $f:\prd{x:X} \sm{a:A(x)} P(x,a)$，往返复合产生函数
+  \begin{equation}
+    \lam{x} (\proj1(f(x)),\proj2(f(x))).\label{eq:prod-ump-rt2}
+  \end{equation}
+  现在对任意 $x:X$，由\cref{thm:eta-sigma}（$\Sigma$-类型的唯一性原理）我们有
+  %
+  \begin{equation*}
+    (\proj1(f(x)),\proj2(f(x))) = f(x).
+  \end{equation*}
+  %
+  因此，由函数外延性，~\eqref{eq:prod-ump-rt2}等于 $f$。
+  另一方面，给定 $(g,h)$，往返复合产生 $(\lam {x} g(x),\lam{x} h(x))$，如前它判断上等于 $(g,h)$。
+\end{proof}
+
+\index{axiom!of choice!type-theoretic}
+这值得注意，因为~\eqref{eq:sigma-ump-map}的命题即类型解释是``选择公理''。
+如果我们把 $\Sigma$ 读作``存在''把 $\Pi$（有时）读作``对所有''，我们可以把：
+\begin{itemize}
+\item $\prd{x:X} \sm{a:A(x)} P(x,a)$ 读作``对所有 $x:X$ 存在 $a:A(x)$ 使得 $P(x,a)$''，和
+\item $\sm{g:\prd{x:X} A(x)} \prd{x:X} P(x,g(x))$ 读作``存在选择函数 $g:\prd{x:X} A(x)$ 使得对所有 $x:X$ 有 $P(x,g(x))$''。
+\end{itemize}
+因此，\cref{thm:ttac}说不仅选择公理是``真的''，它的前件实际上等价于它的结论。
+（另一方面，经典\index{mathematics!classical}数学家可能发现~\eqref{eq:sigma-ump-map}不携带选择公理的通常含义，因为我们已经指定了 $g$ 的值，没有剩余的选择要做。
+我们将在\cref{sec:axiom-choice}回到这一点。）
+
+上述对类型的泛性质是``映入''的，这从积的范畴论概念中很熟悉。
+然而，对类型也有``映出''的泛性质，可能看起来不那么熟悉。
+在笛卡尔积的情况，非依赖版本简单地表达笛卡尔闭伴随\index{adjoint!functor}：
+\[ \eqvspaced{\big((A\times B) \to C\big)}{\big(A\to (B\to C)\big)}.\]
+这的依赖版本对类型族 $C:A\times B\to \type$ 表述：
+\[ \eqvspaced{\Parens{\prd{w:A\times B} C(w)}}{\Parens{\prd{x:A}{y:B} C(x,y)}}. \]
+这里从右到左的函数就是 $A\times B$ 的归纳原理，而从左到右是在对上求值。
+我们把证明它们是拟逆留给读者。
+对 $\Sigma$-类型也有一个版本：
+\begin{equation}
+  \eqvspaced{\Parens{\prd{w:\sm{x:A} B(x)} C(w)}}{\Parens{\prd{x:A}{y:B(x)} C(x,y)}}.\label{eq:sigma-lump}
+\end{equation}
+再次，从右到左的函数是归纳原理。
+
+一些其他归纳原理也是这类泛性质的一部分。
+例如，路径归纳是如下等价的从右到左方向：
+\index{type!identity}%
+\index{universal!property!of identity type}%
+\begin{equation}
+  \label{eq:path-lump}
+  \eqvspaced{\Parens{\prd{x:A}{p:a=x} B(x,p)}}{B(a,\refl a)}
+\end{equation}
+对任意 $a:A$ 和类型族 $B:\prd{x:A} (a=x) \to\type$。
+然而，带递归的归纳类型，如自然数，有更复杂的泛性质；参见\cref{cha:induction}。
+
+\index{type!limit}%
+\index{type!colimit}%
+\index{limit!of types}%
+\index{colimit!of types}%
+因为\cref{thm:prod-ump}表达笛卡尔积的通常泛性质（在适当的同伦论意义上），有范畴论倾向的读者很可能想知道类型的其他极限和余极限。
+在\cref{ex:coprod-ump}中我们要求读者证明余积类型 $A+B$ 也有预期的泛性质，而 $\unit$（终对象）和 $\emptyt$（初对象）的零元情况很容易。
+\index{type!empty}%
+\index{type!unit}%
+\indexsee{initial!type}{type, empty}%
+\indexsee{terminal!type}{type, unit}%
+
+\indexdef{pullback}%
+对于拉回，预期的显式构造有效：给定 $f:A\to C$ 和 $g:B\to C$，我们定义
+\begin{equation}
+  A\times_C B \defeq \sm{a:A}{b:B} (f(a)=g(b)).\label{eq:defn-pullback}
+\end{equation}
+在\cref{ex:pullback}中我们要求读者验证这一点。
+一些更一般的同伦极限可以用类似方式构造，但对于余极限我们将需要新的成分；参见\cref{cha:hits}。
+
+\index{universal!property|)}%

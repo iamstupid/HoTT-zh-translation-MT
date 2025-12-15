@@ -1,0 +1,370 @@
+% 同伦类型论术语表 / HoTT Glossary
+% 本文件定义了同伦类型论中的标准术语翻译
+%
+% 主要参考来源：
+% - 维基百科中文版 (zh.wikipedia.org)
+% - 香蕉空间 (bananaspace.org)
+% - 知乎 HoTT 相关文章
+
+% ============================================
+% 核心概念 / Core Concepts
+% ============================================
+
+% Homotopy Type Theory (HoTT)   同伦类型论
+% Univalent Foundations         泛等基础
+% Univalence Axiom              泛等公理
+% Univalence                    泛等性
+% Type Theory                   类型论
+% Dependent Type Theory         依赖类型论 / 依值类型论
+% Martin-Löf Type Theory        Martin-Löf 类型论
+
+% ============================================
+% 类型 / Types
+% ============================================
+
+% type                          类型
+% universe                      宇宙
+% universe level                宇宙层级
+% dependent type                依赖类型 / 依值类型
+% dependent function type       依赖函数类型 (Π-类型)
+% dependent pair type           依赖对类型 (Σ-类型)
+% function type                 函数类型
+% product type                  积类型
+% sum type / coproduct type     和类型 / 余积类型
+% identity type                 相等类型 / 恒等类型
+% path type                     路径类型
+% higher inductive type (HIT)   高阶归纳类型
+% inductive type                归纳类型
+% coinductive type              余归纳类型
+% W-type                        W-类型
+% record type                   记录类型
+% sigma type (Σ-type)           Σ-类型 / 依赖和类型
+% pi type (Π-type)              Π-类型 / 依赖积类型
+% empty type                    空类型
+% unit type                     单位类型
+% boolean type                  布尔类型
+% natural number type           自然数类型
+% truncation                    截断
+% propositional truncation      命题截断 / 逻辑截断
+% interval type                 区间类型
+
+% ============================================
+% 同伦论术语 / Homotopy Theory Terms
+% ============================================
+
+% path                          路径 / 道路
+% loop                          回路
+% homotopy                      同伦
+% homotopy equivalence          同伦等价
+% contractible                  可缩的
+% fiber                         纤维
+% fibration                     纤维化
+% n-type                        n-类型
+% set (0-type)                  集合 (0-类型)
+% mere proposition (-1-type)    纯命题 (-1-类型)
+% groupoid                      广群
+% ∞-groupoid                    ∞-广群 / 无穷广群
+% higher groupoid               高阶广群
+% fundamental group             基本群
+% loop space                    回路空间
+% suspension                    纬悬 / 悬垂
+% pushout                       推出
+% pullback                      拉回
+% circle (S¹)                   圆 / 圆周 (S¹)
+% sphere (Sⁿ)                   球面 (Sⁿ)
+% torus                         环面
+% truncation level              截断层级
+% connected                     连通的
+% n-connected                   n-连通的
+% pointed type                  有基点类型
+% base point                    基点
+
+% ============================================
+% 逻辑与命题 / Logic and Propositions
+% ============================================
+
+% proposition                   命题
+% proof                         证明
+% witness                       证人 / 见证
+% evidence                      证据
+% axiom                         公理
+% theorem                       定理
+% lemma                         引理
+% corollary                     推论
+% definition                    定义
+% remark                        注记
+% example                       例
+% exercise                      练习
+% propositional equality        命题相等 / 命题等同
+% judgmental equality           判断相等 / 依判断相等
+% definitional equality         定义相等
+% decidable                     可判定的
+% decidable equality            可判定相等
+% proof irrelevance             证明无关性
+% excluded middle               排中律
+% axiom of choice               选择公理
+% law of double negation        双重否定律
+% propositional extensionality  命题外延性
+% function extensionality       函数外延性
+% judgment                      论断 / 判断
+% context                       语境 / 上下文
+% assumption                    前提
+% hypothesis                    假设
+
+% ============================================
+% 等价与同构 / Equivalences and Isomorphisms
+% ============================================
+
+% equivalence                   等价
+% quasi-inverse                 拟逆
+% bi-invertible map             双可逆映射
+% half-adjoint equivalence      半伴随等价
+% isomorphism                   同构
+% bijection                     双射
+% embedding                     嵌入
+% surjection                    满射
+% injection                     单射
+% retraction                    收缩
+% section                       截面
+
+% ============================================
+% 范畴论 / Category Theory
+% ============================================
+
+% category                      范畴
+% functor                       函子
+% natural transformation        自然变换
+% adjunction                    伴随
+% adjoint functor               伴随函子
+% limit                         极限
+% colimit                       余极限
+% initial object                始对象
+% terminal object               终对象
+% morphism                      态射
+% object                        对象
+% precategory                   预范畴
+% univalent category            泛等范畴
+% strict category               严格范畴
+% wild category                 狂野范畴
+% Rezk completion               Rezk 完备化
+
+% ============================================
+% 集合论 / Set Theory
+% ============================================
+
+% set                           集合
+% subset                        子集
+% power set                     幂集
+% cardinal                      基数
+% ordinal                       序数
+% well-ordering                 良序
+% Zorn's lemma                  佐恩引理
+% cumulative hierarchy          累积层级
+
+% ============================================
+% 实数与分析 / Real Numbers and Analysis
+% ============================================
+
+% real number                   实数
+% Cauchy real                   柯西实数
+% Dedekind cut                  戴德金分割
+% rational number               有理数
+% integer                       整数
+% supremum                      上确界
+% infimum                       下确界
+% limit                         极限
+% continuity                    连续性
+% convergence                   收敛
+
+% ============================================
+% 证明助手 / Proof Assistants
+% ============================================
+
+% Coq                           Coq
+% Agda                          Agda
+% Lean                          Lean
+% proof assistant               证明助手
+% formalization                 形式化
+% mechanized proof              机械化证明
+
+% ============================================
+% 类型论操作 / Type-Theoretic Operations
+% ============================================
+
+% computation rule              计算规则
+% uniqueness principle          唯一性原理
+% elimination rule              消去规则
+% introduction rule             引入规则
+% induction principle           归纳原理
+% recursion principle           递归原理
+% transport                     传输
+% ap (action on paths)          路径作用 (ap)
+% apd (dependent ap)            依赖路径作用 (apd)
+% encode-decode method          编码-解码方法
+% fundamental theorem           基本定理
+% J rule / path induction       J 规则 / 路径归纳
+
+% ============================================
+% 立方类型论 / Cubical Type Theory
+% ============================================
+
+% cubical type theory           立方类型论
+% interval                      区间
+% face                          面
+% composition                   复合
+% Kan operation                 Kan 操作
+% glueing                       粘合
+
+% ============================================
+% 术语对照表 (按英文字母排序)
+% Terminology Cross-Reference (Alphabetical)
+% ============================================
+%
+% A
+% action on paths (ap)          路径作用
+% adjoint functor               伴随函子
+% adjunction                    伴随
+% axiom                         公理
+% axiom of choice               选择公理
+%
+% B
+% base point                    基点
+% bi-invertible map             双可逆映射
+% bijection                     双射
+%
+% C
+% category                      范畴
+% circle                        圆 / 圆周
+% colimit                       余极限
+% computation rule              计算规则
+% connected                     连通的
+% context                       语境
+% contractible                  可缩的
+% coproduct type                余积类型
+%
+% D
+% decidable                     可判定的
+% Dedekind cut                  戴德金分割
+% definitional equality         定义相等
+% dependent type                依赖类型
+%
+% E
+% elimination rule              消去规则
+% embedding                     嵌入
+% empty type                    空类型
+% encode-decode method          编码-解码方法
+% equivalence                   等价
+% excluded middle               排中律
+%
+% F
+% fiber                         纤维
+% fibration                     纤维化
+% function extensionality       函数外延性
+% function type                 函数类型
+% functor                       函子
+% fundamental group             基本群
+%
+% G
+% groupoid                      广群
+%
+% H
+% half-adjoint equivalence      半伴随等价
+% higher inductive type         高阶归纳类型
+% homotopy                      同伦
+% homotopy equivalence          同伦等价
+% Homotopy Type Theory          同伦类型论
+%
+% I
+% identity type                 相等类型
+% induction principle           归纳原理
+% inductive type                归纳类型
+% initial object                始对象
+% injection                     单射
+% interval                      区间
+% introduction rule             引入规则
+% isomorphism                   同构
+%
+% J
+% judgment                      论断
+% judgmental equality           判断相等
+%
+% L
+% lemma                         引理
+% limit                         极限
+% loop                          回路
+% loop space                    回路空间
+%
+% M
+% mere proposition              纯命题
+% morphism                      态射
+%
+% N
+% n-connected                   n-连通的
+% n-type                        n-类型
+% natural number type           自然数类型
+% natural transformation        自然变换
+%
+% O
+% object                        对象
+%
+% P
+% path                          路径
+% path induction                路径归纳
+% path type                     路径类型
+% pi type (Π-type)              Π-类型
+% pointed type                  有基点类型
+% precategory                   预范畴
+% product type                  积类型
+% proof                         证明
+% proof assistant               证明助手
+% proof irrelevance             证明无关性
+% proposition                   命题
+% propositional equality        命题相等
+% propositional extensionality  命题外延性
+% propositional truncation      命题截断
+% pullback                      拉回
+% pushout                       推出
+%
+% Q
+% quasi-inverse                 拟逆
+%
+% R
+% real number                   实数
+% recursion principle           递归原理
+% retraction                    收缩
+%
+% S
+% section                       截面
+% set                           集合
+% sigma type (Σ-type)           Σ-类型
+% sphere                        球面
+% strict category               严格范畴
+% sum type                      和类型
+% supremum                      上确界
+% surjection                    满射
+% suspension                    纬悬
+%
+% T
+% terminal object               终对象
+% theorem                       定理
+% torus                         环面
+% transport                     传输
+% truncation                    截断
+% truncation level              截断层级
+% type                          类型
+% Type Theory                   类型论
+%
+% U
+% uniqueness principle          唯一性原理
+% unit type                     单位类型
+% Univalence Axiom              泛等公理
+% Univalent Foundations         泛等基础
+% univalent category            泛等范畴
+% universe                      宇宙
+% universe level                宇宙层级
+%
+% W
+% W-type                        W-类型
+% well-ordering                 良序
+% wild category                 狂野范畴
+% witness                       证人

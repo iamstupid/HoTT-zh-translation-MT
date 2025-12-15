@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Bash(D:texlivebinwindowsxelatex.exe --version)",
+      "Bash(cmd.exe /c \"D:\\texlive\\bin\\windows\\xelatex.exe --version\")",
+      "Bash(cmd.exe /c \"D:\\texlive\\bin\\windows\\xelatex.exe\" --version)",
+      "Bash(powershell.exe -Command \"& ''D:\\texlive\\bin\\windows\\xelatex.exe'' --version\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''D:\\texlive''\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''D:\\texlive\\2024\\bin\\windows'' | Select-Object -First 10\")",
+      "Bash(powershell.exe -Command \"& ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex\")",
+      "Bash(powershell.exe -Command \"& ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex 2>&1 | Select-Object -Last 50\")",
+      "Bash(powershell.exe -Command \"Select-String -Path main-zh.log -Pattern ''(^!|Error|Warning)'' | Select-Object -First 30\")",
+      "Bash(powershell.exe -Command \"& ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex 2>&1 | Select-Object -Last 30\")",
+      "Bash(powershell.exe -Command \"Select-String -Path main-zh.log -Pattern ''^!'' | Measure-Object | Select-Object -ExpandProperty Count\")",
+      "Bash(powershell.exe -Command \"Select-String -Path main-zh.log -Pattern ''Warning'' | Select-Object -First 15\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''d:\\HoTT book CN Translation\\zh-CN\\main-zh.pdf'' | Select-Object Name, Length, LastWriteTime\")",
+      "Bash(powershell.exe -Command \"& ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex 2>&1 | Out-Null; & ''D:\\texlive\\2024\\bin\\windows\\bibtex.exe'' main-zh 2>&1; & ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex 2>&1 | Out-Null; & ''D:\\texlive\\2024\\bin\\windows\\xelatex.exe'' -interaction=nonstopmode main-zh.tex 2>&1 | Select-Object -Last 20\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem ''d:\\HoTT book CN Translation'' -Filter ''*.bst'' -Recurse | Select-Object FullName\")",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(python:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File fix_quotes.ps1)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd Chinese translation (zh-CN) of the HoTT book\n\n- Add zh-CN directory with machine-translated Chinese version\n- Include translation glossary, macros, and chapter files\n- Remove deprecated .travis.yml (replaced by GitHub Actions)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+    ]
+  }
+}
